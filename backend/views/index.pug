@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>O2ARC Login Interface V2</title>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <link rel="stylesheet" href='/stylesheets/common.css'>
+    <link rel="stylesheet" href='/stylesheets/testing_interface.css'>
+
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+</head>
+
+<body>
+
+    <div id="modal_bg">
+        <div id= "modal" >
+            <h1> Welcome to the
+                
+                <span style="color: red">A</span>
+                <span style="color: green">R</span>
+                <span style="color: blue">C</span> World
+            </h1>
+            <div class="main_page_txt">Press <b>Solve</b> to solve ARC problems <br/>
+                Press <b>Make</b> to make new ARC problems<br/>
+            </div>
+
+            <br>
+            <input type="text" id="user_name" placeholder="please write your name" />
+            <br/>
+
+
+            <a href = "/users" class="btn login_button" id="start_btn">Next</a>
+            <button href = "/users" class="login_button" id="start_btn">Solve</button>
+            <button onclick="start_create()" class="login_button" id="start_btn">Make</button>
+            <br />
+        </div>
+    </div>
+
+</body>
+
+</html>
