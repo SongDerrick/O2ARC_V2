@@ -320,7 +320,7 @@ body {
   
   #modal button {
     /* margin-left: 70px; */
-    margin: auto;
+    
   }
   
   .sidenav {
@@ -443,7 +443,7 @@ body {
     transition-delay: 1s;
   }
   
-  button {
+  a {
   align-items: center;
   background-color: #fff;
   border: 1px solid #000;
@@ -528,8 +528,8 @@ body {
   .login_button {
     border: 0;
     outline: none;
-    font-size: 15px;
-    margin: 30px;
+    font-size: 20px;
+    margin: auto;
     background: white;
     color: black;
     padding: 10px;
