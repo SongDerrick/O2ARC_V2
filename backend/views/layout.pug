@@ -9,6 +9,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="./public/javascritps/common.js"></script>
+    <script src="./public/javascripts/testing_interface.js"></script>
 
     <link rel="stylesheet" href='/stylesheets/common.css'>
     <link rel="stylesheet" href='/stylesheets/testing_interface.css'>
@@ -17,127 +18,88 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
 </head>
 
-<body>
-
-    <div id="continue_modal">
-        <div id="continue_modal_content">
-            <p id="task_result"></p>
-            <hr>
-            <div id="continue_buttons">
-                <button class="testing_button" id="evaluate" onclick="evaluateOthers()">Evaluate other's solution</button>
-                <button class="testing_button" id="repeat_task" onclick="repeatTask()">Repeat Task</button>
-                <button class="testing_button" id="new_task" onclick="newTask()">Next Task</button>
+    <body>
+        <div id="modal_bg">
+            <div id="modal">
+                <div>Welcome to the ARC testing interface. <br /> Choose a task file to start, or click on "Random task" to load one from the ARC project on github.</div>
+                <br />
+                <input type="file" class="load_task"/>
+                <button onclick="randomTask()" id="random_task_btn">Random task</button>
             </div>
         </div>
-    </div>
+        <div id="workspace">
 
-    <div id="task_side_nav" class="sidenav">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeTaskList()">&times;</a>
-        <div id="task_list"></div>
-    </div>
-
-    <div id="ARC_task_side_nav" class="sidenav">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeARCTaskList()">&times;</a>
-        <div id="ARC_task_list"></div>
-    </div>
-
-    <div id="workspace">
-        <div id="demonstration_examples_view">
-            <div id="load_task_control_btns">
-                <label id='task_name' for="random_task_btn">Task name:</label>
-                <input type="file" id="load_task_file_input" class="load_task" style="display: none;" />
-                <button class="testing_button" id="browse_task" onclick="openARCTaskList()">Browse ARC</button>
-                <button class="testing_button" id="browse_task" onclick="openTaskList()">Browse MINI-ARC</button>
-                <button class="testing_button" onclick="next_task()" id="random_task_btn"> Next Task </button>
+            <div id="demonstration_examples_view">
+                <div class="text" id="task_demo_header">Task demonstration</div>
+                <div id="task_preview"></div>
             </div>
 
-            <div class="text" id="task_demo_header">
-              Task demonstration
-            </div>
+            <div id="evaluation_view">
 
-            <div class="preview" id="task_preview">
-            </div>
-        </div>
-
-        <div id="evaluation-input-view">
-            <div class="text">
-                <button class="testing_button" onclick="prevTestInput()">Prev</button>
-                Test input grid <span id="current_test_input_id_display">0</span>
-                  <span id="total_test_input_count_display">0</span>
-                <button class="testing_button" onclick="nextTestInput()">Next</button>
-            </div>
-
-            <div id="evaluation_input">
-                <div id="input_test" class="selectable_grid"></div>
-            </div>
-        </div>
-
-        <div id="evaluation_view">
-            <div id="evaluation_output_editor">
-                <div id="edition_view">
-                    <div id="editor_grid_control_btns">
-                        <div id="resize_control_btns">
-                            <label for="output_grid_size">Change grid size: </label>
-                            <input type="text" id="output_grid_size" class="grid_size_field" name="size" value="5x5">
-                            <button class="testing_button" onclick="resizeOutputGrid()" id="resize_btn">Resize</button>
-                        </div>
-
-                        <button class="testing_button" onclick="copyFromInput()">Copy from input</button>
-                        <button class="testing_button" onclick="resetOutputGrid()">Reset grid</button>
-                        <button class="testing_button" id="tool_clear_selection" name="tool_switching" value="floodfill">Clear Selection</button>
-                        <button onclick="submitSolution()" id="submit_solution_btn">Submit!</button>
+                <div id="evaluation-input-view">
+                    <div class="text">Test input grid <span id="current_test_input_id_display">0</span>/<span id="total_test_input_count_display">0</span>
+                        <button onclick="nextTestInput()">Next test input</button>
                     </div>
 
-                    <div id="output_grid">
-                        <div id="output" class="edition_grid selectable_grid">
-                            <div class="row">
-                                <div class="cell" symbol="0" x="0" y="0"></div>
-                                <div class="cell" symbol="0" x="0" y="1"></div>
-                                <div class="cell" symbol="0" x="0" y="2"></div>
-                                <div class="cell" symbol="0" x="0" y="3"></div>
-                                <div class="cell" symbol="0" x="0" y="4"></div>
-                            </div>
-                            <div class="row">
-                                <div class="cell" symbol="0" x="1" y="0"></div>
-                                <div class="cell" symbol="0" x="1" y="1"></div>
-                                <div class="cell" symbol="0" x="1" y="2"></div>
-                                <div class="cell" symbol="0" x="1" y="3"></div>
-                                <div class="cell" symbol="0" x="1" y="4"></div>
-                            </div>
-                            <div class="row">
-                                <div class="cell" symbol="0" x="2" y="0"></div>
-                                <div class="cell" symbol="0" x="2" y="1"></div>
-                                <div class="cell" symbol="0" x="2" y="2"></div>
-                                <div class="cell" symbol="0" x="2" y="3"></div>
-                                <div class="cell" symbol="0" x="2" y="4"></div>
-                            </div>
-                            <div class="row">
-                                <div class="cell" symbol="0" x="3" y="0"></div>
-                                <div class="cell" symbol="0" x="3" y="1"></div>
-                                <div class="cell" symbol="0" x="3" y="2"></div>
-                                <div class="cell" symbol="0" x="3" y="3"></div>
-                                <div class="cell" symbol="0" x="3" y="4"></div>
-                            </div>
-                            <div class="row">
-                                <div class="cell" symbol="0" x="4" y="0"></div>
-                                <div class="cell" symbol="0" x="4" y="1"></div>
-                                <div class="cell" symbol="0" x="4" y="2"></div>
-                                <div class="cell" symbol="0" x="4" y="3"></div>
-                                <div class="cell" symbol="0" x="4" y="4"></div>
-                            </div>
-                        </div>
+                    <div id="evaluation_input" class="selectable_grid"></div>
+                </div>
+
+                <div id="evaluation_output_editor">
+
+                    <div id="load_task_control_btns">
+                        <label for="load_task_file_input">Load task JSON: </label>
+                        <input type="file" id="load_task_file_input" class="load_task" style="display: none;"/>
+                        <input type="button" value="Browse..." onclick="document.getElementById('load_task_file_input').click();" />
+                        <button onclick="randomTask()" id="random_task_btn"> Random... </button>
+                        <p>
+                        <label id='task_name' for="random_task_btn"> Task name: </label>
                     </div>
 
-                    <div id="toolbar">
-                        <div id="basic_tools">
-                            <input type="radio" id="tool_edit" name="tool_switching" value="edit" class="tool_switching" checked>
-                            <label for="tool_edit" class="tool_label">edit</label>
+                    <div id="edition_view">
+                        <div id="editor_grid_control_btns">
+                            <div id="resize_control_btns">
+                                <label for="output_grid_size">Change grid size: </label>
+                                <input type="text" id="output_grid_size" class="grid_size_field" name="size" value="3x3">
+                                <button onclick="resizeOutputGrid()" id="resize_btn">Resize</button>
+                            </div>
 
-                            <input type="radio" id="tool_select" name="tool_switching" value="select" class="tool_switching">
-                            <label for="tool_select" class="tool_label">select</label>
+                            <button onclick="copyFromInput()">Copy from input</button>
+                            <button onclick="resetOutputGrid()">Reset grid</button>
+                            <button onclick="submitSolution()" id="submit_solution_btn">Submit!</button>
+                        </div>
 
-                            <input type="radio" id="tool_floodfill" name="tool_switching" value="floodfill" class="tool_switching">
-                            <label for="tool_floodfill" class="tool_label">flood fill</label>
+                        <div id="output_grid">
+                            <div class="edition_grid selectable_grid">
+                                <div class="row">
+                                    <div class="cell" symbol="0" x="0" y="0"></div>
+                                    <div class="cell" symbol="0" x="0" y="1"></div>
+                                    <div class="cell" symbol="0" x="0" y="2"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="cell" symbol="0" x="1" y="0"></div>
+                                    <div class="cell" symbol="0" x="1" y="1"></div>
+                                    <div class="cell" symbol="0" x="1" y="2"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="cell" symbol="0" x="2" y="0"></div>
+                                    <div class="cell" symbol="0" x="2" y="1"></div>
+                                    <div class="cell" symbol="0" x="2" y="2"></div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div id="toolbar">
+                            <div>
+                                <input type="radio" id="tool_edit" name="tool_switching" value="edit" checked>
+                                <label for="tool_edit">Edit</label>
+
+                                <input type="radio" id="tool_select" name="tool_switching" value="select">
+                                <label for="tool_select">Select</label>
+
+                                <input type="radio" id="tool_floodfill" name="tool_switching" value="floodfill">
+                                <label for="tool_floodfill">Flood fill</label>
+                            </div>
                         </div>
 
                         <div id="symbol_picker">
@@ -152,63 +114,13 @@
                             <div class="symbol_preview symbol_8" symbol="8"></div>
                             <div class="symbol_preview symbol_9" symbol="9"></div>
                         </div>
-
-                        <div id="movement_tools">
-                            <div>
-                                <button class="extra_tools" id="rotate" onclick="rotateCells()">
-                                    <i class="bi bi-arrow-clockwise" style="font-size: 20px"></i>
-                                </button>
-                                <span class="tooltip" id="tooltip_rotate">rotate clockwise</span>
-                            </div>
-
-                            <div id="object_tools">
-                                <button class="extra_tools" id="flip_horizontal" onclick="reflectY()">
-                                    <i class="bi bi-border-middle" style="font-size: 20px"></i>
-                                </button>
-                                <span class="tooltip" id="tooltip_flip_horizontal">horizontal flip</span>
-                            </div>
-
-                            <div>
-                                <button class="extra_tools" id="flip_vertical" onclick="reflectX()">
-                                    <i class="bi bi-border-center" style="font-size: 20px"></i>
-                                </button>
-                                <span class="tooltip" id="tooltip_flip_vertical">vertical flip</span>
-                            </div>
-
-                            <div>
-                                <button class="extra_tools" id="undo" onclick="undo()">
-                                    <i class="bi bi-arrow-90deg-left" style="font-size: 20px"></i>
-                                </button>
-                                <span class="tooltip" id="tooltip_undo">undo</span>
-                                
-                            </div>
-
-                            <div>
-                                <button class="extra_tools" id="redo"onclick="redo()">
-                                
-                                    <i class="bi bi-arrow-90deg-right" style="font-size: 20px"></i>
-                                </button>
-                                <span class="tooltip" id="tooltip_redo">redo</span>
-                                
-                            </div>
-                        </div>
                     </div>
+
+                    <div id="error_display"></div>
+                    <div id="info_display"></div>
                 </div>
-
-                <div id="error_display"></div>
-                <div id="info_display"></div>
             </div>
         </div>
-
-        <div id="layers">
-            <div class="text">LAYER PANEL<button class="add_layer">ADD LAYER</button></div>
-            <div id="layer_panel">
-                <button id="button1" onclick="addLayer()">create Layer from Selection</button>
-                <button id="button2" onclick="deleteLayer()">delete Layer</button>
-                <p></p>
-            </div>
-        </div>
-    </div>
-</body>
+    </body>
 
 </html>

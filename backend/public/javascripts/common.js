@@ -1,4 +1,3 @@
-const PADDING = 5;
 
 class Grid {
     constructor(height, width, values) {
@@ -18,200 +17,6 @@ class Grid {
     }
 }
 
-class Cell {
-    constructor(r, c, value, selected) {
-        this.row = r;
-        this.col = c;
-        this.val = value;
-        this.selected = selected;
-    }
-
-    setRow(r) {
-        this.row = r;
-    }
-
-    setCol(c) {
-        this.col = c;
-    }
-
-    setVal(val) {
-        this.val = val;
-    }
-
-    select() {
-        this.selected = true;
-    }
-
-    unselect() {
-        this.selected = false;
-    }
-}
-
-class Layer {
-    constructor(cells, z, height, width, id) {
-        if (typeof cells == undefined) {
-            this.cells = new Array();
-        } else {
-            this.cells = cells.filter(cell => cell.val > 0);
-        }
-        this.z = z;
-        this.height = height;
-        this.width = width;
-        this.id = id;
-    }
-
-    updateCell(cells) {
-        this.cells = cells;
-    }
-
-    updateGrid(grid) {
-        this.cells = new Array();
-        for (var r = 0; r < grid.grid.length; r++) {
-            for (var c = 0; c < grid.grid[r].length; c++) {
-                if (grid.grid[r][c] > 0) {
-                    this.cells.push(new Cell(r, c, grid.grid[r][c]));
-                }
-            }
-        }
-    }
-
-    containsCell(r, c) {
-        for (var i = 0; i < this.cells.length; i++) {
-            if (r == this.cells[i].row && c == this.cells[i].col) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    addCell(cell) {
-        for (var i = 0; i < this.cells.length; i++) {
-            if (this.cells[i].row == cell.row && this.cells[i].col == cell.col) {
-                this.cells[i].val = cell.val;
-                return;
-            }
-        }
-        this.cells.push(cell);
-    }
-
-    removeCell(r, c) {
-        var oldSize = this.cells.length;
-        var newCells = this.cells.filter(cell => cell.row != r && cell.col != c);
-        if (newCells.size == oldSize) {
-            errorMsg("Cell not included in layer");
-        } else {
-            this.cells = newCells;
-            infoMsg("Cell removed from layer");
-        }
-    }
-
-    getGrid() {
-        if (!this.cells.length) {
-            return new Grid(this.height, this.width, undefined);
-        }
-        var grid = new Array(this.height)
-
-        for (var i = 0; i < this.height; i++){
-            grid[i] = new Array(this.width);
-            for (var j = 0; j < this.width; j++){
-                grid[i][j] = 0;
-            }
-        }
-        for (var i = 0; i < this.cells.length; i++) {
-            var cell = this.cells[i]
-            if(cell.val != undefined && cell.row >= 0 && cell.col >= 0 && cell.row < grid.length && cell.col < grid[0].length){
-                grid[cell.row][cell.col] = cell.val;
-            }
-            
-        }
-        return new Grid(this.height, this.width, grid);
-    }
-
-    getSelected() {
-        var selected = [];
-        for (var i = 0; i < this.cells.length; i++) {
-            if (this.cells[i].selected) {
-                selected.push(this.cells[i]);
-            }
-        }
-        return selected;
-    }
-}
-
-class TESTSET {
-    constructor(input_cells, output_cells) {
-        const NUM_ROWS = 5;
-        const NUM_COLS = 5;
-        this.input_cells = new Array(NUM_ROWS);
-        for (var i = 0; i < NUM_ROWS; i++) {
-            this.input_cells[i] = (new Array(NUM_COLS));
-        }
-        if (input_cells != null) {
-            this.input_cells = input_cells;
-        }
-        this.output_cells = new Array(NUM_ROWS);
-        for (var i = 0; i < NUM_COLS; i++) {
-            this.output_cells[i] = (new Array(NUM_COLS));
-        }
-
-        if (output_cells != null) {
-            this.output_cells = output_cells;
-        }
-    }
-}
-
-class Log {
-    constructor(task, user_id) {
-        this.task = task;
-        this.user_id = user_id;
-        this.action_sequence = new Array();
-    }
-
-    setTask(taskName) {
-        this.task = taskName;
-    }
-
-    setUserID(user_id) {
-        this.user_id = user_id;
-    }
-
-    addAction(action, grid, currentLayer, layer_list, time, submit) {
-        this.action_sequence.push({action: action, grid: grid, currentLayer: currentLayer, layer_list: layer_list, time: time, submit: submit});
-    }
-
-    removeAction() {
-        return this.action_sequence.pop();
-    }
-
-    lastAction() {
-        return this.action_sequence[this.action_sequence.length-1];
-    }
-
-    getJSONObject() {
-        var action_sequence_with_grids = new Array();
-        this.action_sequence.forEach(function(action) {
-            var layer_grid = new Array();
-            action.layer_list.forEach(function(layer) {
-                layer_grid.push(layer.getGrid().grid);
-            });
-            action_sequence_with_grids.push({action: action.action, grid: action.grid, currentLayer: action.currentLayer, layer_list: layer_grid, submit: action.submit, time: action.time});
-        });
-        var obj = 
-        {
-            'task'              : this.task,
-            'user_id'           : this.user_id,
-            'action_sequence'   : action_sequence_with_grids
-        }
-        return obj;
-    }
-
-    getString() {
-        var obj = this.getJSONObject();
-        return JSON.stringify(obj)
-    }
-
-}
-
 function floodfillFromLocation(grid, i, j, symbol) {
     i = parseInt(i);
     j = parseInt(j);
@@ -223,22 +28,18 @@ function floodfillFromLocation(grid, i, j, symbol) {
         return;
     }
 
-    function flow(i, j, symbol, target, affectedCells) {
+    function flow(i, j, symbol, target) {
         if (i >= 0 && i < grid.length && j >= 0 && j < grid[i].length) {
             if (grid[i][j] == target) {
                 grid[i][j] = symbol;
-                affectedCells.push(new Cell(i, j, symbol));
-                affectedCells = affectedCells.concat(
-                    flow(i - 1, j, symbol, target, affectedCells), 
-                    flow(i + 1, j, symbol, target, affectedCells),
-                    flow(i, j - 1, symbol, target, affectedCells),
-                    flow(i, j + 1, symbol, target, affectedCells)
-                );
+                flow(i - 1, j, symbol, target);
+                flow(i + 1, j, symbol, target);
+                flow(i, j - 1, symbol, target);
+                flow(i, j + 1, symbol, target);
             }
         }
-        return affectedCells;
     }
-    return flow(i, j, symbol, target, new Array());
+    flow(i, j, symbol, target);
 }
 
 function parseSizeTuple(size) {
@@ -273,7 +74,7 @@ function fitCellsToContainer(jqGrid, height, width, containerHeight, containerWi
     jqGrid.find('.cell').css('width', size + 'px');
 }
 
-function fillJqGridWithData(jqGrid, dataGrid, pad) {
+function fillJqGridWithData(jqGrid, dataGrid) {
     jqGrid.empty();
     height = dataGrid.height;
     width = dataGrid.width;
@@ -282,9 +83,9 @@ function fillJqGridWithData(jqGrid, dataGrid, pad) {
         row.addClass('row');
         for (var j = 0; j < width; j++){
             var cell = $(document.createElement('div'));
+            cell.addClass('cell');
             cell.attr('x', i);
             cell.attr('y', j);
-            cell.addClass('cell');
             setCellSymbol(cell, dataGrid.grid[i][j]);
             row.append(cell);
         }
