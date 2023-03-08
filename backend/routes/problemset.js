@@ -1,13 +1,34 @@
 var express = require('express');
 var router = express.Router();
+const axios = require('axios')
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database('./db/O2ARC.db');
 
 /* GET users listing. */
-router.get('/:id', function(req, res, next) {
+router.get('/:id', async function(req, res, next) {
+
     const userName = req.params.id
+    var data
+    var data2
     console.log(userName)
+
+    try{
+        const response1 = await axios.get('http://localhost:3000/users/' + userName + '/miniarcs')
+        const response2 = await axios.get('http://localhost:3000/users/' + userName + '/arcs')
+        data = response1.data
+        data2 = response2.data
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).send("Internal Server Error")
+    }
     res.render('problem_set', {
-        userName: userName
+        userName: userName,
+        miniARC_idlist: data,
+        ARC_idlist: data2
     })
+
+
 });
 
 module.exports = router;

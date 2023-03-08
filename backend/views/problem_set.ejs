@@ -85,6 +85,12 @@
                     card's content.
                   </p>
                   <a href="#!" class="btn btn-primary">Solve</a>
+                  <ul class="list-group list-group-light list-group-small">
+                    <% miniARC_idlist.forEach(item => { %>
+                      <li class="list-group-item"><%= item.id %> <%= item.task_name %> </li>
+                    <% }) %>
+                  </ul>
+                  
                 </div>
               </div>
             </div>
@@ -104,6 +110,11 @@
                     card's content.
                   </p>
                   <a href="#!" class="btn btn-primary">Solve</a>
+                  <ul class="list-group list-group-light list-group-small">
+                    <% ARC_idlist.forEach(item => { %>
+                      <li class="list-group-item"><%= item.id %> <%= item.task_name %> </li>
+                    <% }) %>
+                  </ul>
                 </div>
               </div>
             </div>
