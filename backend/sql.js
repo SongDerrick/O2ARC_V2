@@ -40,5 +40,27 @@ evaluation_sql = `CREATE TABLE IF NOT EXISTS evaluation (
     better TEXT
   )`
 
+user_sql = `CREATE TABLE IF NOT EXISTS user (
+  id TEXT PRIMARY KEY,
+  name TEXT
+)`
 
-module.exports = {tasklist_sql, testsets_sql, logs_sql, evaluation_sql}
+tasklist_query = `INSERT INTO tasklist (id, task_name, task_description, content, type) VALUES (?, ?, ?, ?, ?)`
+
+testsets_query = `INSERT INTO testsets (id, user_id, test_id, testjson, approve, ratings, Description) VALUES (?, ?, ?, ?, ?, ?, ?)`
+
+logs_query = `INSERT INTO logs (id, time_stamp, task_id, user_id, action_sequence) VALUES (?, ?, ?, ?, ?)`
+
+evaluation_query = `INSERT INTO evaluation (task_id, trace_id, user_id, points, object, description, general, better) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+
+
+module.exports = {
+  tasklist_sql, 
+  testsets_sql, 
+  logs_sql, 
+  evaluation_sql, 
+  user_sql, 
+  tasklist_query,
+  testsets_query,
+  logs_query,
+  evaluation_query }

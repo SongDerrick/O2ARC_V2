@@ -77,6 +77,13 @@ let db = new sqlite3.Database('db/O2ARC.db', (err) => {
     });
   });
 
+  db.run(sql.user_sql, (err) => {
+    if (err) {
+      console.error(err.message);
+    } else {
+      console.log('User Table created successfully.');
+    }
+  });
 
 
   // close the database connection
