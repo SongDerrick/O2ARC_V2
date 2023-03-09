@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap demo</title>
+    <title>Problem Sets</title>
     
     <!-- Font Awesome -->
     <link
@@ -84,7 +84,8 @@
                     Some quick example text to build on the card title and make up the bulk of the
                     card's content.
                   </p>
-                  <a href="#!" class="btn btn-primary">Solve</a>
+                  <% var rand = userName + '/' + ran1 %>
+                  <a href=<%= rand %> class="btn btn-primary" >Solve Randomly</a>
    
                   <div class="container border mt-5 pt-3" style="height:500px; overflow-y: scroll;">
                     <div class="row pb-2">
@@ -99,9 +100,10 @@
                       </div>
                     </div>
                     <% miniARC_idlist.forEach(item => { %>
+                      <% var reff = userName + '/' + item.id %>
                       <div class="row">
                         <div class="col-3 border">
-                          <%= item.id %>
+                          <a href=<%=reff%>><%= item.id %></a>
                         </div> 
                         <div class="col-6 border">
                           <%= item.task_name %>
@@ -130,7 +132,8 @@
                     Some quick example text to build on the card title and make up the bulk of the
                     card's content.
                   </p>
-                  <a href="#!" class="btn btn-primary">Solve</a>
+                  <% var rand = userName + '/' + ran2 %>
+                  <a href=<%= rand %> class="btn btn-primary" >Solve Randomly</a>
                   <div class="container border mt-5 pt-3" style="height:500px; overflow-y: scroll;">
                     <div class="row pb-2">
                       <div class="col-3">
@@ -144,9 +147,10 @@
                       </div>
                     </div>
                     <% ARC_idlist.forEach(item => { %>
+                      <% var reff = userName + '/' + item.id %>
                       <div class="row">
                         <div class="col-3 border">
-                          <%= item.id %>
+                          <a href=<%=reff%>><%= item.id %></a>
                         </div> 
                         <div class="col-6 border">
                           <%= item.task_name %>
