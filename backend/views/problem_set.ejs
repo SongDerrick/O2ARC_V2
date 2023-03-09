@@ -32,10 +32,10 @@
       <!--Main Navigation-->
     <header>
       <!-- Navbar -->
-      <nav class="navbar navbar-expand-lg navbar-light bg-white">
+      <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top ">
         <div class="container-fluid">
           <!-- Navbar brand -->
-          <a class="navbar-brand" target="_blank" href="/">
+          <a class="navbar-brand" target="_blank">
             <img src="../images/korea_mark.png" height="16" alt="" loading="lazy"
               style="margin-top: -3px;" />
           </a>
@@ -46,7 +46,7 @@
           <div class="collapse navbar-collapse" id="navbarExample01">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
               <li class="nav-item active">
-                <a class="nav-link" aria-current="page" href="/">Welcome <%= userName %> !</a>
+                <a class="nav-link" aria-current="page">Welcome <%= userName %> !</a>
               </li>
             </ul>
 
@@ -67,7 +67,7 @@
       <div class="container">
         <!--Section: Content-->
         <section class="text-center">
-          <h4 class="mb-5"><strong>Try Solving Mini-ARC or ARC Problems!</strong></h4>
+          <h4 class="pt-5 mb-5"><strong>Try Solving Mini-ARC or ARC Problems!</strong></h4>
 
           <div class="row">
             <div class="col-lg-6 mb-4">
@@ -85,12 +85,33 @@
                     card's content.
                   </p>
                   <a href="#!" class="btn btn-primary">Solve</a>
-                  <ul class="list-group list-group-light list-group-small">
+   
+                  <div class="container border mt-5 pt-3" style="height:500px; overflow-y: scroll;">
+                    <div class="row pb-2">
+                      <div class="col-3">
+                        <h6>ID</h6>
+                      </div>
+                      <div class="col-6">
+                        <h6>Task Name</h6>
+                      </div>
+                      <div class="col-3">
+                        <h6>Status</h6>
+                      </div>
+                    </div>
                     <% miniARC_idlist.forEach(item => { %>
-                      <li class="list-group-item"><%= item.id %> <%= item.task_name %> </li>
+                      <div class="row">
+                        <div class="col-3 border">
+                          <%= item.id %>
+                        </div> 
+                        <div class="col-6 border">
+                          <%= item.task_name %>
+                        </div>
+                        <div class="col-3 border">
+                          &#9989
+                        </div>
+                      </div>
                     <% }) %>
-                  </ul>
-                  
+                  </div>
                 </div>
               </div>
             </div>
@@ -110,11 +131,32 @@
                     card's content.
                   </p>
                   <a href="#!" class="btn btn-primary">Solve</a>
-                  <ul class="list-group list-group-light list-group-small">
+                  <div class="container border mt-5 pt-3" style="height:500px; overflow-y: scroll;">
+                    <div class="row pb-2">
+                      <div class="col-3">
+                        <h6>ID</h6>
+                      </div>
+                      <div class="col-6">
+                        <h6>Task Name</h6>
+                      </div>
+                      <div class="col-3">
+                        <h6>Status</h6>
+                      </div>
+                    </div>
                     <% ARC_idlist.forEach(item => { %>
-                      <li class="list-group-item"><%= item.id %> <%= item.task_name %> </li>
+                      <div class="row">
+                        <div class="col-3 border">
+                          <%= item.id %>
+                        </div> 
+                        <div class="col-6 border">
+                          <%= item.task_name %>
+                        </div>
+                        <div class="col-3 border">
+                          &#9989
+                        </div>
+                      </div>
                     <% }) %>
-                  </ul>
+                  </div>
                 </div>
               </div>
             </div>

@@ -54,7 +54,7 @@ router.post('/', function(req, res, next){
           res.status(500).send('Server Error');
         } else {
           console.log(`Rows inserted: ${this.changes}`);
-          res.send('Data inserted successfully');
+          console.log('Data inserted successfully');
           db.close()
           res.redirect('/task/'+user_name)
         }
