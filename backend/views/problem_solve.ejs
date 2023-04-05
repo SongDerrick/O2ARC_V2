@@ -76,17 +76,17 @@
             <div class="row">
 
               <div class="card card_2 col-lg-4">
-                <div>
+                <h5>
                   Task Demonstration
-                </div>
+                </h5>
                 
                 <% grid.forEach(item => { %>
-                  <div class="container-fluid row justify-content-evenly demo_row">
+                  <div class="container-fluid row demo_row">
                   <% item.forEach(agrid => { %>
                     <div class="col">
                     <% for(i = 0; i < agrid.height ; i++){ %>
                       <% if(i == 0){ %>
-                        <div class="container input_preview">
+                        <div class="container">
                       <% } %>
 
                       <div class="row justify-content-center">
@@ -109,7 +109,30 @@
 
 
               <div class="card card_2 col-lg-4">
-                2 of 3 (wider)
+                <h5> Test Input Grid </h5>
+                <% Testgrid.forEach(item => { %>
+                  <div class="container-fluid row demo_row">
+                    <div class="col">
+                    <% for(i = 0; i < item[0].height ; i++){ %>
+                      <% if(i == 0){ %>
+                        <div class="container">
+                      <% } %>
+
+                      <div class="row justify-content-center">
+                      <% for(j = 0; j < item[0].width; j++){ %>
+                        <div class="cell_<%= height %> symbol_<%= item[0].grid[i][j] %>">  </div>
+
+                      <% } %>
+                      <% if(i == item[0].height - 1){ %>
+                      </div>
+                      <% } %>
+
+                      </div>
+                    <% } %>
+                    </div>
+                  
+                </div>
+                <% }) %>
 
                 
               </div>

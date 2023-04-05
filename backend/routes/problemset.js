@@ -62,6 +62,7 @@ router.get('/:id/:problem', function(req, res, next) {
           traingrid = testing_function.loadJSONTask(trainData)
           testgrid = testing_function.loadJSONTask(testData)
           console.log(traingrid[0][0])
+          console.log(testgrid[0])
           h = traingrid[0][0].height
           console.log(h)
           if(h >5){
@@ -74,6 +75,7 @@ router.get('/:id/:problem', function(req, res, next) {
             userName: userName,
             train: trainData,
             grid : traingrid,
+            Testgrid: testgrid,
             height : t
         })
         } else {

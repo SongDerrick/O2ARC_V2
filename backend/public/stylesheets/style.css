@@ -26,6 +26,10 @@
   height : 80vh
 }
 
+h5 {
+  padding-top: 30px;
+}
+
 .cell_sm {
   width: 3vh;
   height: 3vh;
