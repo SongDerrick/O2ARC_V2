@@ -25,11 +25,11 @@
 
     <style>
       :root {
-        --cell-size: <%= h %>px; /* set the initial value of the CSS variable */
+        --cell-size: <%= p %>px; /* set the initial value of the CSS variable */
       }
       .cell_final {
-        height: var(--cell-size);
-        width: var(--cell-size);
+        /* height: var(--cell-size);
+        width: var(--cell-size); */
         border-left: 1px solid #555;
         border-top: 1px solid #555;
         background-color: #000;
@@ -95,7 +95,7 @@
           <div class="container-fluid">
             <div class="row">
 
-              <div class="card card_2 col-lg-4" style="overflow-y: scroll;">
+              <div class="card card_2 col-lg-4">
                 <h5>
                   Task Demonstration
                 </h5>
@@ -107,12 +107,14 @@
                     <% for(i = 0; i < agrid.height ; i++){ %>
                       <% if(i == 0){ %>
                         <div class="container input_preview">
+                        <% if(agrid.height > agrid.width) {n=agrid.height} else{n=agrid.width} %>
+                        <% cs = 200/n %>
+                        <% console.log(cs)%>
                       <% } %>
 
                       <div class="row justify-content-center">
                       <% for(j = 0; j < agrid.width; j++){ %>
-                        <div class="cell_final symbol_<%= agrid.grid[i][j] %>">  </div>
-
+                        <div class="cell_final symbol_<%= agrid.grid[i][j] %>" style="width: <%= cs %>px; height: <%= cs %>px" >  </div>
                       <% } %>
                       <% if(i == agrid.height - 1){ %>
                       </div>
@@ -157,9 +159,7 @@
                 
               </div>
               <div class="card card_2 col-lg-4">
-                <h5>
-                  Solve Task
-                </h5>
+                3 of 3
               </div>
             </div>
           </div>
