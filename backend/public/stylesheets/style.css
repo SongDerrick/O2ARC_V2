@@ -39,16 +39,20 @@ h5 {
 }
 
 .cell_md {
-  width: 10px;
-  height: 10px;
+  width: 1vh;
+  height: 1vh;
   border-left: 1px solid #555;
   border-top: 1px solid #555;
   background-color: #000;
+  padding-right: 0px;
+  padding-left: 0px;
 }
 
 .input_preview {
   height: 200px;
   width: 200px;
+  margin-left: 0px;
+  margin-right: 0px;
 }
 
 .demo_row {
@@ -56,10 +60,10 @@ h5 {
   padding-left: 20px;
 }
 
+
 .col {
   align-items: center;
 }
-
 
 
 .symbol_0 {
