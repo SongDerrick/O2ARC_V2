@@ -81,8 +81,7 @@ router.get('/:id/:problem', function(req, res, next) {
             train: trainData,
             grid : traingrid,
             Testgrid: testgrid,
-            height : t,
-            h:cellsize
+            p:cellsize
         })
         } else {
           return res.status(404).send('Content not found');

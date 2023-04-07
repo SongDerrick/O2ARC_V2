@@ -25,11 +25,11 @@
 
     <style>
       :root {
-        --cell-size: <%= h %>px; /* set the initial value of the CSS variable */
+        --cell-size: <%= p %>px; /* set the initial value of the CSS variable */
       }
       .cell_final {
-        height: var(--cell-size);
-        width: var(--cell-size);
+        /* height: var(--cell-size);
+        width: var(--cell-size); */
         border-left: 1px solid #555;
         border-top: 1px solid #555;
         background-color: #000;
@@ -107,12 +107,15 @@
                     <% for(i = 0; i < item[0].height ; i++){ %>
                       <% if(i == 0){ %>
                         <div class="container input_preview">
+                        
                       <% } %>
+                      <% if(item[0].height > item[0].width) {n=item[0].height} else{n=item[0].width} %>
+                      <% cs = 200/n %>
+                      <% console.log(cs)%>
 
                       <div class="row justify-content-center">
                       <% for(j = 0; j < item[0].width; j++){ %>
-                        <div class="cell_final symbol_<%= item[0].grid[i][j] %>">  </div>
-
+                        <div class="cell_final symbol_<%= item[0].grid[i][j] %>" style="width: <%= cs %>px; height: <%= cs %>px" >  </div>
                       <% } %>
                       <% if(i == item[0].height - 1){ %>
                       </div>
@@ -131,10 +134,14 @@
                         <% if(i == 0){ %>
                           <div class="container input_preview">
                         <% } %>
+
+                        <% if(item[1].height > item[1].width) {n=item[1].height} else{n=item[1].width} %>
+                        <% cs = 200/n %>
+                        <% console.log(cs)%>
   
                         <div class="row justify-content-center">
                         <% for(j = 0; j < item[1].width; j++){ %>
-                          <div class="cell_final symbol_<%= item[1].grid[i][j] %>">  </div>
+                          <div class="cell_final symbol_<%= item[1].grid[i][j] %>" style="width: <%= cs %>px; height: <%= cs %>px">  </div>
   
                         <% } %>
                         <% if(i == item[1].height - 1){ %>
@@ -160,10 +167,13 @@
                       <% if(i == 0){ %>
                         <div class="container output_preview">
                       <% } %>
+                      <% if(item[0].height > item[0].width) {n=item[0].height} else{n=item[0].width} %>
+                      <% cs = 200/n %>
+                      <% console.log(cs)%>
 
                       <div class="row justify-content-center">
                       <% for(j = 0; j < item[0].width; j++){ %>
-                        <div class="cell_final symbol_<%= item[0].grid[i][j] %>">  </div>
+                        <div class="cell_final symbol_<%= item[0].grid[i][j] %>"style="width: <%= cs %>px; height: <%= cs %>px">  </div>
 
                       <% } %>
                       <% if(i == item[0].height - 1){ %>
