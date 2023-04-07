@@ -107,10 +107,11 @@
                     <% for(i = 0; i < agrid.height ; i++){ %>
                       <% if(i == 0){ %>
                         <div class="container input_preview">
-                        <% if(agrid.height > agrid.width) {n=agrid.height} else{n=agrid.width} %>
-                        <% cs = 200/n %>
-                        <% console.log(cs)%>
+                        
                       <% } %>
+                      <% if(agrid.height > agrid.width) {n=agrid.height} else{n=agrid.width} %>
+                      <% cs = 200/n %>
+                      <% console.log(cs)%>
 
                       <div class="row justify-content-center">
                       <% for(j = 0; j < agrid.width; j++){ %>
@@ -139,10 +140,13 @@
                       <% if(i == 0){ %>
                         <div class="container output_preview">
                       <% } %>
+                      <% if(item[0].height > item[0].width) {n=item[0].height} else{n=item[0].width} %>
+                      <% cs = 200/n %>
+                      <% console.log(cs)%>
 
                       <div class="row justify-content-center">
                       <% for(j = 0; j < item[0].width; j++){ %>
-                        <div class="cell_final symbol_<%= item[0].grid[i][j] %>">  </div>
+                        <div class="cell_final symbol_<%= item[0].grid[i][j] %>"style="width: <%= cs %>px; height: <%= cs %>px">  </div>
 
                       <% } %>
                       <% if(i == item[0].height - 1){ %>
