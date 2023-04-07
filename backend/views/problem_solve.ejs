@@ -95,7 +95,7 @@
           <div class="container-fluid">
             <div class="row">
 
-              <div class="card card_2 col-lg-4">
+              <div class="card card_2 col-lg-4" style="overflow-y: scroll;">
                 <h5>
                   Task Demonstration
                 </h5>
@@ -115,7 +115,7 @@
 
                       <div class="row justify-content-center">
                       <% for(j = 0; j < agrid.width; j++){ %>
-                        <div class="cell_final symbol_<%= agrid.grid[i][j] %>" style="width: <%= cs %>px; height: <%= cs %>px" >  </div>
+                        <div class="cell_final symbol_<%= agrid.grid[i][j] %>" style="width: <%= cs %>px; height: <%= cs %>px"></div>
                       <% } %>
                       <% if(i == agrid.height - 1){ %>
                       </div>
