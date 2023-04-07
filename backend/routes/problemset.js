@@ -81,7 +81,6 @@ router.get('/:id/:problem', function(req, res, next) {
             train: trainData,
             grid : traingrid,
             Testgrid: testgrid,
-            height : t,
             h:cellsize
         })
         } else {
