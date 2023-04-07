@@ -95,9 +95,9 @@
           <div class="container-fluid">
             <div class="row">
 
-              <div class="card card_2 col-lg-4">
+              <div class="card card_2 col-lg-4" style="overflow-y: scroll;">
                 <h5>
-                  Task Demonstration
+                  Task Demonstration 1
                 </h5>
                 
                 <% grid.forEach(item => { %>
@@ -116,6 +116,7 @@
                       <div class="row justify-content-center">
                       <% for(j = 0; j < item[0].width; j++){ %>
                         <div class="cell_final symbol_<%= item[0].grid[i][j] %>" style="width: <%= cs %>px; height: <%= cs %>px" >  </div>
+
                       <% } %>
                       <% if(i == item[0].height - 1){ %>
                       </div>
