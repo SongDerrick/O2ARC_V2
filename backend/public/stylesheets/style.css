@@ -99,3 +99,8 @@ h5 {
 .symbol_9 {
   background-color: #870C25; /* brown */
 }
+
+.arrow {
+  margin: 90px auto;
+  height: 20px;
+}
