@@ -23,7 +23,8 @@
 
 
 .card_2 {
-  height : 80vh
+  height : 80vh;
+  
 }
 
 h5 {
@@ -51,13 +52,15 @@ h5 {
 .input_preview {
   height: 200px;
   width: 200px;
-  margin-left: 0px;
-  margin-right: 0px;
+}
+
+.output_preview {
+  height: 400px;
+  width: 400px;
 }
 
 .demo_row {
   margin-top: 20px;
-  padding-left: 20px;
 }
 
 

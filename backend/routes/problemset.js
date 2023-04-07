@@ -64,6 +64,11 @@ router.get('/:id/:problem', function(req, res, next) {
           console.log(traingrid[0][0])
           console.log(testgrid[0])
           h = traingrid[0][0].height
+          w = traingrid[0][0].width
+          console.log(h, w)
+
+          cellsize = 200/Math.max(h,w)
+          console.log(cellsize)
           console.log(h)
           if(h >5){
             t = 'md'
@@ -76,7 +81,8 @@ router.get('/:id/:problem', function(req, res, next) {
             train: trainData,
             grid : traingrid,
             Testgrid: testgrid,
-            height : t
+            height : t,
+            h:cellsize
         })
         } else {
           return res.status(404).send('Content not found');
