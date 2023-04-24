@@ -98,6 +98,35 @@ h5 {
   border: 2px solid orange;
 }
 
+#editor_grid_control_btns {
+  float: left;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  background: white;
+  width: 100%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+#resize_control_btns {
+  width: 100%;
+  float:left;
+  margin-bottom: 10px;
+}
+
+#submit_solution_btn {
+  color: white;
+  border-radius: 4px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  background: rgb(28, 184, 65);
+}
+
+#submit_solution_btn:active {
+background: blue;
+}
+
+button:focus {outline:0;}
+
 #toolbar {
   float: left;
   margin-left: 10px;
