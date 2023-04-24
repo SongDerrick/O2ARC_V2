@@ -31,24 +31,6 @@ h5 {
   padding-top: 30px;
 }
 
-.cell_sm {
-  width: 3vh;
-  height: 3vh;
-  border-left: 1px solid #555;
-  border-top: 1px solid #555;
-  background-color: #000;
-}
-
-.cell_md {
-  width: 1vh;
-  height: 1vh;
-  border-left: 1px solid #555;
-  border-top: 1px solid #555;
-  background-color: #000;
-  padding-right: 0px;
-  padding-left: 0px;
-}
-
 .input_preview {
   height: 200px;
   width: 200px;
@@ -98,6 +80,31 @@ h5 {
 }
 .symbol_9 {
   background-color: #870C25; /* brown */
+}
+
+.symbol_preview {
+  width: 20px;
+  height: 20px;
+  float: left;
+}
+
+#symbol_picker {
+  float: left;
+  margin-left: 20px;
+  width: 100%;
+}
+
+.selected-symbol-preview {
+  border: 2px solid orange;
+}
+
+#toolbar {
+  float: left;
+  margin-left: 10px;
+  margin-top: 18px;
+  margin-bottom: 10px;
+  width: 100%;
+
 }
 
 .arrow {
