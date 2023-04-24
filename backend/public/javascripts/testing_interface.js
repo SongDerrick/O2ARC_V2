@@ -17,24 +17,6 @@ class Grid {
     }
 }
 
-function fillGridWithData(dataGrid) {
-    height = dataGrid.height;
-    width = dataGrid.width;
-    for (var i = 0; i < height; i++){
-        var row = $(document.createElement('div'));
-        row.addClass('row');
-        for (var j = 0; j < width; j++){
-            var cell = $(document.createElement('div'));
-            cell.addClass('cell');
-            cell.attr('x', i);
-            cell.attr('y', j);
-            setCellSymbol(cell, dataGrid.grid[i][j]);
-            row.append(cell);
-        }
-        jqGrid.append(row);
-    }
-}
-
 
 function convertSerializedGridToGridObject(values) {
     height = values.length;
@@ -64,6 +46,5 @@ function loadJSONTask(train) {
 module.exports = {
    Grid,
    convertSerializedGridToGridObject,
-   loadJSONTask,
-   fillGridWithData
+   loadJSONTask
 }
