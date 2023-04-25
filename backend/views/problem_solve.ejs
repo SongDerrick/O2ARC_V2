@@ -222,6 +222,17 @@
               </div>
               <div class="card card_2 col-lg-4">
                 <h5> Output Grid </h5>
+                <div id="editor_grid_control_btns">
+                  <div id="resize_control_btns">
+                      <label for="output_grid_size">Change grid size: </label>
+                      <input type="text" id="output_grid_size" class="grid_size_field" name="size" value="3x3">
+                      <button onclick="resizeOutputGrid()" id="resize_btn">Resize</button>
+                  </div>
+
+                  <button onclick="copyFromInput()">Copy from input</button>
+                  <button onclick="resetOutputGrid()">Reset grid</button>
+                  <button onclick="submitSolution()" id="submit_solution_btn">Submit!</button>
+              </div>
                 <% Outputgrid.forEach(item => { %>
                   <div class="container-fluid row demo_row mx-auto">
                     <div class="col">
