@@ -41,10 +41,19 @@ function loadJSONTask(train) {
     return result
 }
 
+function resetOutputGrid(grid) {
+
+    const array = Array.from({ length: grid[0][0].height }, () => Array.from({ length: grid[0][0].width }, () => 0));
+    //console.log(array)
+    newgrid = convertSerializedGridToGridObject(array)
+    // console.log(newgrid)
+    return newgrid
+}
 
 
 module.exports = {
    Grid,
    convertSerializedGridToGridObject,
-   loadJSONTask
+   loadJSONTask,
+   resetOutputGrid
 }

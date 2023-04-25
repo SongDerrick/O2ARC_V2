@@ -59,6 +59,8 @@ router.get('/:id/:problem', function(req, res, next) {
           trainData = content.train
           testData = content.test
 
+          //console.log(trainData)
+
           traingrid = testing_function.loadJSONTask(trainData)
           testgrid = testing_function.loadJSONTask(testData)
           outputgrid = testing_function.loadJSONTask(testData)
@@ -67,6 +69,8 @@ router.get('/:id/:problem', function(req, res, next) {
           h = traingrid[0][0].height
           w = traingrid[0][0].width
           //console.log(h, w)
+
+          resettedgrid = testing_function.resetOutputGrid(outputgrid)
 
           cellsize = 200/Math.max(h,w)
           // console.log(cellsize)
@@ -79,7 +83,8 @@ router.get('/:id/:problem', function(req, res, next) {
             grid : traingrid,
             Testgrid: testgrid,
             Outputgrid: outputgrid,
-            p:cellsize
+            p:cellsize,
+            reset: resettedgrid
         })
         } else {
           return res.status(404).send('Content not found');
