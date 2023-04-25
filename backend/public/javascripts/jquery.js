@@ -1,5 +1,3 @@
-var $ = require('jquery'); 
-
 $(document).ready(function () {
     $('#symbol_picker').find('.symbol_preview').click(function(event) {
         symbol_preview = $(event.target);
