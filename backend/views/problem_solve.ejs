@@ -50,7 +50,7 @@
     type="text/javascript"
     src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"
     ></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     
     <script>
       $(document).ready(function () {
@@ -102,10 +102,16 @@
               </li>
             </ul>
 
-            <ul class="navbar-nav d-flex flex-row">
+            <ul class="navbar-nav d-flex">
+              <li class="nav-item active">
+                <a class="nav-link" aria-current="page" href="/task/<%= userName %>">MainMenu</a>
+              </li>
               <li class="nav-item active">
                 <a class="nav-link" aria-current="page" href="/">Logout</a>
+                
               </li>
+              
+              
             </ul>
           </div>
         </div>
