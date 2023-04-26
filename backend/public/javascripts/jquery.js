@@ -49,7 +49,7 @@ function resizeOutputGrid() {
         row.className = 'row justify-content-center';
         for (var j = 0; j < cols; j++) {
             var cell = document.createElement('div');
-            cell.className = 'cell_final';
+            cell.className = 'cell_final symbol_0';
             cell.style.width = (400 / n) + 'px';
             cell.style.height = (400 / n) + 'px';
             row.appendChild(cell);
@@ -58,4 +58,38 @@ function resizeOutputGrid() {
     }
     // Log the input value to the console
     console.log("Input Value:", inputValue);
+  }
+
+  function copyFromInput() {
+
+    console.log(testgrid[0][0])
+
+    if(testgrid[0][0].height>testgrid[0][0].width){
+        n = testgrid[0][0].height
+    } else {
+        n = testgrid[0][0].width
+    }
+
+    var userInteractDiv = document.getElementById("user_interact");
+    
+
+    userInteractDiv.innerHTML = "";
+
+    for (var i = 0; i < testgrid[0][0].height; i++) {
+        var rowDiv = document.createElement("div");
+        rowDiv.className = "row justify-content-center";
+        
+        for (var j = 0; j < testgrid[0][0].width; j++) {
+        var cellDiv = document.createElement("div");
+        cellDiv.className = "cell_final symbol_" + testgrid[0][0].grid[i][j];
+        cellDiv.style.width = (400 / n)+ "px"; // Set the desired width of each cell
+        cellDiv.style.height = (400 / n)+ "px"; // Set the desired height of each cell
+        
+        rowDiv.appendChild(cellDiv);
+        }
+        
+        userInteractDiv.appendChild(rowDiv);
+
+    }
+    
   }
