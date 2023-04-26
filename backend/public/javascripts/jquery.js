@@ -32,6 +32,30 @@ function resizeOutputGrid() {
     // Get the input value
     var inputValue = $("#output_grid_size").val();
     
+
+    var rows = parseInt(inputValue.split('x')[0]);
+    var cols = parseInt(inputValue.split('x')[1]);
+
+    if(rows>cols){
+        n = rows
+    } else {
+        n = cols
+    }
+    var grid = document.getElementById('user_interact');
+    grid.innerHTML = '';
+
+    for (var i = 0; i < rows; i++) {
+        var row = document.createElement('div');
+        row.className = 'row justify-content-center';
+        for (var j = 0; j < cols; j++) {
+            var cell = document.createElement('div');
+            cell.className = 'cell_final';
+            cell.style.width = (400 / n) + 'px';
+            cell.style.height = (400 / n) + 'px';
+            row.appendChild(cell);
+        }
+        grid.appendChild(row);
+    }
     // Log the input value to the console
     console.log("Input Value:", inputValue);
   }
