@@ -14,6 +14,23 @@ $(document).ready(function () {
             });
         }
     });
+     // Find the user_interact cell div and add a click listener to it.
+    $('#user_interact').on('click', '.cell_final', function(event) {
+
+        var selectedPreview = $('#symbol_picker').find('.selected-symbol-preview');
+        console.log(selectedPreview.attr('symbol'));  
+        // Get the class of the clicked element.
+        var cellClass = $(this).attr('class');
+        var currentClasses = $(this).attr('class').split(' ');
+        $(this).removeClass(currentClasses[1]).addClass('symbol_'+selectedPreview.attr('symbol'));
+        // Log the new class of the cell
+
+        
+          
+        console.log($(this).attr('class'));
+        console.log(cellClass);
+    });
+
 
 })
 
