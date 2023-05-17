@@ -99,6 +99,17 @@ h5 {
   border: 2px solid rgb(255, 170, 0);
 }
 
+/*Selectable*/
+
+.ui-selected {
+  background-image: url(../img/black-twill.png), url(../img/brushed-alum.png);
+}
+.ui-selectable-helper {
+  border: 1px dotted #ddd;
+  position: absolute;
+  z-index: 1000;
+}
+
 #editor_grid_control_btns {
   float: left;
   margin-top: 10px;
