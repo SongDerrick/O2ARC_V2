@@ -52,6 +52,7 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script>
       var testgrid = <%- JSON.stringify(Testgrid) %>;
+      var currentRoute = window.location.href;
     </script>
     
     <script src="/javascripts/jquery.js"></script>
@@ -263,7 +264,7 @@
 
                   <button onclick="copyFromInput()">Copy from input</button>
                   <button id="resetBtn" onclick="resetOutputGrid()">Reset grid</button>
-                  <button onclick="submitSolution()" id="submit_solution_btn">Submit!</button>
+                  <button onclick="IQsubmitSolution(testgrid, '<%= userName %>' , currentRoute)" id="submit_solution_btn">Submit!</button>
               </div>
                 <% Outputgrid.forEach(item => { %>
                   <div class="container-fluid row demo_row mx-auto">

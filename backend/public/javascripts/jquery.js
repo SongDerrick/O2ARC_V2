@@ -2,12 +2,32 @@ $(document).ready(function () {
     var initialToolMode = 'edit';
     handleToolModeChange(initialToolMode);
 
+
     $('input[name=tool_switching]').change(function() {
         var selectedToolMode = $(this).val();
         handleToolModeChange(selectedToolMode);
     });
-  
-  var selectedPreview = $('#symbol_picker').find('.selected-symbol-preview');
+
+
+    $('#symbol_picker').find('.symbol_preview').click(function(event) {
+        symbol_preview = $(event.target);
+        $('#symbol_picker').find('.symbol_preview').each(function(i, preview) {
+            $(preview).removeClass('selected-symbol-preview');
+        })
+        symbol_preview.addClass('selected-symbol-preview');
+
+        toolMode = $('input[name=tool_switching]:checked').val();
+        if (toolMode == 'select') {
+            $('.edition_grid').find('.ui-selected').each(function(i, cell) {
+                symbol = getSelectedSymbol();
+                setCellSymbol($(cell), symbol);
+            });
+        }
+    });
+     // Find the user_interact cell div and add a click listener to it.
+    $('#user_interact').on('click', '.cell_final', function(event) {
+
+        var selectedPreview = $('#symbol_picker').find('.selected-symbol-preview');
         // console.log(selectedPreview.attr('symbol'));  
         // Get the class of the clicked element.
         var cellClass = $(this).attr('class');
@@ -135,6 +155,96 @@ $(document).ready(function () {
     }
 
 })
+
+function handleToolModeChange(toolMode) {
+    if (toolMode == 'edit') {
+      // 'edit' mode
+      console.log("edit")
+      disableTools();
+      enableEditable();
+    //   infoMsg('Editing mode activated');
+    } else if (toolMode == 'select') {
+      // 'select' mode
+      console.log("select")
+      disableTools();
+      enableSelectable();
+    //   infoMsg('Select some cells and click on a color to fill in, or press C to copy');
+    } else if (toolMode == 'floodfill') {
+      // 'flood fill' mode
+      disableTools();
+    //   enableFloodFill();
+    //   infoMsg('Flood fill mode activated');
+    } else {
+    }
+}
+
+function enableEditable() {
+    $('#symbol_picker').find('.symbol_preview').click(function(event) {
+        symbol_preview = $(event.target);
+        $('#symbol_picker').find('.symbol_preview').each(function(i, preview) {
+            $(preview).removeClass('selected-symbol-preview');
+        })
+        symbol_preview.addClass('selected-symbol-preview');
+    });
+     // Find the user_interact cell div and add a click listener to it.
+    $('#user_interact').on('click', '.cell_final', function(event) {
+
+        var selectedPreview = $('#symbol_picker').find('.selected-symbol-preview');
+        console.log(selectedPreview.attr('symbol'));  
+        // Get the class of the clicked element.
+        var cellClass = $(this).attr('class');
+        var currentClasses = $(this).attr('class').split(' ');
+        $(this).removeClass(currentClasses[1]).addClass('symbol_'+selectedPreview.attr('symbol'));
+        // Log the new class of the cell
+        
+        console.log(cellClass);
+        console.log($(this).attr('class'));
+        
+    });
+}
+
+function enableSelectable() {
+    // get selectable
+    $("#user_interact").selectable();
+    // click symbol_picker
+    $('#symbol_picker').find('.symbol_preview').click(function(event) {
+        // can change symbol picker
+        symbol_preview = $(event.target);
+        $('#symbol_picker').find('.symbol_preview').each(function(i, preview) {
+            $(preview).removeClass('selected-symbol-preview');
+        })
+        symbol_preview.addClass('selected-symbol-preview');
+        // new color class
+        var selectedPreview = $('#symbol_picker').find('.selected-symbol-preview');
+        // remove old color and add new color
+        $('.cell_final.ui-selectee.ui-selected').each(function() {
+            $(this).removeClass(function(index, className) {
+              return (className.match(/(^|\s)symbol_\S+/g) || []).join(' ');
+            });
+            $(this).addClass('symbol_'+selectedPreview.attr('symbol'));
+          });
+    });
+} 
+
+function disableTools() {
+    disableEditable();
+    disableSelectable();
+    // disableFloodFill();
+}
+    
+function disableEditable() {
+    $('#symbol_picker').find('.symbol_preview').off('click');
+    $('#user_interact').off('click', '.cell_final');
+}
+
+function disableSelectable() {
+    // destroy selectable
+    try {
+        $("#user_interact").selectable("destroy");
+    }
+    catch (e) {
+    }
+}
 
 // Function to extract symbol classes
 function getSymbolClasses(classes) {
@@ -298,6 +408,46 @@ function resizeOutputGrid() {
     if(answer){
         alert('Success!')
         window.location.href ="/task/" + name + '/' + incrementedLastPart
+    } else {
+        alert('Wrong!')
+    }
+    
+
+  }
+
+  function IQsubmitSolution(input, name, cRoute){
+    // console.log("hi")
+
+    const divs = document.querySelectorAll('#user_interact .cell_final');
+
+    const numbersArray = [];
+
+    divs.forEach(div => {
+        const className = div.className;
+        const number = className.split('symbol_')[1]; // Extract the number after "symbol_"
+        numbersArray.push(number); // Store the number in the array
+    });
+
+    User_Answer = numbersArray.map(num => parseInt(num))
+    Actual_Answer = input[0][1].grid.flat().map(num => parseInt(num))
+
+    //console.log(numbersArray)
+    //console.log(input[0][0].grid)
+    //console.log(input[0][1].grid.flat()) // 이 친구가 답임 ㅋㅋ
+    console.log(cRoute)
+    var lastPart = cRoute.substring(cRoute.lastIndexOf('/') + 1);
+    var incrementedValue = parseInt(lastPart, 10) + 1;
+    
+    // Convert the incremented value back to a string
+    var incrementedLastPart = incrementedValue.toString();
+    
+    console.log(User_Answer)
+    console.log(Actual_Answer)
+    answer = compareArrays(User_Answer, Actual_Answer)
+    console.log(answer)
+    if(answer){
+        alert('Success!')
+        window.location.href = incrementedLastPart
     } else {
         alert('Wrong!')
     }
