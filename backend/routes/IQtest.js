@@ -64,8 +64,8 @@ router.get('/:id/:problem', function(req, res, next) {
           traingrid = testing_function.loadJSONTask(trainData)
           testgrid = testing_function.loadJSONTask(testData)
           outputgrid = testing_function.loadJSONTask(testData)
-          // console.log(traingrid[0][0])
-          console.log(testgrid[0][0])
+          //console.log(traingrid[0][0])
+          //console.log(testgrid[0])
           h = traingrid[0][0].height
           w = traingrid[0][0].width
           //console.log(h, w)
@@ -77,7 +77,7 @@ router.get('/:id/:problem', function(req, res, next) {
           // console.log(h)
 
           // console.log(traingrid)
-          return res.render('problem_solve', {
+          return res.render('IQtest', {
             userName: userName,
             train: trainData,
             grid : traingrid,

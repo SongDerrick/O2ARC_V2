@@ -15,6 +15,7 @@
     "html": "^1.0.0",
     "http-errors": "~1.6.3",
     "jquery": "^3.6.4",
+    "jquery-ui": "^1.13.2",
     "module": "^1.2.5",
     "morgan": "~1.9.1",
     "node-fetch": "^3.3.0",
@@ -22,6 +23,6 @@
     "sqlite3": "^5.1.4"
   },
   "devDependencies": {
-    "nodemon": "^2.0.20"
+    "nodemon": "^2.0.22"
   }
 }
