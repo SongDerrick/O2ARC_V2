@@ -22,6 +22,9 @@
     />
 
     <style>
+      #timer {
+        font-size: 24px;
+      }
       :root {
         --cell-size: <%= p %>px; /* set the initial value of the CSS variable */
       }
@@ -46,11 +49,9 @@
     type="text/javascript"
     src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/6.2.0/mdb.min.js"
     ></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
-    <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script>
       var testgrid = <%- JSON.stringify(Testgrid) %>;
-      var currentRoute = window.location.href;
     </script>
     
     <script src="/javascripts/jquery.js"></script>
@@ -101,8 +102,57 @@
       <div class="container-fluid">
         <!--Section: Content-->
         <section class="text-center">
-          <h4 class="pt-5 mb-5"><strong>Try Solving Mini-ARC or ARC Problems!</strong></h4>
+          <h4 class="pt-5 mb-5"><strong>Let's check how smart you are!</strong></h4>
+          <p id="timer">5:00</p>
+          <script>
+            // 시작 시간 설정
+            
+            var startTime = Date.now();
+            // 종료 시간 설정 (5분 후)
+            // var endTime = startTime + 1000;
+            var endTime = startTime + 300000;
+            // 타이머 업데이트 함수
+            function updateTimer() {
+              // 현재 시간 계산
+              var currentTime = Date.now();
+      
+              // 남은 시간 계산
+              var remainingTime = endTime - currentTime;
+      
+              // 분, 초 계산
+              var minutes = Math.floor(remainingTime / 60000);
+              var seconds = Math.floor((remainingTime % 60000) / 1000);
+      
+              // 분과 초를 문자열 형태로 조합
+              var timerText = minutes.toString().padStart(2, "0") + ":" + seconds.toString().padStart(2, "0");
+      
+              // 타이머를 표시할 요소 찾기
+              var timerElement = document.getElementById("timer");
+              var targetlink = "http://localhost:3000/task/" + "<%= userName %>"
+      
+              // 타이머 업데이트
+              timerElement.textContent = timerText;
+      
+              // 타이머 종료 확인
+              if (remainingTime <= 0) {
+                clearInterval(timerInterval); // 타이머 중지
+                timerElement.textContent = "타임 아웃!";
+                
+                // alert("시간이 끝났습니다!");
+                // window.open("https://www.naver.com");
+                window.location.href = targetlink;
+                // window.location.href = "https://www.naver.com";
+              }
+            }
+      
+            // 최초 타이머 업데이트
+            updateTimer();
+      
+            // 1초마다 타이머 업데이트 함수 호출
+            var timerInterval = setInterval(updateTimer, 1000);
+          </script>
           
+
           
           <div class="container-fluid">
             <div class="row">
@@ -213,7 +263,7 @@
 
                   <button onclick="copyFromInput()">Copy from input</button>
                   <button id="resetBtn" onclick="resetOutputGrid()">Reset grid</button>
-                  <button onclick="submitSolution(testgrid, '<%= userName %>' , currentRoute)" id="submit_solution_btn">Submit!</button>
+                  <button onclick="submitSolution()" id="submit_solution_btn">Submit!</button>
               </div>
                 <% Outputgrid.forEach(item => { %>
                   <div class="container-fluid row demo_row mx-auto">
