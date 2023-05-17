@@ -142,3 +142,14 @@ button:focus {outline:0;}
   height: 20px;
 }
 
+/*Selectable*/
+
+.ui-selected {
+  background-image: url(../img/black-twill.png), url(../img/brushed-alum.png);
+}
+.ui-selectable-helper {
+  border: 1px dotted #ddd;
+  position: absolute;
+  z-index: 1000;
+}
+
