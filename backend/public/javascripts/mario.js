@@ -105,12 +105,33 @@ function enterProblemMario(problem, stage){
 }
 
 /* function for submit button */
-function submitSolutionMario(){
+function submitSolutionMario(input1){
     /* 맞았는지 틀렸는지 구현 */
+
+    // console.log("hi")
+
+    const divs = document.querySelectorAll('#user_interact .cell_final');
+
+    const numbersArray = [];
+
+    divs.forEach(div => {
+        const className = div.className;
+        const number = className.split('symbol_')[1]; // Extract the number after "symbol_"
+        numbersArray.push(number); // Store the number in the array
+    });
+
+    User_Answer = numbersArray.map(num => parseInt(num))
+    Actual_Answer = input1[0][1].grid.flat().map(num => parseInt(num))
+
+    
+    console.log(User_Answer)
+    console.log(Actual_Answer)
+    answer = compareArrays(User_Answer, Actual_Answer)
+    console.log(answer)
     /* 현재는 랜덤 */
-    var rand = Math.random()
+    
     var retVal = ""
-    if (rand < 0.5){
+    if (!answer){
         retVal = "false"
     }
     else{

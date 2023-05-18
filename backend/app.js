@@ -8,6 +8,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var marioRouter = require('./routes/mario')
 var IQtestRouter = require('./routes/IQtest')
+var problemsSetRouter = require('./routes/problemset')
 
 var app = express();
 
