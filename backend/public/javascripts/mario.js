@@ -133,9 +133,11 @@ function submitSolutionMario(input1){
     var retVal = ""
     if (!answer){
         retVal = "false"
+        alert("Wrong!")
     }
     else{
         retVal = "true"
+        alert("Success!")
     }
 
     /* 마리오 페이지로 redirection with return val */
