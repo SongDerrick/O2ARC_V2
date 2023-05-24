@@ -2,160 +2,63 @@ $(document).ready(function () {
     var initialToolMode = 'edit';
     handleToolModeChange(initialToolMode);
 
-
     $('input[name=tool_switching]').change(function() {
         var selectedToolMode = $(this).val();
         handleToolModeChange(selectedToolMode);
     });
 
-
-    $('#symbol_picker').find('.symbol_preview').click(function(event) {
-        symbol_preview = $(event.target);
-        $('#symbol_picker').find('.symbol_preview').each(function(i, preview) {
-            $(preview).removeClass('selected-symbol-preview');
-        })
-        symbol_preview.addClass('selected-symbol-preview');
-
-        toolMode = $('input[name=tool_switching]:checked').val();
-        if (toolMode == 'select') {
-            $('.edition_grid').find('.ui-selected').each(function(i, cell) {
-                symbol = getSelectedSymbol();
-                setCellSymbol($(cell), symbol);
-            });
-        }
-    });
-     // Find the user_interact cell div and add a click listener to it.
-    $('#user_interact').on('click', '.cell_final', function(event) {
-
-        var selectedPreview = $('#symbol_picker').find('.selected-symbol-preview');
-        // console.log(selectedPreview.attr('symbol'));  
-        // Get the class of the clicked element.
-        var cellClass = $(this).attr('class');
-        var currentClasses = $(this).attr('class').split(' ');
-        $(this).removeClass(currentClasses[1]).addClass('symbol_'+selectedPreview.attr('symbol'));
-        // Log the new class of the cell
-
-        
-          
-        // console.log($(this).attr('class'));
-        // console.log(cellClass);
-    });    
-
     // Select the cell_final elements and create a new MutationObserver object
     var cells = document.querySelectorAll('#user_interact .cell_final');
     var observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-        if (mutation.attributeName === 'class') {
-            var oldClasses = getSymbolClasses(mutation.oldValue.split(' '));
-            var newClasses = getSymbolClasses($(mutation.target).attr('class').split(' '));
+      var changedElements = [];
+      var radioButtons = document.querySelectorAll('input[name="tool_switching"]');
+      var labels = document.querySelectorAll('label[for^="tool_"]');
     
-            var classChanges = getSymbolClassChanges(oldClasses, newClasses);
-
-            if(classChanges.length == 2){
-                console.log(classChanges)
-                console.log(classChanges[0].class, classChanges[1].class)   
-            }
-            }
-           
+      // Find the selected radio button
+      var selectedRadioButton = document.querySelector('input[name="tool_switching"]:checked');
+    
+      // Find the corresponding label for the selected radio button
+      var selectedLabel = document.querySelector('label[for="' + selectedRadioButton.id + '"]');
+    
+      // Retrieve the label text
+      var labelText = selectedLabel.textContent;
+    
+      // Log the selected label text
+      
+            
+      mutations.forEach(function(mutation) {
+        if (mutation.attributeName === 'class') {
+          var oldClasses = getSymbolClasses(mutation.oldValue.split(' '));
+          var newClasses = getSymbolClasses($(mutation.target).attr('class').split(' '));
+    
+          var classChanges = getSymbolClassChanges(oldClasses, newClasses);
+    
+          if (classChanges.length === 2) {
+            changedElements.push(mutation.target);
+          }
+        }
+      });
+    
+      if (changedElements.length > 0) {
+        // console.log(changedElements);
+        var numbersArray = Array.from(cells).map(function(node) {
+          var className = node.className;
+          var matches = className.match(/symbol_(\d+)/);
+          if (matches && matches[1]) {
+            return parseInt(matches[1]);
+          }
         });
+        console.log(numbersArray)
+        console.log(labelText);
+      }
     });
-
+    
     // Start observing changes to the 'class' attribute of each cell_final element
     cells.forEach(function(cell) {
-        observer.observe(cell, { attributes: true, attributeOldValue: true });
+      observer.observe(cell, { attributes: true, attributeOldValue: true });
     });
-
-
-    function handleToolModeChange(toolMode) {
-        if (toolMode == 'edit') {
-          // 'edit' mode
-          disableTools();
-          enableEditable();
-        //   infoMsg('Editing mode activated');
-        } else if (toolMode == 'select') {
-          // 'select' mode
-          disableTools();
-          enableSelectable();
-        //   infoMsg('Select some cells and click on a color to fill in, or press C to copy');
-        } else if (toolMode == 'floodfill') {
-          // 'flood fill' mode
-          disableTools();
-        //   enableFloodFill();
-        //   infoMsg('Flood fill mode activated');
-        } else {
-        }
-    }
-
-    function enableEditable() {
-        $('#symbol_picker').find('.symbol_preview').click(function(event) {
-            symbol_preview = $(event.target);
-            $('#symbol_picker').find('.symbol_preview').each(function(i, preview) {
-                $(preview).removeClass('selected-symbol-preview');
-            })
-            symbol_preview.addClass('selected-symbol-preview');
-        });
-         // Find the user_interact cell div and add a click listener to it.
-        $('#user_interact').on('click', '.cell_final', function(event) {
-    
-            var selectedPreview = $('#symbol_picker').find('.selected-symbol-preview');
-            console.log(selectedPreview.attr('symbol'));  
-            // Get the class of the clicked element.
-            var cellClass = $(this).attr('class');
-            var currentClasses = $(this).attr('class').split(' ');
-            $(this).removeClass(currentClasses[1]).addClass('symbol_'+selectedPreview.attr('symbol'));
-            // Log the new class of the cell
-            
-            console.log(cellClass);
-            console.log($(this).attr('class'));
-            
-        });
-    }
-
-    function enableSelectable() {
-        // get selectable
-        $("#user_interact").selectable();
-        // click symbol_picker
-        $('#symbol_picker').find('.symbol_preview').click(function(event) {
-            // can change symbol picker
-            symbol_preview = $(event.target);
-            $('#symbol_picker').find('.symbol_preview').each(function(i, preview) {
-                $(preview).removeClass('selected-symbol-preview');
-            })
-            symbol_preview.addClass('selected-symbol-preview');
-            // new color class
-            var selectedPreview = $('#symbol_picker').find('.selected-symbol-preview');
-            // remove old color and add new color
-            $('.cell_final.ui-selectee.ui-selected').each(function() {
-                $(this).removeClass(function(index, className) {
-                  return (className.match(/(^|\s)symbol_\S+/g) || []).join(' ');
-                });
-                $(this).addClass('symbol_'+selectedPreview.attr('symbol'));
-              });
-        });
-    } 
-
-    function disableTools() {
-        disableEditable();
-        disableSelectable();
-        // disableFloodFill();
-    }
-        
-    function disableEditable() {
-        $('#symbol_picker').find('.symbol_preview').off('click');
-        $('#user_interact').off('click', '.cell_final');
-    }
-
-    function disableSelectable() {
-        // destroy selectable
-        try {
-            $("#user_interact").selectable("destroy");
-        }
-        catch (e) {
-        }
-    }
-
 })
-
+// Radio Button : 'edit', 'select', floodfill'
 function handleToolModeChange(toolMode) {
     if (toolMode == 'edit') {
       // 'edit' mode
@@ -180,51 +83,43 @@ function handleToolModeChange(toolMode) {
 
 function enableEditable() {
     $('#symbol_picker').find('.symbol_preview').click(function(event) {
-        symbol_preview = $(event.target);
-        $('#symbol_picker').find('.symbol_preview').each(function(i, preview) {
-            $(preview).removeClass('selected-symbol-preview');
-        })
-        symbol_preview.addClass('selected-symbol-preview');
+        pickSymbol();
     });
      // Find the user_interact cell div and add a click listener to it.
     $('#user_interact').on('click', '.cell_final', function(event) {
-
         var selectedPreview = $('#symbol_picker').find('.selected-symbol-preview');
-        console.log(selectedPreview.attr('symbol'));  
         // Get the class of the clicked element.
-        var cellClass = $(this).attr('class');
         var currentClasses = $(this).attr('class').split(' ');
         $(this).removeClass(currentClasses[1]).addClass('symbol_'+selectedPreview.attr('symbol'));
-        // Log the new class of the cell
-        
-        console.log(cellClass);
-        console.log($(this).attr('class'));
-        
     });
 }
 
 function enableSelectable() {
-    // get selectable
-    $("#user_interact").selectable();
-    // click symbol_picker
+    $("#user_interact").selectable();   // get selectable
     $('#symbol_picker').find('.symbol_preview').click(function(event) {
-        // can change symbol picker
-        symbol_preview = $(event.target);
-        $('#symbol_picker').find('.symbol_preview').each(function(i, preview) {
-            $(preview).removeClass('selected-symbol-preview');
-        })
-        symbol_preview.addClass('selected-symbol-preview');
-        // new color class
-        var selectedPreview = $('#symbol_picker').find('.selected-symbol-preview');
-        // remove old color and add new color
-        $('.cell_final.ui-selectee.ui-selected').each(function() {
-            $(this).removeClass(function(index, className) {
-              return (className.match(/(^|\s)symbol_\S+/g) || []).join(' ');
-            });
-            $(this).addClass('symbol_'+selectedPreview.attr('symbol'));
-          });
+        pickSymbol();   // pick symbol color
+        fillSelected(); // fill selected cell_final
     });
-} 
+}
+
+function pickSymbol() {
+    symbol_preview = $(event.target);
+    $('#symbol_picker').find('.symbol_preview').each(function(i, preview) {
+        $(preview).removeClass('selected-symbol-preview');
+    })
+    symbol_preview.addClass('selected-symbol-preview');
+}
+
+function fillSelected() {
+    var selectedPreview = $('#symbol_picker').find('.selected-symbol-preview');
+    // remove old color and add new color
+    $('.cell_final.ui-selectee.ui-selected').each(function() {
+        $(this).removeClass(function(index, className) {
+          return (className.match(/(^|\s)symbol_\S+/g) || []).join(' ');
+        });
+        $(this).addClass('symbol_'+selectedPreview.attr('symbol'));
+    });
+}
 
 function disableTools() {
     disableEditable();
@@ -238,7 +133,6 @@ function disableEditable() {
 }
 
 function disableSelectable() {
-    // destroy selectable
     try {
         $("#user_interact").selectable("destroy");
     }
@@ -277,8 +171,6 @@ function getSymbolClassChanges(oldClasses, newClasses) {
   
     return classChanges;
   }
-
-
 
 function resetOutputGrid() {
     // Use jQuery to select all <div> elements with class "cell_final"
@@ -323,7 +215,7 @@ function resizeOutputGrid() {
     console.log("Input Value:", inputValue);
   }
 
-  function copyFromInput() {
+function copyFromInput() {
 
     console.log(testgrid[0][0])
 
@@ -357,7 +249,7 @@ function resizeOutputGrid() {
     
   }
 
-  function compareArrays(array1, array2) {
+function compareArrays(array1, array2) {
     // Check if the arrays have the same length
     if (array1.length !== array2.length) {
       return false;
@@ -375,7 +267,7 @@ function resizeOutputGrid() {
     return true;
   }
 
-  function submitSolution(input, name, cRoute){
+function submitSolution(input, name, cRoute){
     // console.log("hi")
 
     const divs = document.querySelectorAll('#user_interact .cell_final');
@@ -415,7 +307,7 @@ function resizeOutputGrid() {
 
   }
 
-  function IQsubmitSolution(input, name, cRoute){
+function IQsubmitSolution(input, name, cRoute){
     // console.log("hi")
 
     const divs = document.querySelectorAll('#user_interact .cell_final');
@@ -454,5 +346,3 @@ function resizeOutputGrid() {
     
 
   }
-
-
