@@ -10,22 +10,52 @@ $(document).ready(function () {
     // Select the cell_final elements and create a new MutationObserver object
     var cells = document.querySelectorAll('#user_interact .cell_final');
     var observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-            if (mutation.attributeName === 'class') {
-                var oldClasses = getSymbolClasses(mutation.oldValue.split(' '));
-                var newClasses = getSymbolClasses($(mutation.target).attr('class').split(' '));
-                var classChanges = getSymbolClassChanges(oldClasses, newClasses);
-
-                if(classChanges.length == 2){
-                    console.log(classChanges)
-                    console.log(classChanges[0].class, classChanges[1].class)   
-                }
-            }
+      var changedElements = [];
+      var radioButtons = document.querySelectorAll('input[name="tool_switching"]');
+      var labels = document.querySelectorAll('label[for^="tool_"]');
+    
+      // Find the selected radio button
+      var selectedRadioButton = document.querySelector('input[name="tool_switching"]:checked');
+    
+      // Find the corresponding label for the selected radio button
+      var selectedLabel = document.querySelector('label[for="' + selectedRadioButton.id + '"]');
+    
+      // Retrieve the label text
+      var labelText = selectedLabel.textContent;
+    
+      // Log the selected label text
+      
+            
+      mutations.forEach(function(mutation) {
+        if (mutation.attributeName === 'class') {
+          var oldClasses = getSymbolClasses(mutation.oldValue.split(' '));
+          var newClasses = getSymbolClasses($(mutation.target).attr('class').split(' '));
+    
+          var classChanges = getSymbolClassChanges(oldClasses, newClasses);
+    
+          if (classChanges.length === 2) {
+            changedElements.push(mutation.target);
+          }
+        }
+      });
+    
+      if (changedElements.length > 0) {
+        // console.log(changedElements);
+        var numbersArray = Array.from(cells).map(function(node) {
+          var className = node.className;
+          var matches = className.match(/symbol_(\d+)/);
+          if (matches && matches[1]) {
+            return parseInt(matches[1]);
+          }
         });
+        console.log(numbersArray)
+        console.log(labelText);
+      }
     });
+    
     // Start observing changes to the 'class' attribute of each cell_final element
     cells.forEach(function(cell) {
-        observer.observe(cell, { attributes: true, attributeOldValue: true });
+      observer.observe(cell, { attributes: true, attributeOldValue: true });
     });
 })
 // Radio Button : 'edit', 'select', floodfill'
