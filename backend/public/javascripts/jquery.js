@@ -7,6 +7,11 @@ $(document).ready(function () {
         handleToolModeChange(selectedToolMode);
     });
 
+    $('#select_util_btn').on('click', 'button' , function() {
+        var buttonName = $(this).attr('id'); // 버튼의 이름을 가져옴
+        console.log(buttonName); // 버튼의 이름을 콘솔에 출력
+    });
+
     // Select the cell_final elements and create a new MutationObserver object
     var cells = document.querySelectorAll('#user_interact .cell_final');
     var observer = new MutationObserver(function(mutations) {
@@ -95,6 +100,11 @@ function enableEditable() {
 }
 
 function enableSelectable() {
+    $('#clockrotate').show();
+    $('#counterclockrotate').show();
+    $('#xflip').show();
+    $('#yflip').show();
+
     $("#user_interact").selectable();   // get selectable
     $('#symbol_picker').find('.symbol_preview').click(function(event) {
         pickSymbol();   // pick symbol color
@@ -122,6 +132,11 @@ function fillSelected() {
 }
 
 function disableTools() {
+    $('#clockrotate').hide();
+    $('#counterclockrotate').hide();
+    $('#xflip').hide();
+    $('#yflip').hide();
+
     disableEditable();
     disableSelectable();
     // disableFloodFill();

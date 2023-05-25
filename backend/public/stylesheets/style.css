@@ -137,6 +137,10 @@ h5 {
 background: blue;
 }
 
+#select_util_btn button:active {
+background: blue;
+}
+
 button:focus {outline:0;}
 
 #toolbar {
