@@ -60,6 +60,28 @@ function cell_observer(cells, observer) {
       });
       console.log(numbersArray)
       console.log(labelText);
+
+      fetch('save-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          numbersArray: numbersArray,
+          labelText: labelText
+        })
+      })
+        .then(function(response) {
+          if (response.ok) {
+            console.log('Data saved successfully.');
+          } else {
+            console.log('Failed to save data.');
+          }
+        })
+        .catch(function(error) {
+          console.log('Error:', error);
+        });
+
     }
   });
   // Start observing changes to the 'class' attribute of each cell_final element
@@ -241,7 +263,7 @@ function resizeOutputGrid() {
     console.log("Input Value:", inputValue);
     cell_observer()
 
-  }
+}
 
 function copyFromInput() {
 
@@ -278,7 +300,7 @@ function copyFromInput() {
     cell_observer()
 
     
-  }
+}
 
 function compareArrays(array1, array2) {
     // Check if the arrays have the same length
@@ -296,7 +318,7 @@ function compareArrays(array1, array2) {
   
     // If all elements are equal, the arrays are identical
     return true;
-  }
+}
 
 function submitSolution(input, name, cRoute){
     // console.log("hi")
@@ -336,7 +358,7 @@ function submitSolution(input, name, cRoute){
     }
     
 
-  }
+}
 
 function IQsubmitSolution(input, name, cRoute){
     // console.log("hi")
@@ -376,4 +398,6 @@ function IQsubmitSolution(input, name, cRoute){
     }
     
 
-  }
+}
+  
+  

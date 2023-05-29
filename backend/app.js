@@ -9,6 +9,7 @@ var usersRouter = require('./routes/users');
 var marioRouter = require('./routes/mario')
 var IQtestRouter = require('./routes/IQtest')
 var problemsSetRouter = require('./routes/problemset')
+var dataRouter = require('./routes/data')
 
 var app = express();
 
@@ -29,6 +30,7 @@ app.use('/users', usersRouter);
 app.use('/task', problemsSetRouter)
 app.use('/mario', marioRouter)
 app.use('/IQtest', IQtestRouter);
+app.use('/data', dataRouter)
 
 
 // catch 404 and forward to error handler
