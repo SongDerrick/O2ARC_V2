@@ -34,7 +34,12 @@ function cell_observer(cells, observer) {
     var labelText = selectedLabel.textContent;
 
     // Log the selected label text
+    var inputValue = $("#output_grid_size").val();
+    var rows = parseInt(inputValue.split('x')[0]);
+    var cols = parseInt(inputValue.split('x')[1]);
+
     
+        
           
     mutations.forEach(function(mutation) {
       if (mutation.attributeName === 'class') {
@@ -58,29 +63,9 @@ function cell_observer(cells, observer) {
           return parseInt(matches[1]);
         }
       });
+      
       console.log(numbersArray)
       console.log(labelText);
-
-      fetch('save-data', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          numbersArray: numbersArray,
-          labelText: labelText
-        })
-      })
-        .then(function(response) {
-          if (response.ok) {
-            console.log('Data saved successfully.');
-          } else {
-            console.log('Failed to save data.');
-          }
-        })
-        .catch(function(error) {
-          console.log('Error:', error);
-        });
 
     }
   });
@@ -91,6 +76,55 @@ function cell_observer(cells, observer) {
 
 }
 
+function sendLogData(numbersArray, labelText){
+  const currentURL = new URL(window.location.href);
+  const pathnameSegments = currentURL.pathname.split('/');
+
+  const dynamicParam1 = pathnameSegments[2]; 
+  const dynamicParam2 = pathnameSegments[3];
+
+  console.log(dynamicParam1); 
+  console.log(dynamicParam2); 
+
+  const url = `${encodeURIComponent(dynamicParam2)}/save-data`;
+  console.log(url);
+  
+  fetch(url , {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      numbersArray: numbersArray,
+      labelText: labelText
+    })
+  })
+    .then(function(response) {
+      if (response.ok) {
+        console.log('Data saved successfully.');
+      } else {
+        console.log('Failed to save data.');
+      }
+    })
+    .catch(function(error) {
+      console.log('Error:', error);
+    });
+
+}
+
+function createArray(rows, columns) {
+  const array = [];
+  
+  for (let i = 0; i < rows; i++) {
+    const row = [];
+    for (let j = 0; j < columns; j++) {
+      row.push(0); // or any initial value you prefer
+    }
+    array.push(row);
+  }
+  
+  return array;
+}
 
 // Radio Button : 'edit', 'select', floodfill'
 function handleToolModeChange(toolMode) {
@@ -238,6 +272,7 @@ function resizeOutputGrid() {
 
     var rows = parseInt(inputValue.split('x')[0]);
     var cols = parseInt(inputValue.split('x')[1]);
+    const numbersArray = createArray(rows, cols)
 
     if(rows>cols){
         n = rows
@@ -261,6 +296,8 @@ function resizeOutputGrid() {
     }
     // Log the input value to the console
     console.log("Input Value:", inputValue);
+    sendLogData(numbersArray, 'Change Grid Size')
+
     cell_observer()
 
 }
