@@ -16,12 +16,20 @@ $(document).ready(function () {
 
 })
 
+function pushToTargetArray(array2D, text, targetArray) {
+  targetArray.push([text, array2D]);
+  return targetArray;
+}
+
 function cell_observer(cells, observer) {
   // Select the cell_final elements and create a new MutationObserver object
   var cells = document.querySelectorAll('#user_interact .cell_final');
   const rows = document.querySelectorAll('#user_interact .row')
+  const submitButton = document.getElementById('submit_solution_btn');
+
   const rownum = rows.length
   const divnum = cells.length
+  var final = []
   var observer = new MutationObserver(function(mutations) {
     var changedElements = [];
     var radioButtons = document.querySelectorAll('input[name="tool_switching"]');
@@ -74,7 +82,11 @@ function cell_observer(cells, observer) {
       
       console.log(numbersArray)
       console.log(labelText);
-      sendLogData(numbersArray, labelText)
+      final = pushToTargetArray(numbersArray, labelText, final)
+      console.log(final)
+      submitButton.addEventListener('click', function() {
+        sendLogData(final)
+      })
 
     }
   });
@@ -85,7 +97,7 @@ function cell_observer(cells, observer) {
 
 }
 
-function sendLogData(numbersArray, labelText){
+function sendLogData(final){
   const currentURL = new URL(window.location.href);
   const pathnameSegments = currentURL.pathname.split('/');
 
@@ -104,8 +116,7 @@ function sendLogData(numbersArray, labelText){
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      numbersArray: numbersArray,
-      labelText: labelText
+      numbersArray: final,
     })
   })
     .then(function(response) {
