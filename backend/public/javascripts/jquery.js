@@ -19,6 +19,9 @@ $(document).ready(function () {
 function cell_observer(cells, observer) {
   // Select the cell_final elements and create a new MutationObserver object
   var cells = document.querySelectorAll('#user_interact .cell_final');
+  const rows = document.querySelectorAll('#user_interact .row')
+  const rownum = rows.length
+  const divnum = cells.length
   var observer = new MutationObserver(function(mutations) {
     var changedElements = [];
     var radioButtons = document.querySelectorAll('input[name="tool_switching"]');
@@ -37,9 +40,6 @@ function cell_observer(cells, observer) {
     var inputValue = $("#output_grid_size").val();
     var rows = parseInt(inputValue.split('x')[0]);
     var cols = parseInt(inputValue.split('x')[1]);
-
-    
-        
           
     mutations.forEach(function(mutation) {
       if (mutation.attributeName === 'class') {
@@ -55,17 +55,26 @@ function cell_observer(cells, observer) {
     });
 
     if (changedElements.length > 0) {
-      // console.log(changedElements);
-      var numbersArray = Array.from(cells).map(function(node) {
-        var className = node.className;
-        var matches = className.match(/symbol_(\d+)/);
-        if (matches && matches[1]) {
-          return parseInt(matches[1]);
+
+      const numbersArray = [];
+      for (let i = 0; i < rownum; i++) {
+        const rowArray = [];
+      
+        for (let j = 0; j < divnum/rownum; j++) {
+          const index = i * 5 + j;
+          const div = cells[index];
+      
+          const className = div.className;
+          const number = className.split('symbol_')[1]; // Extract the number after "symbol_"
+          rowArray.push(parseInt(number)); // Convert the number to an integer and store it in the row array
         }
-      });
+      
+        numbersArray.push(rowArray); // Store the row array in the main array
+      }
       
       console.log(numbersArray)
       console.log(labelText);
+      sendLogData(numbersArray, labelText)
 
     }
   });
@@ -340,52 +349,76 @@ function copyFromInput() {
 }
 
 function compareArrays(array1, array2) {
-    // Check if the arrays have the same length
-    if (array1.length !== array2.length) {
+  // Check if the arrays have the same number of rows
+  if (array1.length !== array2.length) {
+    return false;
+  }
+
+  // Check if the arrays have the same number of columns in each row
+  for (let i = 0; i < array1.length; i++) {
+    if (array1[i].length !== array2[i].length) {
       return false;
     }
-  
-    // Iterate over the elements of the arrays
-    for (let i = 0; i < array1.length; i++) {
-      // Compare the elements at each index
-      if (array1[i] !== array2[i]) {
+  }
+
+  // Iterate over the elements of the arrays
+  for (let i = 0; i < array1.length; i++) {
+    for (let j = 0; j < array1[i].length; j++) {
+      // Compare the elements at each index of the nested arrays
+      if (array1[i][j] !== array2[i][j]) {
         return false;
       }
     }
-  
-    // If all elements are equal, the arrays are identical
-    return true;
+  }
+
+  // If all elements are equal, the arrays are identical
+  return true;
 }
 
 function submitSolution(input, name, cRoute){
     // console.log("hi")
 
     const divs = document.querySelectorAll('#user_interact .cell_final');
+    const rows = document.querySelectorAll('#user_interact .row')
+    const rownum = rows.length
+    const divnum = divs.length
 
     const numbersArray = [];
-
-    divs.forEach(div => {
+    for (let i = 0; i < rownum; i++) {
+      const rowArray = [];
+    
+      for (let j = 0; j < divnum/rownum; j++) {
+        const index = i * 5 + j;
+        const div = divs[index];
+    
         const className = div.className;
         const number = className.split('symbol_')[1]; // Extract the number after "symbol_"
-        numbersArray.push(number); // Store the number in the array
-    });
+        rowArray.push(parseInt(number)); // Store the number in the row array
+      }
+    
+      numbersArray.push(rowArray); // Store the row array in the main array
+    }
 
     User_Answer = numbersArray.map(num => parseInt(num))
     Actual_Answer = input[0][1].grid.flat().map(num => parseInt(num))
 
-    //console.log(numbersArray)
-    //console.log(input[0][0].grid)
-    //console.log(input[0][1].grid.flat()) // 이 친구가 답임 ㅋㅋ
+    console.log(numbersArray)
+
+    for (let i = 0; i < input[0][1].grid.length; i++) {
+      for (let j = 0; j < input[0][1].grid[i].length; j++) {
+        // Convert the value to an integer using parseInt()
+        input[0][1].grid[i][j] = parseInt(input[0][1].grid[i][j]);
+      }
+    }
+    console.log(input[0][1].grid)
     console.log(cRoute)
     var lastPart = cRoute.substring(cRoute.lastIndexOf('/') + 1);
     var incrementedValue = parseInt(lastPart, 10) + 1;
     
     // Convert the incremented value back to a string
     var incrementedLastPart = incrementedValue.toString();
-    
-    console.log(User_Answer)
-    console.log(Actual_Answer)
-    answer = compareArrays(User_Answer, Actual_Answer)
+
+    answer = compareArrays(numbersArray, input[0][1].grid)
     console.log(answer)
     if(answer){
         alert('Success!')
@@ -401,17 +434,37 @@ function IQsubmitSolution(input, name, cRoute){
     // console.log("hi")
 
     const divs = document.querySelectorAll('#user_interact .cell_final');
+    const rows = document.querySelectorAll('#user_interact .row')
+    const rownum = rows.length
+    const divnum = divs.length
 
     const numbersArray = [];
-
-    divs.forEach(div => {
+    for (let i = 0; i < rownum; i++) {
+      const rowArray = [];
+    
+      for (let j = 0; j < divnum/rownum; j++) {
+        const index = i * 5 + j;
+        const div = divs[index];
+    
         const className = div.className;
         const number = className.split('symbol_')[1]; // Extract the number after "symbol_"
-        numbersArray.push(number); // Store the number in the array
-    });
+        rowArray.push(parseInt(number)); // Store the number in the row array
+      }
+    
+      numbersArray.push(rowArray); // Store the row array in the main array
+    }
 
     User_Answer = numbersArray.map(num => parseInt(num))
     Actual_Answer = input[0][1].grid.flat().map(num => parseInt(num))
+
+    console.log(numbersArray)
+
+    for (let i = 0; i < input[0][1].grid.length; i++) {
+      for (let j = 0; j < input[0][1].grid[i].length; j++) {
+        // Convert the value to an integer using parseInt()
+        input[0][1].grid[i][j] = parseInt(input[0][1].grid[i][j]);
+      }
+    }
 
     //console.log(numbersArray)
     //console.log(input[0][0].grid)
