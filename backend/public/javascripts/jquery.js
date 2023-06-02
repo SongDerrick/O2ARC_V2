@@ -12,13 +12,67 @@ $(document).ready(function () {
         console.log(buttonName); // 버튼의 이름을 콘솔에 출력
     });
 
+    $('#select_util_btn').on('click', 'button' , function() {
+      var buttonName = $(this).attr('id'); // 버튼의 이름을 가져옴
+      console.log(buttonName); // 버튼의 이름을 콘솔에 출력
+      var selectedIds = getSelectedCellIds(); // getSelectedCellIds() 함수를 호출하여 선택된 셀의 ID를 가져옴
+      var symbols = getSymbolClassesFromCellIds(selectedIds)
+      var coordinates = convertCellIdsToCoordinates(selectedIds)
+      var rectangular = isRectangular(coordinates)
+      if (rectangular) {
+        var size = calculateRectangleSize(coordinates)
+        var planesymbol = saveInRectangle(symbols, size.width, size.height)
+        var planeid = saveInRectangle(selectedIds, size.width, size.height)
+        console.log('planesymbol:', planesymbol);
+        console.log('planeid:', planeid);
+        if (buttonName == 'xflip') {
+          console.log(buttonName); // 버튼의 이름을 콘솔에 출력
+          var changed_symbol = flipArrayX(planesymbol)
+          console.log("x flipped", changed_symbol)
+          updateCellClasses(planeid, changed_symbol)
+        }
+        if (buttonName == 'yflip') {
+          console.log(buttonName); // 버튼의 이름을 콘솔에 출력
+          var changed_symbol = flipArrayY(planesymbol)
+          console.log("y flipped", changed_symbol)
+          updateCellClasses(planeid, changed_symbol)
+        }
+        if (buttonName == 'clockrotate') {
+          console.log(buttonName); // 버튼의 이름을 콘솔에 출력
+          var changed_symbol = rotateArrayClockwise(planesymbol)
+          console.log("Clockwise Rotate", changed_symbol)
+          //updateCellClasses(planeid, changed_symbol)
+        }
+        if (buttonName == 'counterclockrotate') {
+          console.log(buttonName); // 버튼의 이름을 콘솔에 출력
+          var changed_symbol = rotateArrayCounterClockwise(planesymbol)
+          console.log("y flipped", changed_symbol)
+          //updateCellClasses(planeid, changed_symbol)
+        }
+      }
+    });
+
     cell_observer()
 
 })
 
+
+var final = []
+
+function pushToTargetArray(array2D, text, targetArray) {
+  targetArray.push([text, array2D]);
+  return targetArray;
+}
+
 function cell_observer(cells, observer) {
   // Select the cell_final elements and create a new MutationObserver object
   var cells = document.querySelectorAll('#user_interact .cell_final');
+  const rows = document.querySelectorAll('#user_interact .row')
+  const submitButton = document.getElementById('submit_solution_btn');
+
+  const rownum = rows.length
+  const divnum = cells.length
+
   var observer = new MutationObserver(function(mutations) {
     var changedElements = [];
     var radioButtons = document.querySelectorAll('input[name="tool_switching"]');
@@ -37,9 +91,6 @@ function cell_observer(cells, observer) {
     var inputValue = $("#output_grid_size").val();
     var rows = parseInt(inputValue.split('x')[0]);
     var cols = parseInt(inputValue.split('x')[1]);
-
-    
-        
           
     mutations.forEach(function(mutation) {
       if (mutation.attributeName === 'class') {
@@ -55,18 +106,27 @@ function cell_observer(cells, observer) {
     });
 
     if (changedElements.length > 0) {
-      // console.log(changedElements);
-      var numbersArray = Array.from(cells).map(function(node) {
-        var className = node.className;
-        var matches = className.match(/symbol_(\d+)/);
-        if (matches && matches[1]) {
-          return parseInt(matches[1]);
+
+      const numbersArray = [];
+      for (let i = 0; i < rownum; i++) {
+        const rowArray = [];
+      
+        for (let j = 0; j < divnum/rownum; j++) {
+          const index = i * 5 + j;
+          const div = cells[index];
+      
+          const className = div.className;
+          const number = className.split('symbol_')[1]; // Extract the number after "symbol_"
+          rowArray.push(parseInt(number)); // Convert the number to an integer and store it in the row array
         }
-      });
+      
+        numbersArray.push(rowArray); // Store the row array in the main array
+      }
       
       console.log(numbersArray)
       console.log(labelText);
-
+      final = pushToTargetArray(numbersArray, labelText, final)
+      console.log(final)
     }
   });
   // Start observing changes to the 'class' attribute of each cell_final element
@@ -76,15 +136,15 @@ function cell_observer(cells, observer) {
 
 }
 
-function sendLogData(numbersArray, labelText){
+function sendLogData(final){
   const currentURL = new URL(window.location.href);
   const pathnameSegments = currentURL.pathname.split('/');
 
   const dynamicParam1 = pathnameSegments[2]; 
   const dynamicParam2 = pathnameSegments[3];
 
-  console.log(dynamicParam1); 
-  console.log(dynamicParam2); 
+  // console.log(dynamicParam1); 
+  // console.log(dynamicParam2); 
 
   const url = `${encodeURIComponent(dynamicParam2)}/save-data`;
   console.log(url);
@@ -95,8 +155,7 @@ function sendLogData(numbersArray, labelText){
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      numbersArray: numbersArray,
-      labelText: labelText
+      numbersArray: final,
     })
   })
     .then(function(response) {
@@ -340,58 +399,86 @@ function copyFromInput() {
 }
 
 function compareArrays(array1, array2) {
-    // Check if the arrays have the same length
-    if (array1.length !== array2.length) {
+  // Check if the arrays have the same number of rows
+  if (array1.length !== array2.length) {
+    return false;
+  }
+
+  // Check if the arrays have the same number of columns in each row
+  for (let i = 0; i < array1.length; i++) {
+    if (array1[i].length !== array2[i].length) {
       return false;
     }
-  
-    // Iterate over the elements of the arrays
-    for (let i = 0; i < array1.length; i++) {
-      // Compare the elements at each index
-      if (array1[i] !== array2[i]) {
+  }
+
+  // Iterate over the elements of the arrays
+  for (let i = 0; i < array1.length; i++) {
+    for (let j = 0; j < array1[i].length; j++) {
+      // Compare the elements at each index of the nested arrays
+      if (array1[i][j] !== array2[i][j]) {
         return false;
       }
     }
-  
-    // If all elements are equal, the arrays are identical
-    return true;
+  }
+
+  // If all elements are equal, the arrays are identical
+  return true;
 }
 
 function submitSolution(input, name, cRoute){
     // console.log("hi")
 
     const divs = document.querySelectorAll('#user_interact .cell_final');
+    const rows = document.querySelectorAll('#user_interact .row')
+    const rownum = rows.length
+    const divnum = divs.length
 
     const numbersArray = [];
-
-    divs.forEach(div => {
+    for (let i = 0; i < rownum; i++) {
+      const rowArray = [];
+    
+      for (let j = 0; j < divnum/rownum; j++) {
+        const index = i * 5 + j;
+        const div = divs[index];
+    
         const className = div.className;
         const number = className.split('symbol_')[1]; // Extract the number after "symbol_"
-        numbersArray.push(number); // Store the number in the array
-    });
+        rowArray.push(parseInt(number)); // Store the number in the row array
+      }
+    
+      numbersArray.push(rowArray); // Store the row array in the main array
+    }
 
     User_Answer = numbersArray.map(num => parseInt(num))
     Actual_Answer = input[0][1].grid.flat().map(num => parseInt(num))
 
-    //console.log(numbersArray)
-    //console.log(input[0][0].grid)
-    //console.log(input[0][1].grid.flat()) // 이 친구가 답임 ㅋㅋ
+    console.log(numbersArray)
+
+    for (let i = 0; i < input[0][1].grid.length; i++) {
+      for (let j = 0; j < input[0][1].grid[i].length; j++) {
+        // Convert the value to an integer using parseInt()
+        input[0][1].grid[i][j] = parseInt(input[0][1].grid[i][j]);
+      }
+    }
+    console.log(input[0][1].grid)
     console.log(cRoute)
     var lastPart = cRoute.substring(cRoute.lastIndexOf('/') + 1);
     var incrementedValue = parseInt(lastPart, 10) + 1;
     
     // Convert the incremented value back to a string
     var incrementedLastPart = incrementedValue.toString();
-    
-    console.log(User_Answer)
-    console.log(Actual_Answer)
-    answer = compareArrays(User_Answer, Actual_Answer)
+
+    answer = compareArrays(numbersArray, input[0][1].grid)
     console.log(answer)
     if(answer){
+        sendLogData(final)
+        final = []
         alert('Success!')
         window.location.href ="/task/" + name + '/' + incrementedLastPart
     } else {
+        sendLogData(final)
         alert('Wrong!')
+        final = []
     }
     
 
@@ -401,17 +488,37 @@ function IQsubmitSolution(input, name, cRoute){
     // console.log("hi")
 
     const divs = document.querySelectorAll('#user_interact .cell_final');
+    const rows = document.querySelectorAll('#user_interact .row')
+    const rownum = rows.length
+    const divnum = divs.length
 
     const numbersArray = [];
-
-    divs.forEach(div => {
+    for (let i = 0; i < rownum; i++) {
+      const rowArray = [];
+    
+      for (let j = 0; j < divnum/rownum; j++) {
+        const index = i * 5 + j;
+        const div = divs[index];
+    
         const className = div.className;
         const number = className.split('symbol_')[1]; // Extract the number after "symbol_"
-        numbersArray.push(number); // Store the number in the array
-    });
+        rowArray.push(parseInt(number)); // Store the number in the row array
+      }
+    
+      numbersArray.push(rowArray); // Store the row array in the main array
+    }
 
     User_Answer = numbersArray.map(num => parseInt(num))
     Actual_Answer = input[0][1].grid.flat().map(num => parseInt(num))
+
+    console.log(numbersArray)
+
+    for (let i = 0; i < input[0][1].grid.length; i++) {
+      for (let j = 0; j < input[0][1].grid[i].length; j++) {
+        // Convert the value to an integer using parseInt()
+        input[0][1].grid[i][j] = parseInt(input[0][1].grid[i][j]);
+      }
+    }
 
     //console.log(numbersArray)
     //console.log(input[0][0].grid)
@@ -436,5 +543,240 @@ function IQsubmitSolution(input, name, cRoute){
     
 
 }
+
+function createInputObject(coordinates, symbols) {
+  var input = {};
+
+  for (var i = 0; i < coordinates.length; i++) {
+    var cellId = 'cell_' + coordinates[i][0] + '-' + coordinates[i][1];
+    input[cellId] = symbols[i];
+  }
+
+  return input;
+}
   
-  
+function calculateRectangleSize(coordinates) {
+  var minX = Infinity;
+  var minY = Infinity;
+  var maxX = -Infinity;
+  var maxY = -Infinity;
+
+  for (var i = 0; i < coordinates.length; i++) {
+    var [x, y] = coordinates[i];
+    minX = Math.min(minX, x);
+    minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x);
+    maxY = Math.max(maxY, y);
+  }
+
+  // 높이와 너비를 계산합니다.
+  var height = maxY - minY + 1;
+  var width = maxX - minX + 1;
+
+  return { height, width };
+}
+
+function saveInRectangle(symbols, numRows, numColumns) {
+  var output = [];
+  var index = 0;
+
+  for (var i = 0; i < numRows; i++) {
+    var row = [];
+    for (var j = 0; j < numColumns; j++) {
+      row.push(symbols[index]);
+      index++;
+    }
+    output.push(row);
+  }
+
+  return output;
+}
+
+function flipArrayX(arr) {
+  var flippedArr = [];
+
+  // Iterate over the input array in reverse order
+  for (var i = arr.length - 1; i >= 0; i--) {
+    var subArr = arr[i];
+    flippedArr.push(subArr);
+  }
+
+  return flippedArr;
+}
+
+function flipArrayY(arr) {
+  var flippedArr = [];
+
+  // Iterate over the input array in reverse order
+  for (var i = 0; i < arr.length; i++) {
+    var subArr = arr[i];
+    var flippedSubArr = subArr.reverse(); // Reverse the sub-array
+    flippedArr.push(flippedSubArr);
+  }
+
+  return flippedArr;
+}
+
+function rotateArrayClockwise(arr) {
+  var rows = arr.length;
+  var cols = arr[0].length;
+  var rotatedArr = [];
+
+  // Create the rotated array with transposed dimensions
+  for (var j = 0; j < cols; j++) {
+    var newRow = [];
+    for (var i = rows - 1; i >= 0; i--) {
+      newRow.push(arr[i][j]);
+    }
+    rotatedArr.push(newRow);
+  }
+
+  return rotatedArr;
+}
+
+function rotateArrayCounterClockwise(arr) {
+  var rows = arr.length;
+  var cols = arr[0].length;
+  var rotatedArr = [];
+
+  for (var j = cols - 1; j >= 0; j--) {
+    var newRow = [];
+    for (var i = 0; i < rows; i++) {
+      newRow.push(arr[i][j]);
+    }
+    rotatedArr.push(newRow);
+  }
+
+  return rotatedArr;
+}
+
+function updateCellSymbols(planeid, symbols) {
+  var cells = planeid.flat();
+
+  // Iterate over the cells array
+  for (var i = 0; i < cells.length; i++) {
+    var cellId = cells[i];
+    var symbol = symbols[i];
+
+    // Remove existing symbol class from cell
+    $('#' + cellId).removeClass(function(index, classNames) {
+      var existingClasses = classNames.split(' ');
+      var symbolClasses = existingClasses.filter(function(className) {
+        return className.startsWith('symbol_');
+      });
+      return symbolClasses.join(' ');
+    });
+
+    // Add new symbol class to cell
+    $('#' + cellId).addClass(symbol);
+  }
+}
+
+function updateCellClasses(cellIdsArray, symbolsArray) {
+  // Iterate over the cellIdsArray and symbolsArray
+  for (var i = 0; i < cellIdsArray.length; i++) {
+    var cellIds = cellIdsArray[i];
+    var symbols = symbolsArray[i];
+
+    // Iterate over the cellIds and symbols
+    for (var j = 0; j < cellIds.length; j++) {
+      var cellId = cellIds[j];
+      var symbol = symbols[j];
+
+      // Remove existing symbol class from the cell
+      var $cell = $('#' + cellId);
+      $cell.removeClass(function (index, classNames) {
+        return classNames.split(' ').filter(function (className) {
+          return className.startsWith('symbol_');
+        }).join(' ');
+      });
+
+      // Add the new symbol class to the cell
+      $cell.addClass(symbol);
+    }
+  }
+}
+
+function getSelectedCellIds() {
+  var selectedCellIds = [];
+
+  $('.ui-selected').each(function() {
+    var cellId = $(this).attr('id');
+    if(cellId) {
+      selectedCellIds.push(cellId);
+    }
+  });
+
+  return selectedCellIds;
+}
+
+function getSymbolClassesFromCellIds(cellIds) {
+  var symbolClasses = [];
+
+  if (Array.isArray(cellIds)) {
+    cellIds.forEach(function(cellId) {
+      if (cellId) {
+        var $cell = $('#' + cellId);
+        var classes = $cell.attr('class').split(' ');
+
+        classes.forEach(function(className) {
+          if (className.startsWith('symbol')) {
+            symbolClasses.push(className);
+          }
+        });
+      }
+    });
+  }
+
+  return symbolClasses;
+}
+function convertCellIdsToCoordinates(cellIds) {
+  var coordinates = [];
+
+  if (Array.isArray(cellIds)) {
+    cellIds.forEach(function(cellId) {
+      if (cellId) {
+        var parts = cellId.split('_')[1].split('-');
+        var row = parseInt(parts[0]);
+        var column = parseInt(parts[1]);
+        coordinates.push([row, column]);
+      }
+    });
+  }
+
+  return coordinates;
+}
+
+function isRectangular(coordinates) {
+  if (coordinates.length < 2) {
+    // A rectangle needs at least 2 coordinates
+    return false;
+  }
+
+  var minRow = coordinates[0][0];
+  var maxRow = coordinates[0][0];
+  var minCol = coordinates[0][1];
+  var maxCol = coordinates[0][1];
+
+  for (var i = 1; i < coordinates.length; i++) {
+    var row = coordinates[i][0];
+    var col = coordinates[i][1];
+
+    if (row < minRow) {
+      minRow = row;
+    } else if (row > maxRow) {
+      maxRow = row;
+    }
+
+    if (col < minCol) {
+      minCol = col;
+    } else if (col > maxCol) {
+      maxCol = col;
+    }
+  }
+
+  var numRows = maxRow - minRow + 1;
+  var numCols = maxCol - minCol + 1;
+
+  return coordinates.length === numRows * numCols;
+}

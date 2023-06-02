@@ -98,13 +98,13 @@ router.get('/:id/:problem', function(req, res, next) {
 router.post('/:id/:problem/save-data', (req, res) => {
   // Retrieve the data from the request body
   const numbersArray = req.body.numbersArray;
-  const labelText = req.body.labelText;
+  // const labelText = req.body.labelText;
   const userName = req.params.id
   const problem = req.params.problem
 
   // console.log(req)
-  console.log(numbersArray, labelText)
-  console.log(userName, problem)
+  console.log(numbersArray)
+  // console.log(userName, problem)
   // Save the data to the database (replace this with your database logic)
   // ...
 
