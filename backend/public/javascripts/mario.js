@@ -1,5 +1,5 @@
 /* global variable */
-TOTAL_STAGE = 12;
+TOTAL_STAGE = 6;
 clear_stage_list = new Array();
 fail_stage_list = new Array();
 last_stage = -123;
@@ -162,9 +162,11 @@ function submitSolutionMario(input1){
     var retVal = ""
     if (!answer){
         retVal = "false"
+        alert("Wrong!")
     }
     else{
         retVal = "true"
+        alert("Success!")
     }
 
     /* 마리오 페이지로 redirection with return val */
