@@ -14,7 +14,6 @@ $(document).ready(function () {
 
     $('#select_util_btn').on('click', 'button' , function() {
       var buttonName = $(this).attr('id'); // 버튼의 이름을 가져옴
-      console.log(buttonName); // 버튼의 이름을 콘솔에 출력
       var selectedIds = getSelectedCellIds(); // getSelectedCellIds() 함수를 호출하여 선택된 셀의 ID를 가져옴
       var symbols = getSymbolClassesFromCellIds(selectedIds)
       var coordinates = convertCellIdsToCoordinates(selectedIds)
@@ -23,31 +22,53 @@ $(document).ready(function () {
         var size = calculateRectangleSize(coordinates)
         var planesymbol = saveInRectangle(symbols, size.width, size.height)
         var planeid = saveInRectangle(selectedIds, size.width, size.height)
-        console.log('planesymbol:', planesymbol);
+        //console.log('planesymbol:', planesymbol);
         console.log('planeid:', planeid);
         if (buttonName == 'xflip') {
-          console.log(buttonName); // 버튼의 이름을 콘솔에 출력
           var changed_symbol = flipArrayX(planesymbol)
           console.log("x flipped", changed_symbol)
           updateCellClasses(planeid, changed_symbol)
         }
         if (buttonName == 'yflip') {
-          console.log(buttonName); // 버튼의 이름을 콘솔에 출력
           var changed_symbol = flipArrayY(planesymbol)
           console.log("y flipped", changed_symbol)
           updateCellClasses(planeid, changed_symbol)
         }
         if (buttonName == 'clockrotate') {
-          console.log(buttonName); // 버튼의 이름을 콘솔에 출력
+          selectedIds = getSelectedCellIds(); // getSelectedCellIds() 함수를 호출하여 선택된 셀의 ID를 가져옴
+          symbols = getSymbolClassesFromCellIds(selectedIds)
+          coordinates = convertCellIdsToCoordinates(selectedIds)
+          size = calculateRectangleSize(coordinates)
+          planesymbol = saveInRectangle(symbols, size.width, size.height)
+          planeid = saveInRectangle(selectedIds, size.width, size.height)  
+          removeSelectedClass()
           var changed_symbol = rotateArrayClockwise(planesymbol)
-          console.log("Clockwise Rotate", changed_symbol)
-          //updateCellClasses(planeid, changed_symbol)
+          //console.log("symbol rotate", changed_symbol)
+          var black_symbol = createRectangle(size.height, size.width)
+          console.log("black: ", black_symbol)
+          updateCellClasses(planeid, black_symbol)
+          var changed_id = rotateRectangle(planeid)
+          //console.log("id roate", changed_id)
+          addSelectedClass(changed_id)
+          updateCellClasses(changed_id, changed_symbol)
         }
         if (buttonName == 'counterclockrotate') {
-          console.log(buttonName); // 버튼의 이름을 콘솔에 출력
+          selectedIds = getSelectedCellIds(); // getSelectedCellIds() 함수를 호출하여 선택된 셀의 ID를 가져옴
+          symbols = getSymbolClassesFromCellIds(selectedIds)
+          coordinates = convertCellIdsToCoordinates(selectedIds)
+          size = calculateRectangleSize(coordinates)
+          planesymbol = saveInRectangle(symbols, size.width, size.height)
+          planeid = saveInRectangle(selectedIds, size.width, size.height)  
+          removeSelectedClass()
           var changed_symbol = rotateArrayCounterClockwise(planesymbol)
-          console.log("y flipped", changed_symbol)
-          //updateCellClasses(planeid, changed_symbol)
+          //console.log("symbol rotate", changed_symbol)
+          var black_symbol = createRectangle(size.height, size.width)
+          console.log("black: ", black_symbol)
+          updateCellClasses(planeid, black_symbol)
+          var changed_id = rotateRectangle(planeid)
+          //console.log("id roate", changed_id)
+          addSelectedClass(changed_id)
+          updateCellClasses(changed_id, changed_symbol)
         }
       }
     });
@@ -673,6 +694,8 @@ function updateCellSymbols(planeid, symbols) {
 }
 
 function updateCellClasses(cellIdsArray, symbolsArray) {
+  console.log("cell_id",cellIdsArray)
+  console.log("symbolIID",symbolsArray)
   // Iterate over the cellIdsArray and symbolsArray
   for (var i = 0; i < cellIdsArray.length; i++) {
     var cellIds = cellIdsArray[i];
@@ -710,6 +733,21 @@ function getSelectedCellIds() {
   return selectedCellIds;
 }
 
+function removeSelectedClass() {
+  $(".ui-selected").removeClass("ui-selected");
+}
+
+function addSelectedClass(cellIdsArray) {
+  for (var i = 0; i < cellIdsArray.length; i++) {
+    var cellIds = cellIdsArray[i];
+
+    for (var j = 0; j < cellIds.length; j++) {
+      var cellId = cellIds[j];
+      $('#' + cellId).addClass('ui-selected');
+    }
+  }
+}
+
 function getSymbolClassesFromCellIds(cellIds) {
   var symbolClasses = [];
 
@@ -730,22 +768,7 @@ function getSymbolClassesFromCellIds(cellIds) {
 
   return symbolClasses;
 }
-function convertCellIdsToCoordinates(cellIds) {
-  var coordinates = [];
 
-  if (Array.isArray(cellIds)) {
-    cellIds.forEach(function(cellId) {
-      if (cellId) {
-        var parts = cellId.split('_')[1].split('-');
-        var row = parseInt(parts[0]);
-        var column = parseInt(parts[1]);
-        coordinates.push([row, column]);
-      }
-    });
-  }
-
-  return coordinates;
-}
 
 function isRectangular(coordinates) {
   if (coordinates.length < 2) {
@@ -779,4 +802,140 @@ function isRectangular(coordinates) {
   var numCols = maxCol - minCol + 1;
 
   return coordinates.length === numRows * numCols;
+}
+
+function applyPaddingToRectangle(arr, pad_symbol) {
+  var rows = arr.length;
+  var cols = arr[0].length;
+  var maxDimension = Math.max(rows, cols);
+
+  // Add padding to make a square
+  if (cols < maxDimension) {
+    for (var i = 0; i < rows; i++) {
+      for (var j = cols; j < maxDimension; j++) {
+        arr[i].unshift(pad_symbol);
+      }
+    }
+  } else if (rows < maxDimension) {
+    for (var i = rows; i < maxDimension; i++) {
+      var newRow = Array(maxDimension).fill(pad_symbol);
+      arr.unshift(newRow);
+    }
+  }
+
+  return arr;
+}
+
+function padRectangleToSquare(arr) {
+  const height = arr.length;
+  const width = arr[0].length;
+  const max_length = Math.max(height, width);
+  const square = Array.from({ length: max_length }, () => Array(max_length).fill(''));
+
+  let rowOffset = 0;
+  let colOffset = 0;
+
+  if (height < width) {
+    rowOffset = Math.floor((max_length - height) / 2);
+  } else if (height > width) {
+    colOffset = Math.floor((max_length - width) / 2);
+  }
+
+  for (let i = 0; i < height; i++) {
+    for (let j = 0; j < width; j++) {
+      square[i + rowOffset][j + colOffset] = arr[i][j];
+    }
+  }
+
+  for (let i = 0; i < square.length; i++) {
+    const cellId = square[i][0].replace(/-\d+$/, '');
+    for (let j = 0; j < square[i].length; j++) {
+      square[i][j] = `${cellId}-${j + 1}`;
+    }
+  }
+
+  return square;
+}
+
+
+function rotateRectangle(arr) {
+  const height = arr[0].length; //회전을 위해 바꿈
+  const width = arr.length; //회전을 위해 바꿈
+  var center = convertCellIdsToCoordinates(findCenterValue(arr));
+  var new_rec = createRectangle(width, height);
+  new_rec = createCellArray(fillArrayWithPositions(new_rec, center));
+  //console.log("center:", center)
+  //console.log("height", height)
+  //console.log("width", width)
+  console.log("new_rec", new_rec)
+  
+  return new_rec;
+}
+
+function fillArrayWithPositions(array, center) {
+  const rows = array.length;
+  const cols = array[0].length;
+
+  const filledArray = Array.from({ length: rows }, (_, i) =>
+    Array.from({ length: cols }, (_, j) => [i + center[0][0] - Math.floor(rows / 2), j + center[0][1] - Math.floor(cols / 2)])
+  );
+
+  //console.log("filledArray:", filledArray);
+
+  return filledArray;
+}
+
+function createCellArray(array) {
+  const result = [];
+  for (let i = 0; i < array.length; i++) {
+    const row = array[i];
+    const newRow = [];
+    for (let j = 0; j < row.length; j++) {
+      const [x, y] = row[j];
+      const cellName = `cell_${x}-${y}`;
+      newRow.push(cellName);
+    }
+    result.push(newRow);
+  }
+  //console.log("createCellArray", result);
+  return result;
+}
+
+function findCenterValue(matrix) {
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+  const centerRow = Math.floor(rows / 2);
+  const centerCol = Math.floor(cols / 2);
+  const centerValue = matrix[centerRow][centerCol];
+  return [centerValue];
+}
+
+function createRectangle(width, height) {
+  const rectangle = [];
+  for (let y = 0; y < height; y++) {
+    const row = [];
+    for (let x = 0; x < width; x++) {
+      row.push('symbol_0');
+    }
+    rectangle.push(row);
+  }
+  //console.log("createrectangle", rectangle)
+  return rectangle;
+}
+
+function convertCellIdsToCoordinates(cellIds) {
+  var coordinates = [];
+
+  if (Array.isArray(cellIds)) {
+    cellIds.forEach(function(cellId) {
+      if (cellId) {
+        var parts = cellId.split('_')[1].split('-');
+        var row = parseInt(parts[0]);
+        var column = parseInt(parts[1]);
+        coordinates.push([row, column]);
+      }
+    });
+  }
+
+  return coordinates;
 }
