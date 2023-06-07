@@ -23,7 +23,7 @@ $(document).ready(function () {
         var planesymbol = saveInRectangle(symbols, size.width, size.height)
         var planeid = saveInRectangle(selectedIds, size.width, size.height)
         //console.log('planesymbol:', planesymbol);
-        console.log('planeid:', planeid);
+        //console.log('planeid:', planeid);
         if (buttonName == 'xflip') {
           var changed_symbol = flipArrayX(planesymbol)
           console.log("x flipped", changed_symbol)
@@ -45,7 +45,6 @@ $(document).ready(function () {
           var changed_symbol = rotateArrayClockwise(planesymbol)
           //console.log("symbol rotate", changed_symbol)
           var black_symbol = createRectangle(size.height, size.width)
-          console.log("black: ", black_symbol)
           updateCellClasses(planeid, black_symbol)
           var changed_id = rotateRectangle(planeid)
           //console.log("id roate", changed_id)
@@ -63,7 +62,6 @@ $(document).ready(function () {
           var changed_symbol = rotateArrayCounterClockwise(planesymbol)
           //console.log("symbol rotate", changed_symbol)
           var black_symbol = createRectangle(size.height, size.width)
-          console.log("black: ", black_symbol)
           updateCellClasses(planeid, black_symbol)
           var changed_id = rotateRectangle(planeid)
           //console.log("id roate", changed_id)
@@ -694,8 +692,6 @@ function updateCellSymbols(planeid, symbols) {
 }
 
 function updateCellClasses(cellIdsArray, symbolsArray) {
-  console.log("cell_id",cellIdsArray)
-  console.log("symbolIID",symbolsArray)
   // Iterate over the cellIdsArray and symbolsArray
   for (var i = 0; i < cellIdsArray.length; i++) {
     var cellIds = cellIdsArray[i];
