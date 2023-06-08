@@ -7,9 +7,6 @@ const logic_function = require('../public/javascripts/logic_function.js')
 
 const testing_function = require('../public/javascripts/testing_interface.js')
 
-var train
-var test
-
 /* GET users listing. */
 router.get('/:id', async function(req, res, next) {
 
@@ -100,10 +97,76 @@ router.post('/:id/:problem/save-data', (req, res) => {
   const numbersArray = req.body.numbersArray;
   // const labelText = req.body.labelText;
   const userName = req.params.id
+ 
   const problem = req.params.problem
+  var ids = []
+  var task_name = []
 
   // console.log(req)
-  console.log(numbersArray)
+  const sql1 = 'SELECT id, name FROM user WHERE name = ?';
+  const sql2 = 'SELECT id, task_name FROM tasklist WHERE id = ?';
+
+  function retrieveIds() {
+    return new Promise((resolve, reject) => {
+      db.all(sql1, [userName], (err, rows) => {
+        if (err) {
+          reject(err);
+        }
+  
+        const ids = rows.map(row => row.id);
+        resolve(ids);
+      });
+    });
+  }
+
+  function retrieveTaskIds() {
+    return new Promise((resolve, reject) => {
+      db.all(sql2, [problem], (err, rows) => {
+        if (err) {
+          reject(err);
+        }
+  
+        const ids = rows.map(row => row.task_name);
+        resolve(ids);
+      });
+    });
+  }
+
+  function insertSubmission(subid, userId, userName, taskId, taskName, numbersArray) {
+    const timeStamp = new Date().toISOString();
+    const actionSequence = JSON.stringify(numbersArray);
+  
+    const sql = 'INSERT INTO submission (id, user_id, user_name, task_id, task_name, time_stamp, action_sequence) VALUES (?, ?, ?, ?, ?, ?, ?)';
+  
+    db.run(sql, [subid, userId, userName, taskId, taskName, timeStamp, actionSequence], function(err) {
+      if (err) {
+        console.error(err);
+      } else {
+        console.log('Submission inserted successfully.');
+      }
+    });
+  }
+  
+  // Use async/await to retrieve the ids and perform other functions
+  (async () => {
+    try {
+      ids = await retrieveIds();
+      task_name = await retrieveTaskIds();
+      //console.log('IDs:', ids);
+      const subid = logic_function.generateRandomId();
+      insertSubmission(subid, ids[0], userName, problem, task_name[0], numbersArray)
+      // console.log(subid, ids[0], userName, problem, task_name[0], numbersArray)
+      console.log(numbersArray)
+  
+      // Other functions that depend on the retrieved ids can be called here
+      // ...
+    } catch (err) {
+      console.error(err);
+    }
+
+  })();
+
+  
   // console.log(userName, problem)
   // Save the data to the database (replace this with your database logic)
   // ...

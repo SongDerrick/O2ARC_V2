@@ -14,6 +14,7 @@ $(document).ready(function () {
 
     $('#select_util_btn').on('click', 'button' , function() {
       var buttonName = $(this).attr('id'); // 버튼의 이름을 가져옴
+      movedesrcript = buttonName
       console.log(buttonName); // 버튼의 이름을 콘솔에 출력
       var selectedIds = getSelectedCellIds(); // getSelectedCellIds() 함수를 호출하여 선택된 셀의 ID를 가져옴
       var symbols = getSymbolClassesFromCellIds(selectedIds)
@@ -58,9 +59,10 @@ $(document).ready(function () {
 
 
 var final = []
+var movedesrcript = ''
 
-function pushToTargetArray(array2D, text, targetArray) {
-  targetArray.push([text, array2D]);
+function pushToTargetArray(array2D, text1, text2, targetArray) {
+  targetArray.push([text1, text2, array2D]);
   return targetArray;
 }
 
@@ -112,7 +114,7 @@ function cell_observer(cells, observer) {
         const rowArray = [];
       
         for (let j = 0; j < divnum/rownum; j++) {
-          const index = i * 5 + j;
+          const index = i * divnum/rownum + j;
           const div = cells[index];
       
           const className = div.className;
@@ -125,8 +127,10 @@ function cell_observer(cells, observer) {
       
       console.log(numbersArray)
       console.log(labelText);
-      final = pushToTargetArray(numbersArray, labelText, final)
+      final = pushToTargetArray(numbersArray, labelText, movedesrcript, final)
       console.log(final)
+      console.log(movedesrcript)
+      movedesrcript = ''
     }
   });
   // Start observing changes to the 'class' attribute of each cell_final element
@@ -313,9 +317,19 @@ function resetOutputGrid() {
     // Use jQuery to select all <div> elements with class "cell_final"
     // and update their class attribute
     $("#user_interact .cell_final").attr("class", "cell_final symbol_0");
-    // Reapply the MutationObserver to the updated elements
-    // Reapply the MutationObserver to the updated elements
-    // cell_observer()
+    const divs = document.querySelectorAll('#user_interact .cell_final');
+    const rows = document.querySelectorAll('#user_interact .row')
+    const rownum = rows.length
+    const divnum = divs.length
+
+    var array = [];
+    array = createArray(rownum, divnum/rownum)
+    console.log(array)
+
+    labelText = "Edit"
+    movedesrcript = 'reset grid'
+    // final = pushToTargetArray(array, labelText, movedesrcript, final)
+    
     
   }
 
@@ -332,6 +346,7 @@ function resizeOutputGrid() {
     var rows = parseInt(inputValue.split('x')[0]);
     var cols = parseInt(inputValue.split('x')[1]);
     const numbersArray = createArray(rows, cols)
+    array = createArray(rows, cols)
 
     if(rows>cols){
         n = rows
@@ -355,7 +370,11 @@ function resizeOutputGrid() {
     }
     // Log the input value to the console
     console.log("Input Value:", inputValue);
-    sendLogData(numbersArray, 'Change Grid Size')
+    labelText = "Edit"
+    movedesrcript = 'change grid size'
+    final = pushToTargetArray(array, labelText, movedesrcript, final)
+    movedesrcript = ''
+    
 
     cell_observer()
 
@@ -383,6 +402,7 @@ function copyFromInput() {
         for (var j = 0; j < testgrid[0][0].width; j++) {
         var cellDiv = document.createElement("div");
         cellDiv.className = "cell_final symbol_" + testgrid[0][0].grid[i][j];
+        cellDiv.id = "cell_" +i +'-' + j 
         cellDiv.style.width = (400 / n)+ "px"; // Set the desired width of each cell
         cellDiv.style.height = (400 / n)+ "px"; // Set the desired height of each cell
         
@@ -392,7 +412,10 @@ function copyFromInput() {
         userInteractDiv.appendChild(rowDiv);
 
     }
-
+    labelText = "Edit"
+    movedesrcript = 'copy from input'
+    final = pushToTargetArray(testgrid[0][0].grid, labelText, movedesrcript, final)
+    movedesrcript = ''
     cell_observer()
 
     
@@ -426,19 +449,22 @@ function compareArrays(array1, array2) {
 }
 
 function submitSolution(input, name, cRoute){
-    // console.log("hi")
 
     const divs = document.querySelectorAll('#user_interact .cell_final');
     const rows = document.querySelectorAll('#user_interact .row')
     const rownum = rows.length
     const divnum = divs.length
 
+    // console.log(divs[0].className)
+    // console.log(rownum)
+    // console.log(divnum/rownum)
+
     const numbersArray = [];
     for (let i = 0; i < rownum; i++) {
       const rowArray = [];
     
       for (let j = 0; j < divnum/rownum; j++) {
-        const index = i * 5 + j;
+        const index = i * (divnum/rownum) + j;
         const div = divs[index];
     
         const className = div.className;
@@ -461,7 +487,7 @@ function submitSolution(input, name, cRoute){
       }
     }
     console.log(input[0][1].grid)
-    console.log(cRoute)
+    // console.log(cRoute)
     var lastPart = cRoute.substring(cRoute.lastIndexOf('/') + 1);
     var incrementedValue = parseInt(lastPart, 10) + 1;
     

@@ -9,7 +9,16 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function generateRandomId() {
+    const timestamp = Date.now().toString();
+    const randomNumber = Math.floor(Math.random() * 100000).toString().padStart(5, '0');
+    const randomId = timestamp + randomNumber;
+    return randomId;
+  }
+  
+
 module.exports = {
     newID,
-    getRandomInt
+    getRandomInt,
+    generateRandomId
 }
