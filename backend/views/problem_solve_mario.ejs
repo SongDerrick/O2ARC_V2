@@ -36,6 +36,7 @@
 
       }
     </style>
+
     <link rel="stylesheet" href='/stylesheets/style.css'>
     <script src="/javascripts/mario.js"></script>
   </head>
@@ -227,7 +228,7 @@
 
                       <div class="row justify-content-center">
                       <% for(j = 0; j < item[0].width; j++){ %>
-                        <div class="cell_final symbol_<%= item[0].grid[i][j] %>"style="width: <%= cs %>px; height: <%= cs %>px">  </div>
+                        <div class="cell_final symbol_<%= item[0].grid[i][j] %>" id="cell_<%= i %>-<%= j %>" style="width: <%= cs %>px; height: <%= cs %>px">  </div>
 
                       <% } %>
                       <% if(i == item[0].height - 1){ %>
@@ -250,10 +251,16 @@
                       <input type="radio" id="tool_select"
                        name="tool_switching" value="select">
                       <label for="tool_select">Select</label>
-<!-- 
-                      <input type="radio" id="tool_floodfill"
+
+                      <!-- <input type="radio" id="tool_floodfill"
                        name="tool_switching" value="floodfill">
                       <label for="tool_floodfill">Flood fill</label> -->
+                      <div id="select_util_btn">
+                        <button id="clockrotate" style="display: none;">Clockwise Rotate</button>
+                        <button id="counterclockrotate" style="display: none;">Counterclockwise Rotate</button>
+                        <button id="xflip" style="display: none;">X flip</button>
+                        <button id="yflip" style="display: none;">Y flip</button>
+                      </div>
                   </div>
               </div>
 

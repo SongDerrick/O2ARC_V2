@@ -1,5 +1,5 @@
 /* global variable */
-TOTAL_STAGE = 12;
+TOTAL_STAGE = 6;
 clear_stage_list = new Array();
 fail_stage_list = new Array();
 last_stage = -123;
@@ -134,32 +134,48 @@ function enterProblemMario(problem, stage){
 }
 
 /* function for submit button */
-function submitSolutionMario(input1){
+function submitSolutionMario(input){
     /* 맞았는지 틀렸는지 구현 */
-
-    // console.log("hi")
-
     const divs = document.querySelectorAll('#user_interact .cell_final');
+    const rows = document.querySelectorAll('#user_interact .row')
+    const rownum = rows.length
+    const divnum = divs.length
+
+    // console.log(divs[0].className)
+    // console.log(rownum)
+    // console.log(divnum/rownum)
 
     const numbersArray = [];
-
-    divs.forEach(div => {
+    for (let i = 0; i < rownum; i++) {
+      const rowArray = [];
+    
+      for (let j = 0; j < divnum/rownum; j++) {
+        const index = i * (divnum/rownum) + j;
+        const div = divs[index];
+    
         const className = div.className;
         const number = className.split('symbol_')[1]; // Extract the number after "symbol_"
-        numbersArray.push(number); // Store the number in the array
-    });
+        rowArray.push(parseInt(number)); // Store the number in the row array
+      }
+    
+      numbersArray.push(rowArray); // Store the row array in the main array
+    }
 
     User_Answer = numbersArray.map(num => parseInt(num))
-    Actual_Answer = input1[0][1].grid.flat().map(num => parseInt(num))
+    Actual_Answer = input[0][1].grid.flat().map(num => parseInt(num))
 
-    
-    console.log(User_Answer)
-    console.log(Actual_Answer)
-    answer = compareArrays(User_Answer, Actual_Answer)
-    console.log(answer)
-    /* 현재는 랜덤 */
-    
+    console.log(numbersArray)
+
+    for (let i = 0; i < input[0][1].grid.length; i++) {
+      for (let j = 0; j < input[0][1].grid[i].length; j++) {
+        // Convert the value to an integer using parseInt()
+        input[0][1].grid[i][j] = parseInt(input[0][1].grid[i][j]);
+      }
+    }
+    console.log(input[0][1].grid)
+    answer = compareArrays(numbersArray, input[0][1].grid)
     var retVal = ""
+
     if (!answer){
         retVal = "false"
         alert("Wrong!")
@@ -177,11 +193,11 @@ function submitSolutionMario(input1){
 /* super secret */
 function superSecret(){
     if(TOTAL_STAGE == clear_stage_list.length){
-        alert("hihello")
+        alert("유저 데이터 마시따!")
     }
     else{
         if (!confirm("You can get reward when you achieve 100%\nDo you want to reset?")) {
-            alert("None")
+            // alert("None")
         } else {
             document.cookie = "csl=";
             document.cookie = "fsl=";
