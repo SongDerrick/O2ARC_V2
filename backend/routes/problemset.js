@@ -38,7 +38,7 @@ router.get('/:id', async function(req, res, next) {
 
 });
 
-router.get('/:id/:problem', function(req, res, next) {
+router.get('/:id/:problem', async function(req, res, next) {
     const db = new sqlite3.Database('./db/O2ARC.db');
     const userName = req.params.id
     const problem = req.params.problem
@@ -47,7 +47,7 @@ router.get('/:id/:problem', function(req, res, next) {
     const query = 'SELECT content FROM tasklist WHERE id = ?';
     const params = [problem];
 
-    db.get(query, [params], (err, row) => {
+    await db.get(query, [params], (err, row) => {
         if (err) {
           console.error(err.message);
           return res.status(500).send('Error executing query');
