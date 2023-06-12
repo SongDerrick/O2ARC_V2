@@ -47,7 +47,8 @@ router.get('/:id/:problem', function(req, res, next) {
     const query = 'SELECT content FROM tasklist WHERE id = ?';
     const params = [problem];
 
-    db.get(query, [params], (err, row) => {
+    async function queryDB(query, params){
+      await db.get(query, [params], (err, row) => {
         if (err) {
           console.error(err.message);
           return res.status(500).send('Error executing query');
@@ -88,6 +89,10 @@ router.get('/:id/:problem', function(req, res, next) {
           return res.status(404).send('Content not found');
         }
       });
+
+    }
+
+    queryDB(query, params)
 
 
 
