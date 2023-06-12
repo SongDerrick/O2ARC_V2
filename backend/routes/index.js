@@ -11,7 +11,7 @@ router.get('/', function(req, res, next) {
 
 
 router.post('/', function(req, res, next){
-  const db = new sqlite3.Database('https://dataengineeringprojectarc.onrender.com/db/O2ARC.db');
+  const db = new sqlite3.Database('./db/O2ARC.db');
   //console.log(req.body.username)
   user_name = req.body.username // 유저의 이름을 인풋으로 받음
   
