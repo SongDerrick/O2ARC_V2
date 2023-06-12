@@ -25,7 +25,7 @@ router.get('/:id', async function(req, res, next) {
 
     } catch (err) {
         console.log(err)
-        res.status(500).send("Internal Server Error")
+        returen res.status(500).send("Internal Server Error")
     }
     res.render('problem_set', {
         userName: userName,
