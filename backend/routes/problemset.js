@@ -51,6 +51,7 @@ router.get('/:id/:problem', function(req, res, next) {
           console.error(err.message);
           return res.status(500).send('Error executing query');
         }
+        console.log(row)
         if (row) {
           const content = JSON.parse(row.content);
           trainData = content.train
