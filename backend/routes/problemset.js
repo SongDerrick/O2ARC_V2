@@ -39,15 +39,14 @@ router.get('/:id', async function(req, res, next) {
 });
 
 router.get('/:id/:problem', function(req, res, next) {
+    const db = new sqlite3.Database('./db/O2ARC.db');
     const userName = req.params.id
     const problem = req.params.problem
-
+    
     console.log(userName, problem)
     const query = 'SELECT content FROM tasklist WHERE id = ?';
     const params = [problem];
-    console.log(db)
-    console.log(query)
-    console.log(params)
+
     db.get(query, [params], (err, row) => {
         if (err) {
           console.error(err.message);
