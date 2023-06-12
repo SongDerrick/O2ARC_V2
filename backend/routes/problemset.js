@@ -39,7 +39,6 @@ router.get('/:id', async function(req, res, next) {
 });
 
 router.get('/:id/:problem', function(req, res, next) {
-    const db = new sqlite3.Database('./db/O2ARC.db');
     const userName = req.params.id
     const problem = req.params.problem
     
