@@ -39,64 +39,58 @@ router.get('/:id', async function(req, res, next) {
 });
 
 router.get('/:id/:problem', function(req, res, next) {
-    const userName = req.params.id
-    const problem = req.params.problem
-    const db = new sqlite3.Database('./db/O2ARC.db');
+  const userName = req.params.id;
+  const problem = req.params.problem;
+  const db = new sqlite3.Database('./db/O2ARC.db');
 
-    console.log(userName, problem)
-    const query = 'SELECT content FROM tasklist WHERE id = ?';
-    const params = [problem];
+  console.log(userName, problem);
+  const query = 'SELECT content FROM tasklist WHERE id = ?';
+  const params = [problem];
 
-    async function queryDB(query, params){
-      await db.get(query, [params], (err, row) => {
-        if (err) {
-          console.error(err.message);
-          return res.status(500).send('Error executing query');
-        }
-        if (row) {
-          const content = JSON.parse(row.content);
-          trainData = content.train
-          testData = content.test
+  function queryDB(query, params, callback) {
+    db.get(query, [params], (err, row) => {
+      if (err) {
+        console.error(err.message);
+        return callback('Error executing query', null);
+      }
+      if (row) {
+        const content = JSON.parse(row.content);
+        const trainData = content.train;
+        const testData = content.test;
 
-          //console.log(trainData)
+        const traingrid = testing_function.loadJSONTask(trainData);
+        const testgrid = testing_function.loadJSONTask(testData);
+        const outputgrid = testing_function.loadJSONTask(testData);
 
-          traingrid = testing_function.loadJSONTask(trainData)
-          testgrid = testing_function.loadJSONTask(testData)
-          outputgrid = testing_function.loadJSONTask(testData)
-          // console.log(traingrid[0][0])
-          console.log(testgrid[0][0])
-          h = traingrid[0][0].height
-          w = traingrid[0][0].width
-          //console.log(h, w)
+        const h = traingrid[0][0].height;
+        const w = traingrid[0][0].width;
 
-          resettedgrid = testing_function.resetOutputGrid(outputgrid)
+        const resettedgrid = testing_function.resetOutputGrid(outputgrid);
+        const cellsize = 200 / Math.max(h, w);
 
-          cellsize = 200/Math.max(h,w)
-          // console.log(cellsize)
-          // console.log(h)
+        return callback(null, {
+          userName: userName,
+          train: trainData,
+          grid: traingrid,
+          Testgrid: testgrid,
+          Outputgrid: outputgrid,
+          p: cellsize,
+          reset: resettedgrid
+        });
+      } else {
+        return callback('Content not found', null);
+      }
+    });
+  }
 
-          // console.log(traingrid)
-          return res.render('problem_solve', {
-            userName: userName,
-            train: trainData,
-            grid : traingrid,
-            Testgrid: testgrid,
-            Outputgrid: outputgrid,
-            p:cellsize,
-            reset: resettedgrid
-        })
-        } else {
-          return res.status(404).send('Content not found');
-        }
-      });
-
+  queryDB(query, params, (err, result) => {
+    if (err) {
+      return res.status(500).send(err);
+    } else {
+      return res.render('problem_solve', result);
     }
-
-    queryDB(query, params)
-
-
-
-})
+  });
+});
 
 router.post('/:id/:problem/save-data', (req, res) => {
   // Retrieve the data from the request body
