@@ -18,8 +18,8 @@ router.get('/:id', function(req, res, next) {
     console.log(userName)
 
     try{
-        const response1 = await axios.get('http://localhost:3000/users/' + userName + '/miniarcs')
-        const response2 = await axios.get('http://localhost:3000/users/' + userName + '/arcs')
+        const response1 = axios.get('http://localhost:3000/users/' + userName + '/miniarcs')
+        const response2 = axios.get('http://localhost:3000/users/' + userName + '/arcs')
         data = response1.data
         data2 = response2.data
 
