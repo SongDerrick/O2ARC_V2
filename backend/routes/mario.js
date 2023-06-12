@@ -16,7 +16,7 @@ router.get('/:id/:problem', function(req, res, next) {
 
   console.log(userName, problem)
   const query = 'SELECT content FROM tasklist WHERE id = ?';
-  const params = [problem];
+  const params = problem;
 
   db.get(query, [params], (err, row) => {
       if (err) {
