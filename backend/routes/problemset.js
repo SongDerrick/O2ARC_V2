@@ -44,10 +44,10 @@ router.get('/:id/:problem', async function(req, res, next) {
     const problem = req.params.problem
     
     console.log(userName, problem)
-    const query = 'SELECT content FROM tasklist WHERE id = ?';
-    const params = [problem];
+    console.log("pa")
+    const params = problem;
 
-    await db.get(query, [params], (err, row) => {
+    await db.get("SELECT content FROM tasklist WHERE id = ?", [params], (err, row) => {
         if (err) {
           console.error(err.message);
           return res.status(500).send('Error executing query');
