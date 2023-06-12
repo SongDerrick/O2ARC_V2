@@ -8,7 +8,7 @@ const logic_function = require('../public/javascripts/logic_function.js')
 const testing_function = require('../public/javascripts/testing_interface.js')
 
 /* GET users listing. */
-router.get('/:id', async function(req, res, next) {
+router.get('/:id', function(req, res, next) {
 
     const userName = req.params.id
     var data
