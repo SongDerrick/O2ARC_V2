@@ -194,6 +194,15 @@ function submitSolutionMario(input){
 function superSecret(){
     if(TOTAL_STAGE == clear_stage_list.length){
         alert("유저 데이터 마시따!")
+        if (!confirm("Reset?")) {
+            // alert("None")
+        } else {
+            document.cookie = "csl=";
+            document.cookie = "fsl=";
+            document.cookie = "ls=";
+            document.cookie = "rs=";
+            window.location.reload();
+        }
     }
     else{
         if (!confirm("You can get reward when you achieve 100%\nDo you want to reset?")) {

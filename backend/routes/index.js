@@ -41,7 +41,7 @@ router.post('/', function(req, res, next){
     } else if (exists) {
 
       console.log(`${user_name} exists in database.`);
-      res.redirect('/task/'+user_name)
+      return res.redirect('/task/'+user_name)
       // 이미 등록된 사람인 경우 콘솔에 존재한다고 출력하고 /task/user_name으로 리다이렉트
     } else {
 
@@ -52,11 +52,11 @@ router.post('/', function(req, res, next){
       db.run(sql, params, function(err) {
         if (err) {
           console.error(err.message);
-          res.status(500).send('Server Error');
+          return res.status(500).send('Server Error');
         } else {
           console.log(`Rows inserted: ${this.changes}`);
           console.log('Data inserted successfully');
-          res.redirect('/task/'+user_name)
+          return res.redirect('/task/'+user_name)
         }
       });
       // 등록되지 않은 사람인 경우 콘솔에 디비 존재하지 않는다고 출력하고 /task/user_name으로 리다이렉트

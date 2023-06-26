@@ -15,12 +15,12 @@ router.get('/:id/miniarcs', function(req, res, next) {
   db.all(query, params, (err, rows) => {
     if (err) {
       console.error(err.message);
-      res.status(500).send('Error retrieving data');
+      return res.status(500).send('Error retrieving data');
       //db.close()
     } else {
       //console.log('data retrieved successfully')
       //console.log(rows)
-      res.send(rows)
+      return res.send(rows)
       //db.close()
     }
   });
@@ -38,12 +38,12 @@ router.get('/:id/arcs', function(req, res, next) {
   db.all(query, params, (err, rows) => {
     if (err) {
       console.error(err.message);
-      res.status(500).send('Error retrieving data');
+      return res.status(500).send('Error retrieving data');
       //db.close()
     } else {
       //console.log('data retrieved successfully')
       //console.log(rows)
-      res.send(rows)
+      return res.send(rows)
       //db.close()
     }
   });
