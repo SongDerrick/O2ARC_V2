@@ -90,7 +90,14 @@ router.get('/:id/:problem', function(req, res, next) {
 
 
 
-})
+  queryDB(query, params, (err, result) => {
+    if (err) {
+      return res.status(500).send(err);
+    } else {
+      return res.render('problem_solve', result);
+    }
+  });
+});
 
 router.post('/:id/:problem/save-data', (req, res) => {
   // Retrieve the data from the request body
