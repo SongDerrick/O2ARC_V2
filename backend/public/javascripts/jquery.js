@@ -431,8 +431,8 @@ function copyFromInput() {
         var cellDiv = document.createElement("div");
         cellDiv.className = "cell_final symbol_" + testgrid[0][0].grid[i][j];
         cellDiv.id = "cell_" +i +'-' + j 
-        cellDiv.style.width = (400 / n)+ "px"; // Set the desired width of each cell
-        cellDiv.style.height = (400 / n)+ "px"; // Set the desired height of each cell
+        cellDiv.style.width = (399 / n)+ "px"; // Set the desired width of each cell
+        cellDiv.style.height = (399 / n)+ "px"; // Set the desired height of each cell
         
         rowDiv.appendChild(cellDiv);
         }
