@@ -33,4 +33,4 @@ jobs:
           cd /home/bitnami/O2ARC_V2/backend
           git pull origin main
           npm ci
-          pm2 reload www
+          pm2 reload app
