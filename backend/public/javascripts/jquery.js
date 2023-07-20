@@ -573,7 +573,7 @@ function IQsubmitSolution(input, name, cRoute){
         input[0][1].grid[i][j] = parseInt(input[0][1].grid[i][j]);
       }
     }
-
+    
     //console.log(numbersArray)
     //console.log(input[0][0].grid)
     //console.log(input[0][1].grid.flat()) // 이 친구가 답임 ㅋㅋ
