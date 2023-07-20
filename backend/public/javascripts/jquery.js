@@ -564,7 +564,7 @@ function IQsubmitSolution(input, name, cRoute){
 
     User_Answer = numbersArray.map(num => parseInt(num))
     Actual_Answer = input[0][1].grid.flat().map(num => parseInt(num))
-
+  
     console.log(numbersArray)
 
     for (let i = 0; i < input[0][1].grid.length; i++) {
@@ -586,7 +586,7 @@ function IQsubmitSolution(input, name, cRoute){
     
     console.log(User_Answer)
     console.log(Actual_Answer)
-    answer = compareArrays(User_Answer, Actual_Answer)
+    answer = compareArrays(numbersArray, input[0][1].grid)
     console.log(answer)
     if(answer){
         alert('Success!')
