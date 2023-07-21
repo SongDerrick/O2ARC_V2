@@ -1,8 +1,9 @@
-$(document).ready(function () {
+$(function () {
+
     var initialToolMode = 'edit';
     handleToolModeChange(initialToolMode);
-
-    $('input[name=tool_switching]').change(function() {
+    $('input[id=tool_edit]').prop('checked',true);
+    $('input[name=tool_switching]').on('change',function() {
         var selectedToolMode = $(this).val();
         handleToolModeChange(selectedToolMode);
     });
@@ -234,7 +235,7 @@ function handleToolModeChange(toolMode) {
     } else if (toolMode == 'floodfill') {
       // 'flood fill' mode
       disableTools();
-    //   enableFloodFill();
+      //enableFloodFill();
     //   infoMsg('Flood fill mode activated');
     } else {
     }
@@ -258,12 +259,13 @@ function enableSelectable() {
     $('#counterclockrotate').show();
     $('#xflip').show();
     $('#yflip').show();
-
+    
     $("#user_interact").selectable();   // get selectable
-    $('#symbol_picker').find('.symbol_preview').click(function(event) {
+    $('#symbol_picker').find('.symbol_preview').on('click',function(event) {
         pickSymbol();   // pick symbol color
         fillSelected(); // fill selected cell_final
     });
+  
 }
 
 function pickSymbol() {
@@ -390,8 +392,8 @@ function resizeOutputGrid() {
         for (var j = 0; j < cols; j++) {
             var cell = document.createElement('div');
             cell.className = 'cell_final symbol_0';
-            cell.style.width = (400 / n) + 'px';
-            cell.style.height = (400 / n) + 'px';
+            cell.style.width = (399 / n) + 'px';
+            cell.style.height = (399 / n) + 'px';
             row.appendChild(cell);
         }
         grid.appendChild(row);
@@ -754,7 +756,7 @@ function updateCellClasses(cellIdsArray, symbolsArray) {
 function getSelectedCellIds() {
   var selectedCellIds = [];
 
-  $('.ui-selected').each(function() {
+  $('.cell_final.ui-selected').each(function() {
     var cellId = $(this).attr('id');
     if(cellId) {
       selectedCellIds.push(cellId);
