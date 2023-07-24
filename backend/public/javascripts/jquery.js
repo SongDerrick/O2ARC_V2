@@ -1,3 +1,10 @@
+var copied = new Array();
+const miniGridSize = 200;
+const fullGridSize = 400;
+var final = []
+var movedesrcript = ''
+
+
 $(function () {
     rownum = testgrid[0][0].height;
     colnum = testgrid[0][0].width;
@@ -85,15 +92,29 @@ $(function () {
       }
     });
 
+    $('body').on('keydown',function(event){
+      if(event.ctrlKey && event.key==='c'){
+        
+        selected = $('.ui-selected');
+
+
+      } else if(event.ctrlKey && event.key === 'v'){
+        
+      } else if(event.ctrlKey && event.key === 'z' && !event.shiftKey){
+
+      } else if(event.ctrlKey && event.shiftKey && event.key ==='z'){
+
+      } else if(event.key === 'w' || event.key ==='ArrowUp'){
+        console.log('up!!!');
+        //이런식으로 이벤트 넣으면 돼요
+      } else if(event.key ==='a' || event.key==='ArrowLeft'){
+        console.log('left!!!');
+      }
+    });
+
     cell_observer()
 
 })
-
-const miniGridSize = 200;
-const fullGridSize = 400;
-var final = []
-var movedesrcript = ''
-var copied = new Array();
 
 function pushToTargetArray(array2D, text1, text2, targetArray) {
   targetArray.push([text1, text2, array2D]);
