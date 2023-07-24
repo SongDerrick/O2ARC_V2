@@ -1,18 +1,7 @@
 $(function () {
-    rows = testgrid[0][0].height;
-    cols = testgrid[0][0].width;
-    if(rows>cols){
-      n = rows
-      $('#test_output_grid').css('height',fullGridSize);
-      $('#test_output_grid').css('width',fullGridSize*cols/rows);
-    } else {
-      n = cols
-      $('#test_output_grid').css('height',fullGridSize);
-      $('#test_output_grid').css('width',fullGridSize);
-    }
-    $('#test_output_grid').data('height',rows);
-    $('#test_output_grid').data('width',cols);
-    $('#output_grid_size').val(rows+"x"+cols)
+    rownum = testgrid[0][0].height;
+    colnum = testgrid[0][0].width;
+    $('#output_grid_size').val(rownum+"x"+colnum)
 
     var initialToolMode = 'edit';
     handleToolModeChange(initialToolMode);
@@ -104,6 +93,7 @@ const miniGridSize = 200;
 const fullGridSize = 400;
 var final = []
 var movedesrcript = ''
+var copied = new Array();
 
 function pushToTargetArray(array2D, text1, text2, targetArray) {
   targetArray.push([text1, text2, array2D]);
@@ -113,11 +103,11 @@ function pushToTargetArray(array2D, text1, text2, targetArray) {
 function cell_observer(cells, observer) {
   // Select the cell_final elements and create a new MutationObserver object
   var cells = document.querySelectorAll('#test_output_grid .cell_final');
-  //const rows = document.querySelectorAll('.test_output_grid .row')
+  const rows = document.querySelectorAll('.test_output_grid .row')
   const submitButton = document.getElementById('submit_solution_btn');
 
-  const rownum = $('#test_output_grid').data('height');
-  const colnum = $('#test_output_grid').data('width');
+  const rownum = rows.length
+  const colnum = cells.length / rownum;
 
   var observer = new MutationObserver(function(mutations) {
     var changedElements = [];
@@ -270,12 +260,23 @@ function enableEditable() {
 }
 
 function enableSelectable() {
+    disableSelectable();
+    var curmode = $('input[name=tool_switching]:checked').val();
+    if (curmode != 'select') return;
     $('#clockrotate').show();
     $('#counterclockrotate').show();
     $('#xflip').show();
     $('#yflip').show();
     
-    $(".user_interact").selectable();   // get selectable
+    $(".user_interact").selectable({
+      autoRefresh: false,
+      filter: '> .row > .cell_final',
+      start: function(event, ui) {
+          $('.ui-selected').each(function(i, e) {
+              $(e).removeClass('ui-selected');
+          });
+      }
+    });   // get selectable
     $('#symbol_picker').find('.symbol_preview').on('click',function(event) {
         pickSymbol();   // pick symbol color
         fillSelected(); // fill selected cell_final
@@ -294,7 +295,7 @@ function pickSymbol() {
 function fillSelected() {
     var selectedPreview = $('#symbol_picker').find('.selected-symbol-preview');
     // remove old color and add new color
-    $('.cell_final.ui-selectee.ui-selected').each(function() {
+    $('#test_output_grid .cell_final.ui-selectee.ui-selected').each(function() {
         $(this).removeClass(function(index, className) {
           return (className.match(/(^|\s)symbol_\S+/g) || []).join(' ');
         });
@@ -362,16 +363,17 @@ function resetOutputGrid() {
     // Use jQuery to select all <div> elements with class "cell_final"
     // and update their class attribute
     $("#test_output_grid .cell_final").attr("class", "cell_final symbol_0");
-    //width = $("#test_output_grid").data('width'));
-    //const divs = document.querySelectorAll('#test_output_grid .cell_final');
-    //const rows = document.querySelectorAll('#test_output_grid .row')
-    const rownum = $('#test_output_grid').data('height');
-    const colnum = $('#test_output_grid').data('width');
+
+    const divs = document.querySelectorAll('#test_output_grid .cell_final');
+    const rows = document.querySelectorAll('#test_output_grid .row')
+    const rownum = rows.length
+    const colnum = divs.length / rows.length
 
     var array = [];
     array = createArray(rownum, colnum)
     console.log(array)
 
+    enableSelectable();
     labelText = "Edit"
     movedesrcript = 'reset grid'
     // final = pushToTargetArray(array, labelText, movedesrcript, final)
@@ -408,17 +410,17 @@ function resizeOutputGrid() {
     grid.innerHTML = '';
 
     for (var i = 0; i < rows; i++) {
-        //var row = document.createElement('div');
-        //row.className = 'row justify-content-center';
+        var row = document.createElement('div');
+        row.className = 'row justify-content-center';
         for (var j = 0; j < cols; j++) {
             var cell = document.createElement('div');
             cell.className = 'cell_final symbol_0';
             cell.id = "cell_" +i +'-' + j 
             cell.style.width = ((fullGridSize-1) / n) + 'px';
             cell.style.height = ((fullGridSize-1) / n) + 'px';
-            grid.appendChild(cell);
+            row.appendChild(cell);
         }
-        //grid.appendChild(row);
+        grid.appendChild(row);
     }
     // Log the input value to the console
     console.log("Input Value:", inputValue);
@@ -426,7 +428,7 @@ function resizeOutputGrid() {
     movedesrcript = 'change grid size'
     final = pushToTargetArray(array, labelText, movedesrcript, final)
     movedesrcript = ''
-    
+    enableSelectable();
 
     cell_observer()
 
@@ -453,8 +455,8 @@ function copyFromInput() {
     userInteractDiv.innerHTML = "";
 
     for (var i = 0; i < rows; i++) {
-        //var rowDiv = document.createElement("div");
-        //rowDiv.className = "row justify-content-center";
+        var rowDiv = document.createElement("div");
+        rowDiv.className = "row justify-content-center";
         
         for (var j = 0; j < cols; j++) {
           var cellDiv = document.createElement("div");
@@ -463,12 +465,14 @@ function copyFromInput() {
           cellDiv.style.width = ((fullGridSize-1) / n)+ "px"; // Set the desired width of each cell
           cellDiv.style.height = ((fullGridSize-1) / n)+ "px"; // Set the desired height of each cell
 
-        userInteractDiv.appendChild(cellDiv);
+          rowDiv.appendChild(cellDiv);
         }
         
-        //userInteractDiv.appendChild(rowDiv);
+        userInteractDiv.appendChild(rowDiv);
 
     }
+
+    enableSelectable()
     labelText = "Edit"
     movedesrcript = 'copy from input'
     final = pushToTargetArray(testgrid[0][0].grid, labelText, movedesrcript, final)
@@ -508,9 +512,9 @@ function compareArrays(array1, array2) {
 function submitSolution(input, name, cRoute){
 
     const divs = document.querySelectorAll('#test_output_grid .cell_final');
-    //const rows = document.querySelectorAll('#test_output_grid .row')
-    const rownum = $('#test_output_grid').data('height');
-    const colnum = $('#test_output_grid').data('width');
+    const rows = document.querySelectorAll('#test_output_grid .row')
+    const rownum = rows.length
+    const colnum = divs.length / rownum;
 
     // console.log(divs[0].className)
     // console.log(rownum)
@@ -521,7 +525,7 @@ function submitSolution(input, name, cRoute){
       const rowArray = [];
     
       for (let j = 0; j < colnum; j++) {
-        const index = i * (colnum) + j;
+        const index = i * colnum + j;
         const div = divs[index];
     
         const className = div.className;
@@ -571,9 +575,9 @@ function IQsubmitSolution(input, name, cRoute){
     // console.log("hi")
 
     const divs = document.querySelectorAll('#test_output_grid .cell_final');
-    //const rows = document.querySelectorAll('#test_output_grid .row')
-    const rownum = $('#test_output_grid').data('height');
-    const colnum = $('#test_output_grid').data('width');
+    const rows = document.querySelectorAll('#test_output_grid .row')
+    const rownum = rows.length;
+    const colnum = divs.length / rownum;
 
     const numbersArray = [];
     for (let i = 0; i < rownum; i++) {
@@ -783,7 +787,7 @@ function updateCellClasses(cellIdsArray, symbolsArray) {
 function getSelectedCellIds() {
   var selectedCellIds = [];
 
-  $('.cell_final.ui-selected').each(function() {
+  $('#test_output_grid .cell_final.ui-selected').each(function() {
     var cellId = $(this).attr('id');
     if(cellId) {
       selectedCellIds.push(cellId);
