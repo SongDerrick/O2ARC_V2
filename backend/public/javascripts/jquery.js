@@ -112,7 +112,7 @@ function pushToTargetArray(array2D, text1, text2, targetArray) {
 
 function cell_observer(cells, observer) {
   // Select the cell_final elements and create a new MutationObserver object
-  var cells = document.querySelectorAll('.test_output_grid .cell_final');
+  var cells = document.querySelectorAll('#test_output_grid .cell_final');
   //const rows = document.querySelectorAll('.test_output_grid .row')
   const submitButton = document.getElementById('submit_solution_btn');
 
