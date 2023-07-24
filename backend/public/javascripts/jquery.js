@@ -413,6 +413,7 @@ function resizeOutputGrid() {
         for (var j = 0; j < cols; j++) {
             var cell = document.createElement('div');
             cell.className = 'cell_final symbol_0';
+            cell.id = "cell_" +i +'-' + j 
             cell.style.width = ((fullGridSize-1) / n) + 'px';
             cell.style.height = ((fullGridSize-1) / n) + 'px';
             grid.appendChild(cell);
@@ -452,15 +453,15 @@ function copyFromInput() {
     userInteractDiv.innerHTML = "";
 
     for (var i = 0; i < rows; i++) {
-        var rowDiv = document.createElement("div");
-        rowDiv.className = "row justify-content-center";
+        //var rowDiv = document.createElement("div");
+        //rowDiv.className = "row justify-content-center";
         
         for (var j = 0; j < cols; j++) {
-        var cellDiv = document.createElement("div");
-        cellDiv.className = "cell_final symbol_" + testgrid[0][0].grid[i][j];
-        cellDiv.id = "cell_" +i +'-' + j 
-        cellDiv.style.width = ((fullGridSize-1) / n)+ "px"; // Set the desired width of each cell
-        cellDiv.style.height = ((fullGridSize-1) / n)+ "px"; // Set the desired height of each cell
+          var cellDiv = document.createElement("div");
+          cellDiv.className = "cell_final symbol_" + testgrid[0][0].grid[i][j];
+          cellDiv.id = "cell_" +i +'-' + j 
+          cellDiv.style.width = ((fullGridSize-1) / n)+ "px"; // Set the desired width of each cell
+          cellDiv.style.height = ((fullGridSize-1) / n)+ "px"; // Set the desired height of each cell
 
         userInteractDiv.appendChild(cellDiv);
         }
