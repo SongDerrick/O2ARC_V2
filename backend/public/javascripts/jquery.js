@@ -1,4 +1,18 @@
 $(function () {
+    rows = testgrid[0][0].height;
+    cols = testgrid[0][0].width;
+    if(rows>cols){
+      n = rows
+      $('#test_output_grid').css('height',fullGridSize);
+      $('#test_output_grid').css('width',fullGridSize*cols/rows);
+    } else {
+      n = cols
+      $('#test_output_grid').css('height',fullGridSize);
+      $('#test_output_grid').css('width',fullGridSize);
+    }
+    $('#test_output_grid').data('height',rows);
+    $('#test_output_grid').data('width',cols);
+    $('#output_grid_size').val(rows+"x"+cols)
 
     var initialToolMode = 'edit';
     handleToolModeChange(initialToolMode);
@@ -86,7 +100,8 @@ $(function () {
 
 })
 
-
+const miniGridSize = 200;
+const fullGridSize = 400;
 var final = []
 var movedesrcript = ''
 
@@ -97,12 +112,12 @@ function pushToTargetArray(array2D, text1, text2, targetArray) {
 
 function cell_observer(cells, observer) {
   // Select the cell_final elements and create a new MutationObserver object
-  var cells = document.querySelectorAll('#user_interact .cell_final');
-  const rows = document.querySelectorAll('#user_interact .row')
+  var cells = document.querySelectorAll('.test_output_grid .cell_final');
+  //const rows = document.querySelectorAll('.test_output_grid .row')
   const submitButton = document.getElementById('submit_solution_btn');
 
-  const rownum = rows.length
-  const divnum = cells.length
+  const rownum = $('#test_output_grid').data('height');
+  const colnum = $('#test_output_grid').data('width');
 
   var observer = new MutationObserver(function(mutations) {
     var changedElements = [];
@@ -142,8 +157,8 @@ function cell_observer(cells, observer) {
       for (let i = 0; i < rownum; i++) {
         const rowArray = [];
       
-        for (let j = 0; j < divnum/rownum; j++) {
-          const index = i * divnum/rownum + j;
+        for (let j = 0; j < colnum; j++) {
+          const index = i * colnum + j;
           const div = cells[index];
       
           const className = div.className;
@@ -246,7 +261,7 @@ function enableEditable() {
         pickSymbol();
     });
      // Find the user_interact cell div and add a click listener to it.
-    $('#user_interact').on('click', '.cell_final', function(event) {
+    $('#test_output_grid').on('click', '.cell_final', function(event) {
         var selectedPreview = $('#symbol_picker').find('.selected-symbol-preview');
         // Get the class of the clicked element.
         var currentClasses = $(this).attr('class').split(' ');
@@ -260,7 +275,7 @@ function enableSelectable() {
     $('#xflip').show();
     $('#yflip').show();
     
-    $("#user_interact").selectable();   // get selectable
+    $(".user_interact").selectable();   // get selectable
     $('#symbol_picker').find('.symbol_preview').on('click',function(event) {
         pickSymbol();   // pick symbol color
         fillSelected(); // fill selected cell_final
@@ -300,12 +315,12 @@ function disableTools() {
     
 function disableEditable() {
     $('#symbol_picker').find('.symbol_preview').off('click');
-    $('#user_interact').off('click', '.cell_final');
+    $('#test_output_grid').off('click', '.cell_final');
 }
 
 function disableSelectable() {
     try {
-        $("#user_interact").selectable("destroy");
+        $(".user_interact").selectable("destroy");
     }
     catch (e) {
     }
@@ -346,14 +361,15 @@ function getSymbolClassChanges(oldClasses, newClasses) {
 function resetOutputGrid() {
     // Use jQuery to select all <div> elements with class "cell_final"
     // and update their class attribute
-    $("#user_interact .cell_final").attr("class", "cell_final symbol_0");
-    const divs = document.querySelectorAll('#user_interact .cell_final');
-    const rows = document.querySelectorAll('#user_interact .row')
-    const rownum = rows.length
-    const divnum = divs.length
+    $("#test_output_grid .cell_final").attr("class", "cell_final symbol_0");
+    //width = $("#test_output_grid").data('width'));
+    //const divs = document.querySelectorAll('#test_output_grid .cell_final');
+    //const rows = document.querySelectorAll('#test_output_grid .row')
+    const rownum = $('#test_output_grid').data('height');
+    const colnum = $('#test_output_grid').data('width');
 
     var array = [];
-    array = createArray(rownum, divnum/rownum)
+    array = createArray(rownum, colnum)
     console.log(array)
 
     labelText = "Edit"
@@ -380,23 +396,28 @@ function resizeOutputGrid() {
 
     if(rows>cols){
         n = rows
+        $('#test_output_grid').css('width',fullGridSize*cols/rows);
     } else {
         n = cols
+        $('#test_output_grid').css('width',fullGridSize);
     }
-    var grid = document.getElementById('user_interact');
+    $('#test_output_grid').data('height',rows);
+    $('#test_output_grid').data('width',cols);
+
+    var grid = document.getElementById('test_output_grid');
     grid.innerHTML = '';
 
     for (var i = 0; i < rows; i++) {
-        var row = document.createElement('div');
-        row.className = 'row justify-content-center';
+        //var row = document.createElement('div');
+        //row.className = 'row justify-content-center';
         for (var j = 0; j < cols; j++) {
             var cell = document.createElement('div');
             cell.className = 'cell_final symbol_0';
-            cell.style.width = (399 / n) + 'px';
-            cell.style.height = (399 / n) + 'px';
-            row.appendChild(cell);
+            cell.style.width = ((fullGridSize-1) / n) + 'px';
+            cell.style.height = ((fullGridSize-1) / n) + 'px';
+            grid.appendChild(cell);
         }
-        grid.appendChild(row);
+        //grid.appendChild(row);
     }
     // Log the input value to the console
     console.log("Input Value:", inputValue);
@@ -413,33 +434,38 @@ function resizeOutputGrid() {
 function copyFromInput() {
 
     console.log(testgrid[0][0])
-
-    if(testgrid[0][0].height>testgrid[0][0].width){
-        n = testgrid[0][0].height
+    rows = testgrid[0][0].height;
+    cols = testgrid[0][0].width;
+    if(rows>cols){
+      n = rows
+      $('#test_output_grid').css('width',fullGridSize*cols/rows);
     } else {
-        n = testgrid[0][0].width
+      n = cols
+      $('#test_output_grid').css('width',fullGridSize);
     }
-
-    var userInteractDiv = document.getElementById("user_interact");
+    $('#output_grid_size').val(rows+"x"+cols)
+    $('#test_output_grid').data('height',rows);
+    $('#test_output_grid').data('width',cols);
+    var userInteractDiv = document.getElementById("test_output_grid");
     
 
     userInteractDiv.innerHTML = "";
 
-    for (var i = 0; i < testgrid[0][0].height; i++) {
+    for (var i = 0; i < rows; i++) {
         var rowDiv = document.createElement("div");
         rowDiv.className = "row justify-content-center";
         
-        for (var j = 0; j < testgrid[0][0].width; j++) {
+        for (var j = 0; j < cols; j++) {
         var cellDiv = document.createElement("div");
         cellDiv.className = "cell_final symbol_" + testgrid[0][0].grid[i][j];
         cellDiv.id = "cell_" +i +'-' + j 
-        cellDiv.style.width = (399 / n)+ "px"; // Set the desired width of each cell
-        cellDiv.style.height = (399 / n)+ "px"; // Set the desired height of each cell
-        
-        rowDiv.appendChild(cellDiv);
+        cellDiv.style.width = ((fullGridSize-1) / n)+ "px"; // Set the desired width of each cell
+        cellDiv.style.height = ((fullGridSize-1) / n)+ "px"; // Set the desired height of each cell
+
+        userInteractDiv.appendChild(cellDiv);
         }
         
-        userInteractDiv.appendChild(rowDiv);
+        //userInteractDiv.appendChild(rowDiv);
 
     }
     labelText = "Edit"
@@ -480,10 +506,10 @@ function compareArrays(array1, array2) {
 
 function submitSolution(input, name, cRoute){
 
-    const divs = document.querySelectorAll('#user_interact .cell_final');
-    const rows = document.querySelectorAll('#user_interact .row')
-    const rownum = rows.length
-    const divnum = divs.length
+    const divs = document.querySelectorAll('#test_output_grid .cell_final');
+    //const rows = document.querySelectorAll('#test_output_grid .row')
+    const rownum = $('#test_output_grid').data('height');
+    const colnum = $('#test_output_grid').data('width');
 
     // console.log(divs[0].className)
     // console.log(rownum)
@@ -493,8 +519,8 @@ function submitSolution(input, name, cRoute){
     for (let i = 0; i < rownum; i++) {
       const rowArray = [];
     
-      for (let j = 0; j < divnum/rownum; j++) {
-        const index = i * (divnum/rownum) + j;
+      for (let j = 0; j < colnum; j++) {
+        const index = i * (colnum) + j;
         const div = divs[index];
     
         const className = div.className;
@@ -543,16 +569,16 @@ function submitSolution(input, name, cRoute){
 function IQsubmitSolution(input, name, cRoute){
     // console.log("hi")
 
-    const divs = document.querySelectorAll('#user_interact .cell_final');
-    const rows = document.querySelectorAll('#user_interact .row')
-    const rownum = rows.length
-    const divnum = divs.length
+    const divs = document.querySelectorAll('#test_output_grid .cell_final');
+    //const rows = document.querySelectorAll('#test_output_grid .row')
+    const rownum = $('#test_output_grid').data('height');
+    const colnum = $('#test_output_grid').data('width');
 
     const numbersArray = [];
     for (let i = 0; i < rownum; i++) {
       const rowArray = [];
     
-      for (let j = 0; j < divnum/rownum; j++) {
+      for (let j = 0; j < colnum; j++) {
         const index = i * 5 + j;
         const div = divs[index];
     
