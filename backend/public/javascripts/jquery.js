@@ -144,7 +144,7 @@ $(function () {
           xx = xlist[i]; yy = ylist[i]; cv = symbols[i];
           COPIED_ARRAY[xx-minx][yy-miny] = cv; 
         }
-        console.log(`-- Action: Copy Array\n---- From: <${from}>\n---- Area: (${minx},${miny}) ~ (${maxx},${maxy})\n---- Copied:`, COPIED_ARRAY);
+        console.log(`-- Action: Copy Array\n---- From: <${from}>\n---- Where: (${minx},${miny}) ~ (${maxx},${maxy})\n---- Copied:`, COPIED_ARRAY);
 
       } else if(event.ctrlKey && event.key === 'v'){
         
@@ -178,7 +178,7 @@ $(function () {
             }
           } 
           
-          console.log(`-- Action: Paste Array\n---- Area: (${pasteCellX},${pasteCellY}) ~ (${pasteCellX+height-1},${pasteCellY+width-1})\n---- Data:`,COPIED_ARRAY);
+          console.log(`-- Action: Paste Array\n---- Where: (${pasteCellX},${pasteCellY}) ~ (${pasteCellX+height-1},${pasteCellY+width-1})\n---- Data:`,COPIED_ARRAY);
         } else {
           // Please Select Only ONE Position(left top corner);
           return;
@@ -363,6 +363,8 @@ function enableEditable() {
     $('#test_output_grid').on('click', '.cell_final', function(event) {
         var selectedPreview = $('#symbol_picker').find('.selected-symbol-preview');
         // Get the class of the clicked element.
+        [from, x,y] = $(this).attr('id').split(/[_-]/);
+        console.log(`--Action: Coloring\n---- Where: (${x},${y})\n---- Color: ${selectedPreview.attr('symbol')}`)
         var currentClasses = $(this).attr('class').split(' ');
         $(this).removeClass(currentClasses[1]).addClass('symbol_'+selectedPreview.attr('symbol'));
     });
@@ -404,12 +406,25 @@ function pickSymbol() {
 function fillSelected() {
     var selectedPreview = $('#symbol_picker').find('.selected-symbol-preview');
     // remove old color and add new color
+    let minx=1000, miny=1000, maxx=-1, maxy=-1;
+    let color = selectedPreview.attr('symbol')
+    
     $('#test_output_grid .cell_final.ui-selectee.ui-selected').each(function() {
         $(this).removeClass(function(index, className) {
           return (className.match(/(^|\s)symbol_\S+/g) || []).join(' ');
         });
-        $(this).addClass('symbol_'+selectedPreview.attr('symbol'));
+        $(this).addClass('symbol_'+color);
+        [from, x,y] = $(this).attr('id').split(/[_-]/);
+        x = parseInt(x);
+        y = parseInt(y);
+        minx=Math.min(x,minx);
+        maxx=Math.max(x,maxx);
+        miny=Math.min(y,miny);
+        maxy=Math.max(y,maxy);
+
     });
+    if(maxx===-1) return;
+    console.log(`-- Action: Fill\n---- Where: (${minx},${miny}) ~ (${maxx},${maxy})\n---- Color: ${color}`)
 }
 
 function disableTools() {
