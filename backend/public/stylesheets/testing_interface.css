@@ -77,9 +77,6 @@ background: blue;
 
 button:focus {outline:0;}
 
-#output_grid {
-
-}
 
 #toolbar {
   float: left;

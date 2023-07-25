@@ -1,8 +1,9 @@
-var copied = new Array();
+var COPIED_ARRAY = [];
+
 const miniGridSize = 200;
 const fullGridSize = 400;
 var final = []
-var movedesrcript = ''
+var moveDescript = ''
 
 
 $(function () {
@@ -10,45 +11,49 @@ $(function () {
     colnum = testgrid[0][0].width;
     $('#output_grid_size').val(rownum+"x"+colnum)
 
+    // Configure Initial Tool Mode
     var initialToolMode = 'edit';
     handleToolModeChange(initialToolMode);
     $('input[id=tool_edit]').prop('checked',true);
+
+    // Event Listener for Tool Switching
     $('input[name=tool_switching]').on('change',function() {
         var selectedToolMode = $(this).val();
         handleToolModeChange(selectedToolMode);
     });
 
+    // Select Mode Action Buttons 
     $('#select_util_btn').on('click', 'button' , function() {
-        var buttonName = $(this).attr('id'); // 버튼의 이름을 가져옴
-        console.log(buttonName); // 버튼의 이름을 콘솔에 출력
-    });
 
-    $('#select_util_btn').on('click', 'button' , function() {
-      var buttonName = $(this).attr('id'); // 버튼의 이름을 가져옴
-      movedesrcript = buttonName
-      console.log(buttonName); // 버튼의 이름을 콘솔에 출력
-      var selectedIds = getSelectedCellIds(); // getSelectedCellIds() 함수를 호출하여 선택된 셀의 ID를 가져옴
-      var symbols = getSymbolClassesFromCellIds(selectedIds)
-      var coordinates = convertCellIdsToCoordinates(selectedIds)
-      var rectangular = isRectangular(coordinates)
+      var buttonName = $(this).attr('id'); // Read Button name
+      moveDescript = buttonName;         // Action Description Set (to stockpile trajectories)
+
+      var selectedIds = getSelectedCellIds();   // Retrieve Selected Cell Ids
+      var symbols = getSymbolClassesFromCellIds(selectedIds)  // Retrieve Selected Cells' Colors
+      var coordinates = convertCellIdsToCoordinates(selectedIds)  // Convert Cell ids' to Coords
+      var rectangular = isRectangular(coordinates)  // Verify the selection area is square-shaped
+
       if (rectangular) {
         var size = calculateRectangleSize(coordinates)
         var planesymbol = saveInRectangle(symbols, size.width, size.height)
         var planeid = saveInRectangle(selectedIds, size.width, size.height)
-        //console.log('planesymbol:', planesymbol);
-        //console.log('planeid:', planeid);
+
         if (buttonName == 'xflip') {
+        
           var changed_symbol = flipArrayX(planesymbol)
-          console.log("x flipped", changed_symbol)
+          console.log("-- Action: X Flip\n---- Changed:", changed_symbol);
           updateCellClasses(planeid, changed_symbol)
+
         }
         if (buttonName == 'yflip') {
+
           var changed_symbol = flipArrayY(planesymbol)
-          console.log("y flipped", changed_symbol)
+          console.log("-- Action: Y Flip\n---- Changed:", changed_symbol);
           updateCellClasses(planeid, changed_symbol)
+
         }
         if (buttonName == 'clockrotate') {
-          console.log(buttonName); // 버튼의 이름을 콘솔에 출력
+
           selectedIds = getSelectedCellIds(); // getSelectedCellIds() 함수를 호출하여 선택된 셀의 ID를 가져옴
           symbols = getSymbolClassesFromCellIds(selectedIds)
           coordinates = convertCellIdsToCoordinates(selectedIds)
@@ -57,16 +62,16 @@ $(function () {
           planeid = saveInRectangle(selectedIds, size.width, size.height)  
           removeSelectedClass()
           var changed_symbol = rotateArrayClockwise(planesymbol)
-          console.log("Clockwise Rotate", changed_symbol)
-          //updateCellClasses(planeid, changed_symbol)
-          //console.log("symbol rotate", changed_symbol)
+          console.log("-- Action: CW Rotate\n---- Changed:", changed_symbol);
+
           var black_symbol = createRectangle(size.height, size.width)
-          console.log("black: ", black_symbol)
+          //console.log("black: ", black_symbol)
           updateCellClasses(planeid, black_symbol)
           var changed_id = rotateRectangle(planeid)
-          //console.log("id roate", changed_id)
+
           addSelectedClass(changed_id)
           updateCellClasses(changed_id, changed_symbol)
+
         }
         if (buttonName == 'counterclockrotate') {
           console.log(buttonName); // 버튼의 이름을 콘솔에 출력
@@ -78,14 +83,13 @@ $(function () {
           planeid = saveInRectangle(selectedIds, size.width, size.height)  
           removeSelectedClass()
           var changed_symbol = rotateArrayCounterClockwise(planesymbol)
-          console.log("y flipped", changed_symbol)
-          //updateCellClasses(planeid, changed_symbol)
-          //console.log("symbol rotate", changed_symbol)
+          console.log("-- Action: CCW Rotate\n---- Changed:", changed_symbol);
+
           var black_symbol = createRectangle(size.height, size.width)
-          console.log("black: ", black_symbol)
+          //console.log("black: ", black_symbol)
           updateCellClasses(planeid, black_symbol)
           var changed_id = rotateRectangle(planeid)
-          //console.log("id roate", changed_id)
+
           addSelectedClass(changed_id)
           updateCellClasses(changed_id, changed_symbol)
         }
@@ -96,19 +100,101 @@ $(function () {
       if(event.ctrlKey && event.key==='c'){
         
         selected = $('.ui-selected');
+        if (selected.length == 0){ return; }
 
+        xlist = [];
+        ylist = [];
+        symbols = [];
+        var xx,yy,cv,from;
+
+        // retrieve cell data from selected
+        for(let i=0; i< selected.length; i++){
+          cellid = $(selected[i]).attr('id');
+          cv = parseInt($(selected[i]).attr('class').match(/symbol_([0-9])/)[1]) // get cell symbol number
+          ar = cellid.split(/[_-]/);
+          [from,xx,yy] = ar;
+          xx= parseInt(xx); yy = parseInt(yy); cv = parseInt(cv);
+
+          xlist.push(xx);
+          ylist.push(yy);
+          symbols.push(cv);
+        }        
+        if(from == 'inputcell'){
+          from = 'Input Grid';
+        } else {
+          from = 'Output Grid';
+        }
+
+        // Calculate array size
+        let minx = Math.min(...xlist);
+        let maxx = Math.max(...xlist);
+        let miny = Math.min(...ylist);
+        let maxy = Math.max(...ylist);
+        let copyheight = maxx-minx+1;
+        let copywidth = maxy-miny+1;
+
+        // ARRAY CONStruction
+        COPIED_ARRAY = [];
+        for( var i =0; i<copyheight ; i++){
+          COPIED_ARRAY.push([]);
+        }
+        
+        // put into the copy array
+        for(var i =0; i<selected.length; i++){
+          xx = xlist[i]; yy = ylist[i]; cv = symbols[i];
+          COPIED_ARRAY[xx-minx][yy-miny] = cv; 
+        }
+        console.log(`-- Action: Copy Array\n---- From: <${from}>\n---- Area: (${minx},${miny}) ~ (${maxx},${maxy})\n---- Copied:`, COPIED_ARRAY);
 
       } else if(event.ctrlKey && event.key === 'v'){
         
+        if(COPIED_ARRAY.length==0){
+          // No Data To Paste
+          return;
+        }
+        selected = $('#test_output_grid').find('.ui-selected');
+        if(selected.length==0){
+          // No Position Specified
+          return;
+        } else if (selected.length==1){
+          ar = $(selected[0]).attr('id').split(/[-_]/);
+          [from, pasteCellX,pasteCellY] = ar;
+          pasteCellX = parseInt(pasteCellX); 
+          pasteCellY = parseInt(pasteCellY); 
+
+          height = COPIED_ARRAY.length;
+          width = COPIED_ARRAY[0].length;
+          for(var i = 0; i < height;i++){
+            for(var j = 0; j< width; j++){
+              x = pasteCellX + i;
+              y = pasteCellY + j;
+              cv = COPIED_ARRAY[i][j];
+              found = $(`#cell_${x}-${y}`)
+              if(found.length == 1){
+                symbolClass = found.attr('class').match(/symbol_[0-9]/)[0]
+                found.removeClass(symbolClass).addClass('symbol_'+cv);
+              }
+
+            }
+          } 
+          
+          console.log(`-- Action: Paste Array\n---- Area: (${pasteCellX},${pasteCellY}) ~ (${pasteCellX+height-1},${pasteCellY+width-1})\n---- Data:`,COPIED_ARRAY);
+        } else {
+          // Please Select Only ONE Position(left top corner);
+          return;
+        }
+
       } else if(event.ctrlKey && event.key === 'z' && !event.shiftKey){
 
       } else if(event.ctrlKey && event.shiftKey && event.key ==='z'){
 
       } else if(event.key === 'w' || event.key ==='ArrowUp'){
+        
         console.log('up!!!');
         //이런식으로 이벤트 넣으면 돼요
       } else if(event.key ==='a' || event.key==='ArrowLeft'){
         console.log('left!!!');
+        
       }
     });
 
@@ -117,6 +203,7 @@ $(function () {
 })
 
 function pushToTargetArray(array2D, text1, text2, targetArray) {
+  console.log("----------------------- Data Pushed -------------------------------")
   targetArray.push([text1, text2, array2D]);
   return targetArray;
 }
@@ -124,7 +211,7 @@ function pushToTargetArray(array2D, text1, text2, targetArray) {
 function cell_observer(cells, observer) {
   // Select the cell_final elements and create a new MutationObserver object
   var cells = document.querySelectorAll('#test_output_grid .cell_final');
-  const rows = document.querySelectorAll('.test_output_grid .row')
+  const rows = document.querySelectorAll('#test_output_grid .row')
   const submitButton = document.getElementById('submit_solution_btn');
 
   const rownum = rows.length
@@ -180,12 +267,12 @@ function cell_observer(cells, observer) {
         numbersArray.push(rowArray); // Store the row array in the main array
       }
       
-      console.log(numbersArray)
-      console.log(labelText);
-      final = pushToTargetArray(numbersArray, labelText, movedesrcript, final)
-      console.log(final)
-      console.log(movedesrcript)
-      movedesrcript = ''
+      //console.log(numbersArray)
+      //console.log(labelText);
+      final = pushToTargetArray(numbersArray, labelText, moveDescript, final)
+      //console.log(final)
+      //console.log(moveDescript)
+      moveDescript = ''
     }
   });
   // Start observing changes to the 'class' attribute of each cell_final element
@@ -248,18 +335,19 @@ function createArray(rows, columns) {
 function handleToolModeChange(toolMode) {
     if (toolMode == 'edit') {
       // 'edit' mode
-      console.log("edit")
+      console.log("Switch Tool: Edit");
       disableTools();
       enableEditable();
     //   infoMsg('Editing mode activated');
     } else if (toolMode == 'select') {
       // 'select' mode
-      console.log("select")
+      console.log("Switch Tool: Select");
       disableTools();
       enableSelectable();
     //   infoMsg('Select some cells and click on a color to fill in, or press C to copy');
     } else if (toolMode == 'floodfill') {
       // 'flood fill' mode
+      console.log("Switch Tool: Flood Fill");
       disableTools();
       //enableFloodFill();
     //   infoMsg('Flood fill mode activated');
@@ -392,12 +480,12 @@ function resetOutputGrid() {
 
     var array = [];
     array = createArray(rownum, colnum)
-    console.log(array)
+    console.log(`-- Action: Reset Grid`);
 
     enableSelectable();
     labelText = "Edit"
-    movedesrcript = 'reset grid'
-    // final = pushToTargetArray(array, labelText, movedesrcript, final)
+    moveDescript = 'reset grid'
+    // final = pushToTargetArray(array, labelText, moveDescript, final)
     
     
   }
@@ -444,11 +532,11 @@ function resizeOutputGrid() {
         grid.appendChild(row);
     }
     // Log the input value to the console
-    console.log("Input Value:", inputValue);
+    console.log(`-- Action: Resize Grid\n---- Size: ${rows} x ${cols}`);
     labelText = "Edit"
-    movedesrcript = 'change grid size'
-    final = pushToTargetArray(array, labelText, movedesrcript, final)
-    movedesrcript = ''
+    moveDescript = 'change grid size'
+    final = pushToTargetArray(array, labelText, moveDescript, final)
+    moveDescript = ''
     enableSelectable();
 
     cell_observer()
@@ -457,7 +545,7 @@ function resizeOutputGrid() {
 
 function copyFromInput() {
 
-    console.log(testgrid[0][0])
+    //console.log(testgrid[0][0])
     rows = testgrid[0][0].height;
     cols = testgrid[0][0].width;
     if(rows>cols){
@@ -494,10 +582,12 @@ function copyFromInput() {
     }
 
     enableSelectable()
+    console.log(`-- Action: Copy From Input`);
     labelText = "Edit"
-    movedesrcript = 'copy from input'
-    final = pushToTargetArray(testgrid[0][0].grid, labelText, movedesrcript, final)
-    movedesrcript = ''
+    moveDescript = 'copy from input'
+    final = pushToTargetArray(testgrid[0][0].grid, labelText, moveDescript, final)
+    moveDescript = ''
+
     cell_observer()
 
     
@@ -559,17 +649,15 @@ function submitSolution(input, name, cRoute){
 
     User_Answer = numbersArray.map(num => parseInt(num))
     Actual_Answer = input[0][1].grid.flat().map(num => parseInt(num))
-
-    console.log(numbersArray)
-
+    
     for (let i = 0; i < input[0][1].grid.length; i++) {
       for (let j = 0; j < input[0][1].grid[i].length; j++) {
         // Convert the value to an integer using parseInt()
         input[0][1].grid[i][j] = parseInt(input[0][1].grid[i][j]);
       }
     }
-    console.log(input[0][1].grid)
-    // console.log(cRoute)
+
+    //console.log(cRoute)
     var lastPart = cRoute.substring(cRoute.lastIndexOf('/') + 1);
     var incrementedValue = parseInt(lastPart, 10) + 1;
     
@@ -577,7 +665,7 @@ function submitSolution(input, name, cRoute){
     var incrementedLastPart = incrementedValue.toString();
 
     answer = compareArrays(numbersArray, input[0][1].grid)
-    console.log(answer)
+    console.log(`-- Action: Submit\n---- Input:`,numbersArray,`\n---- Answer: `,input[0][1].grid, `\n---- Correct: ${answer}`);
     if(answer){
         sendLogData(final)
         final = []
@@ -953,7 +1041,7 @@ function rotateRectangle(arr) {
   //console.log("center:", center)
   //console.log("height", height)
   //console.log("width", width)
-  console.log("new_rec", new_rec)
+  //console.log("new_rec", new_rec)
 
   return new_rec;
 }
