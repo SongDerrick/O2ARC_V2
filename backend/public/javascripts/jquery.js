@@ -3,6 +3,9 @@ var COPIED_ARRAY = [];
 const miniGridSize = 200;
 const fullGridSize = 400;
 var final = []
+
+const Actions = ['Color', 'Fill', 'FlipX', 'FlipY', 'RotateCW', 'RotateCCW', 'Copy', 'Paste', 'Move', 'FloodFill'];
+const CriticalActions = ['CopyFromInput', 'ResetGrid', 'ResizeGrid', 'Submit'];
 var moveDescript = ''
 
 
@@ -26,7 +29,6 @@ $(function () {
     $('#select_util_btn').on('click', 'button' , function() {
 
       var buttonName = $(this).attr('id'); // Read Button name
-      moveDescript = buttonName;         // Action Description Set (to stockpile trajectories)
 
       var selectedIds = getSelectedCellIds();   // Retrieve Selected Cell Ids
       var symbols = getSymbolClassesFromCellIds(selectedIds)  // Retrieve Selected Cells' Colors
@@ -39,21 +41,21 @@ $(function () {
         var planeid = saveInRectangle(selectedIds, size.width, size.height)
 
         if (buttonName == 'xflip') {
-        
+          moveDescript = 'FlipX';
           var changed_symbol = flipArrayX(planesymbol)
           console.log("-- Action: X Flip\n---- Changed:", changed_symbol);
           updateCellClasses(planeid, changed_symbol)
 
         }
         if (buttonName == 'yflip') {
-
+          moveDescript = 'FlipY';
           var changed_symbol = flipArrayY(planesymbol)
           console.log("-- Action: Y Flip\n---- Changed:", changed_symbol);
           updateCellClasses(planeid, changed_symbol)
 
         }
         if (buttonName == 'clockrotate') {
-
+          moveDescript = 'RotateCW';
           selectedIds = getSelectedCellIds(); // getSelectedCellIds() 함수를 호출하여 선택된 셀의 ID를 가져옴
           symbols = getSymbolClassesFromCellIds(selectedIds)
           coordinates = convertCellIdsToCoordinates(selectedIds)
@@ -74,7 +76,7 @@ $(function () {
 
         }
         if (buttonName == 'counterclockrotate') {
-          console.log(buttonName); // 버튼의 이름을 콘솔에 출력
+          moveDescript = 'RotateCCW';
           selectedIds = getSelectedCellIds(); // getSelectedCellIds() 함수를 호출하여 선택된 셀의 ID를 가져옴
           symbols = getSymbolClassesFromCellIds(selectedIds)
           coordinates = convertCellIdsToCoordinates(selectedIds)
@@ -145,7 +147,7 @@ $(function () {
           COPIED_ARRAY[xx-minx][yy-miny] = cv; 
         }
         console.log(`-- Action: Copy Array\n---- From: <${from}>\n---- Where: (${minx},${miny}) ~ (${maxx},${maxy})\n---- Copied:`, COPIED_ARRAY);
-
+        
       } else if(event.ctrlKey && event.key === 'v'){
         
         if(COPIED_ARRAY.length==0){
@@ -169,7 +171,8 @@ $(function () {
               x = pasteCellX + i;
               y = pasteCellY + j;
               cv = COPIED_ARRAY[i][j];
-              found = $(`#cell_${x}-${y}`)
+              found = $(`#cell_${x}-${y}`);
+
               if(found.length == 1){
                 symbolClass = found.attr('class').match(/symbol_[0-9]/)[0]
                 found.removeClass(symbolClass).addClass('symbol_'+cv);
@@ -177,7 +180,7 @@ $(function () {
 
             }
           } 
-          
+          moveDescript = 'Paste';
           console.log(`-- Action: Paste Array\n---- Where: (${pasteCellX},${pasteCellY}) ~ (${pasteCellX+height-1},${pasteCellY+width-1})\n---- Data:`,COPIED_ARRAY);
         } else {
           // Please Select Only ONE Position(left top corner);
@@ -203,7 +206,7 @@ $(function () {
 })
 
 function pushToTargetArray(array2D, text1, text2, targetArray) {
-  console.log("----------------------- Data Pushed -------------------------------")
+  console.log(`-------- Data Pushed, ${text1}, ${text2} --------`)
   targetArray.push([text1, text2, array2D]);
   return targetArray;
 }
@@ -271,7 +274,6 @@ function cell_observer(cells, observer) {
       //console.log(labelText);
       final = pushToTargetArray(numbersArray, labelText, moveDescript, final)
       //console.log(final)
-      //console.log(moveDescript)
       moveDescript = ''
     }
   });
@@ -363,6 +365,8 @@ function enableEditable() {
     $('#test_output_grid').on('click', '.cell_final', function(event) {
         var selectedPreview = $('#symbol_picker').find('.selected-symbol-preview');
         // Get the class of the clicked element.
+        moveDescript = 'Color'
+        let from, x, y;
         [from, x,y] = $(this).attr('id').split(/[_-]/);
         console.log(`--Action: Coloring\n---- Where: (${x},${y})\n---- Color: ${selectedPreview.attr('symbol')}`)
         var currentClasses = $(this).attr('class').split(' ');
@@ -424,6 +428,7 @@ function fillSelected() {
 
     });
     if(maxx===-1) return;
+    moveDescript = 'Fill'
     console.log(`-- Action: Fill\n---- Where: (${minx},${miny}) ~ (${maxx},${maxy})\n---- Color: ${color}`)
 }
 
@@ -499,7 +504,7 @@ function resetOutputGrid() {
 
     enableSelectable();
     labelText = "Edit"
-    moveDescript = 'reset grid'
+    moveDescript = 'ResetGrid'
     // final = pushToTargetArray(array, labelText, moveDescript, final)
     
     
@@ -549,7 +554,7 @@ function resizeOutputGrid() {
     // Log the input value to the console
     console.log(`-- Action: Resize Grid\n---- Size: ${rows} x ${cols}`);
     labelText = "Edit"
-    moveDescript = 'change grid size'
+    moveDescript = 'ResizeGrid'
     final = pushToTargetArray(array, labelText, moveDescript, final)
     moveDescript = ''
     enableSelectable();
@@ -599,7 +604,7 @@ function copyFromInput() {
     enableSelectable()
     console.log(`-- Action: Copy From Input`);
     labelText = "Edit"
-    moveDescript = 'copy from input'
+    moveDescript = 'CopyFromInput'
     final = pushToTargetArray(testgrid[0][0].grid, labelText, moveDescript, final)
     moveDescript = ''
 
