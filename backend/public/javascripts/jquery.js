@@ -434,6 +434,7 @@ function enableEditable() {
     });
      // Find the user_interact cell div and add a click listener to it.
     $('#test_output_grid').on('click', '.cell_final', function(event) {
+        // Store the selected preview symbol.
         var selectedPreview = $('#symbol_picker').find('.selected-symbol-preview');
         // Get the class of the clicked element.
         moveDescript = 'Color'
@@ -454,7 +455,7 @@ function enableSelectable() {
     $('#xflip').show();
     $('#yflip').show();
     
-    $(".user_interact").selectable({
+    $(".user_interact").selectable({ // .selectable: jQuery UI function
       autoRefresh: false,
       filter: '> .row > .cell_final',
       start: function(event, ui) {
@@ -475,9 +476,10 @@ function pickSymbol() {
     $('#symbol_picker').find('.symbol_preview').each(function(i, preview) {
         $(preview).removeClass('selected-symbol-preview');
     })
-    symbol_preview.addClass('selected-symbol-preview');
+    symbol_preview.addClass('selected-symbol-preview'); // add a class to the clicked symbol
 }
 
+// Change the class of the selected cells to the clicked symbol
 function fillSelected() {
     var selectedPreview = $('#symbol_picker').find('.selected-symbol-preview');
     // remove old color and add new color
