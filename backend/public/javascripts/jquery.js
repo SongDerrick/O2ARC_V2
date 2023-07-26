@@ -4,6 +4,12 @@ const miniGridSize = 200;
 const fullGridSize = 400;
 var final = []
 
+/*
+// Undo and Redo History Stacks
+var history = []
+var undoHistory = []
+*/
+
 const Actions = ['Color', 'Fill', 'FlipX', 'FlipY', 'RotateCW', 'RotateCCW', 'Copy', 'Paste', 'Move', 'FloodFill'];
 const CriticalActions = ['CopyFromInput', 'ResetGrid', 'ResizeGrid', 'Submit'];
 var moveDescript = ''
@@ -200,10 +206,75 @@ $(function () {
         
       }
     });
+  
+  /*
+  // Event Listeners for Undo & Redo Button
+  $('#undo_button').on('click', function() {
+      handleUndoAction();
+  });
+  
+  $('#redo_button').on('click', function() {
+      handleRedoAction();
+  });
+  */
 
     cell_observer()
 
 })
+
+/*
+
+// Record cell state changes
+function recordCellchange(cellId, OldSymbol, NewSymbol) {
+  // Push the cell change to the history stack
+  history.push({cellId: cellId, oldSymbol: oldSymbol, newSymbol: newSymbol});
+  // Clear the undoHistory stack whenever a new change is made
+  undoHistory = [];
+}
+
+// Event Handlers for Undo & Redo Button
+function handleUndoAction() {
+  if (history.length > 0) {
+    // Pop the latest change from the history stack
+    var change = history.pop();
+    
+    // Revert the cell to its old symbol
+    $('#' + change.cellId).removeClass('symbol_' + change.newSymbol).addClass('symbol_' + change.oldSymbol);
+    
+    // Push the change to the undoHistory stack
+    undoHistory.push(change);
+    }
+  // Disable the Undo button if there is no more history
+  if (history.length === 0) {
+        $('#undo_button').prop('disabled', true);
+    }
+    
+    // Enable the Redo button after an undo
+    $('#redo_button').prop('disabled', false);
+}
+
+
+function handleRedoAction() {
+  if (undoHistory.length > 0) {
+    // Pop the latest undone change from the undoHistory stack
+    var change = undoHistory.pop();
+
+    // Reapply the new symbol to the cell
+    $('#' + change.cellId).removeClass('symbol_' + change.oldSymbol).addClass('symbol_' + change.newSymbol);
+    
+    // Push the change back to the history stack
+    history.push(change);
+    }
+  // Disable the Redo button if there is no more undo history
+    if (undoHistory.length === 0) {
+        $('#redo_button').prop('disabled', true);
+    }
+    
+    // Enable the Undo button after a redo
+    $('#undo_button').prop('disabled', false);
+}
+*/
+
 
 function pushToTargetArray(array2D, text1, text2, targetArray) {
   console.log(`-------- Data Pushed, ${text1}, ${text2} --------`)
