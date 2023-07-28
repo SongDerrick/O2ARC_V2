@@ -3,6 +3,7 @@ var router = express.Router();
 const axios = require('axios')
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('./db/O2ARC.db');
+const db_test = new sqlite3.Database('./db/O2ARC_test.db');
 const logic_function = require('../public/javascripts/logic_function.js')
 const userhelper = require('../helpers/users');
 const testing_function = require('../public/javascripts/testing_interface.js')
@@ -13,13 +14,17 @@ router.get('/:id', async function(req, res, next) {
     const userName = req.params.id
     var data
     var data2
-    var minirand = logic_function.getRandomInt(5948,6096)
-    var rand = logic_function.getRandomInt(6098,6496)
+    // var minirand = logic_function.getRandomInt(5948,6096)
+    var minirand = logic_function.getRandomInt(5948,6084)
+    // var rand = logic_function.getRandomInt(6098,6496)
+    var rand = logic_function.getRandomInt(6085,6472)
     console.log(userName)
 
     try{
-        data = await userhelper.getARCList(userName,mini=true);
-        data2 = await userhelper.getARCList(userName);
+        // data = await userhelper.getARCList(userName,mini=true);
+        // data2 = await userhelper.getARCList(userName);
+        data = await userhelper.getARCList_test(userName,mini=true);
+        data2 = await userhelper.getARCList_test(userName);
     } catch (err) {
         console.log(err)
         return res.status(500).send("Internal Server Error")
@@ -43,7 +48,8 @@ router.get('/:id/:problem', function(req, res, next) {
     console.log(userName, problem)
     const params = problem;
 
-    db.get("SELECT content FROM tasklist WHERE id = ?", [params], (err, row) => {
+    db_test.get("SELECT content FROM HappyARC WHERE id = ?", [params], (err, row) => {
+    // db.get("SELECT content FROM tasklist WHERE id = ?", [params], (err, row) => {
         if (err) {
           console.error(err.message);
           return res.status(500).send('Error executing query');
@@ -113,7 +119,8 @@ router.post('/:id/:problem/save-data', (req, res) => {
 
   function retrieveIds() {
     return new Promise((resolve, reject) => {
-      db.all(sql1, [userName], (err, rows) => {
+      db_test.all(sql1, [userName], (err, rows) => {
+      // db.all(sql1, [userName], (err, rows) => {
         if (err) {
           reject(err);
         }
@@ -126,7 +133,8 @@ router.post('/:id/:problem/save-data', (req, res) => {
 
   function retrieveTaskIds() {
     return new Promise((resolve, reject) => {
-      db.all(sql2, [problem], (err, rows) => {
+      db_test.all(sql2, [problem], (err, rows) => {
+      // db.all(sql2, [problem], (err, rows) => {
         if (err) {
           reject(err);
         }
@@ -142,8 +150,9 @@ router.post('/:id/:problem/save-data', (req, res) => {
     const actionSequence = JSON.stringify(numbersArray);
   
     const sql = 'INSERT INTO submission (id, user_id, user_name, task_id, task_name, time_stamp, action_sequence) VALUES (?, ?, ?, ?, ?, ?, ?)';
-  
-    db.run(sql, [subid, userId, userName, taskId, taskName, timeStamp, actionSequence], function(err) {
+    
+    db_test.run(sql, [subid, userId, userName, taskId, taskName, timeStamp, actionSequence], function(err) {
+    // db.run(sql, [subid, userId, userName, taskId, taskName, timeStamp, actionSequence], function(err) {
       if (err) {
         console.error(err);
       } else {

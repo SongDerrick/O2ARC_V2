@@ -5,6 +5,16 @@ fail_stage_list = new Array();
 last_stage = -123;
 random_stage = new Array();
 
+clear_stage_list_mini = new Array();
+fail_stage_list_mini = new Array();
+last_stage_mini = -123;
+random_stage_mini = new Array();
+
+clear_stage_list_arc = new Array();
+fail_stage_list_arc = new Array();
+last_stage_arc = -123;
+random_stage_arc = new Array();
+
 /* @@@@@@@@@@@@@@@@@ 돌아가는 별자리 함수 @@@@@@@@@@@@@@@@@ */
 /* 랜덤 int 가져오는 함수 */
 function getRandomArbitrary(min, max) {
@@ -256,4 +266,262 @@ function superSecret() {
 			window.location.reload();
 		}
 	}
+}
+
+
+// Mini ARC competition을 위한 코드
+function setCookieData_mini() {
+	var cookies = document.cookie.split(";").map((el) => el.split("="));
+	/* check cookies */
+	var flag = false;
+	for (let i = 0; i < cookies.length; i++) {
+		var elem = cookies[i];
+		if (elem[0].trim() == "csl_mini") {
+			if (elem[1].length == 0) {
+				continue;
+			}
+			clear_stage_list_mini = elem[1].split("@");
+			flag = true;
+		}
+		if (elem[0].trim() == "fsl_mini") {
+			if (elem[1].length == 0) {
+				continue;
+			}
+			fail_stage_list_mini = elem[1].split("@");
+			flag = true;
+		}
+		if (elem[0].trim() == "rs_mini") {
+			if (elem[1].length == 0) {
+				continue;
+			}
+			random_stage_mini = elem[1].split("@");
+			flag = true;
+		}
+		if (elem[0].trim() == "ls_mini") {
+			if (elem[1] == -123) {
+				continue;
+			}
+			last_stage_mini = elem[1] * 1;
+			flag = true;
+		}
+	}
+	/* if no cookie data about csl fsl */
+	if (!flag) {
+		document.cookie = "csl_mini=" + clear_stage_list_mini.join("@");
+		document.cookie = "fsl_mini=" + fail_stage_list_mini.join("@");
+		document.cookie = "ls_mini=" + String(-123);
+
+		/* get random stage */
+		let getRandom = (min, max, count) => {
+			let temp_list = new Array();
+			let flag = false;
+			while (temp_list.length < count) {
+				flag = false;
+				let elem = Math.floor(Math.random() * (max - min + 1)) + min;
+				for (let e of temp_list) {
+					if (e == elem || elem == 6097) {
+						flag = true;
+					}
+				}
+				if (!flag) {
+					temp_list.push(elem);
+				}
+			}
+			return temp_list;
+		};
+		// random_stage = getRandom(
+		// 	5948,
+		// 	6496,
+		// 	TOTAL_STAGE
+		// ); /* 문제를 랜덤으로 가져오는건데 지정하는걸로 바꿔.*/
+		random_stage_mini = [5952,5971,5978,5983,6015,6018,6021,6022,6026,6033,6048,6055]
+		document.cookie = "rs_mini=" + random_stage_mini.join("@");
+	}
+}
+
+/* save data in cookies */
+function checkResult_mini() {
+	if (last_stage_mini != -123) {
+		/* correct */
+		var num = last_stage_mini;
+		if (window.location.href.split("?").at(-1) == "true") {
+			clear_stage_list_mini.push(num);
+			document.cookie = "csl_mini=" + clear_stage_list_mini.join("@");
+		} else if (window.location.href.split("?").at(-1) == "false") {
+			fail_stage_list_mini.push(num);
+			document.cookie = "fsl_mini=" + fail_stage_list_mini.join("@");
+		}
+		document.cookie = "ls_mini=" + String(-123);
+		last_stage_mini = -123;
+		location.href = "/mini_competition";
+		return;
+	}
+
+	/* set ui by cookie */
+	let rnsh = document.getElementsByClassName("stage");
+	for (let i = 0; i < random_stage_mini.length; i++) {
+		rnsh[i].setAttribute(
+			"onclick",
+			"enterProblem_mini(" +
+				random_stage_mini[i].toString() +
+				"," +
+				(i + 1).toString() +
+				");"
+		);
+	}
+
+	for (let elem of clear_stage_list_mini) {
+		let stage_html = document.getElementById(elem);
+		stage_html.firstElementChild.className = "stage-clear";
+		stage_html.firstElementChild.setAttribute("onclick", "");
+		stage_html.firstElementChild.lastElementChild.textContent = "Clear";
+	}
+
+	/* change progress bar */
+	let per = parseInt((100 * clear_stage_list_mini.length) / TOTAL_STAGE);
+	document.querySelector(".progress-bar-move").style.width =
+		per.toString() + "%";
+	document.getElementsByClassName("titlePER")[0].innerHTML =
+		per.toString() + "%";
+
+	for (let elem of fail_stage_list_mini) {
+		let stage_html = document.getElementById(elem);
+		stage_html.firstElementChild.className = "stage-fail";
+		stage_html.firstElementChild.setAttribute("onclick", "");
+		stage_html.firstElementChild.lastElementChild.textContent = "Fail";
+	}
+}
+
+function enterProblem_mini(problem, stage) {
+	document.cookie = "ls_mini=" + String(stage);
+	location.href = "/mini_competition/anonymous/" + String(problem);
+}
+
+
+// ARC competition을 위한 코드
+function setCookieData_arc() {
+	var cookies = document.cookie.split(";").map((el) => el.split("="));
+	/* check cookies */
+	var flag = false;
+	for (let i = 0; i < cookies.length; i++) {
+		var elem = cookies[i];
+		if (elem[0].trim() == "csl_arc") {
+			if (elem[1].length == 0) {
+				continue;
+			}
+			clear_stage_list_arc = elem[1].split("@");
+			flag = true;
+		}
+		if (elem[0].trim() == "fsl_arc") {
+			if (elem[1].length == 0) {
+				continue;
+			}
+			fail_stage_list_arc = elem[1].split("@");
+			flag = true;
+		}
+		if (elem[0].trim() == "rs_arc") {
+			if (elem[1].length == 0) {
+				continue;
+			}
+			random_stage_arc = elem[1].split("@");
+			flag = true;
+		}
+		if (elem[0].trim() == "ls_arc") {
+			if (elem[1] == -123) {
+				continue;
+			}
+			last_stage_arc = elem[1] * 1;
+			flag = true;
+		}
+	}
+	/* if no cookie data about csl fsl */
+	if (!flag) {
+		document.cookie = "csl_arc=" + clear_stage_list_arc.join("@");
+		document.cookie = "fsl_arc=" + fail_stage_list_arc.join("@");
+		document.cookie = "ls_arc=" + String(-123);
+
+		/* get random stage */
+		let getRandom = (min, max, count) => {
+			let temp_list = new Array();
+			let flag = false;
+			while (temp_list.length < count) {
+				flag = false;
+				let elem = Math.floor(Math.random() * (max - min + 1)) + min;
+				for (let e of temp_list) {
+					if (e == elem || elem == 6097) {
+						flag = true;
+					}
+				}
+				if (!flag) {
+					temp_list.push(elem);
+				}
+			}
+			return temp_list;
+		};
+		// random_stage = getRandom(
+		// 	5948,
+		// 	6496,
+		// 	TOTAL_STAGE
+		// ); /* 문제를 랜덤으로 가져오는건데 지정하는걸로 바꿔.*/
+		random_stage_arc = [6268,6410,6241,6247,6309,6271,6490,6299,6291,6410,6186,6227]
+		document.cookie = "rs_arc=" + random_stage_arc.join("@");
+	}
+}
+
+
+function checkResult_arc() {
+	if (last_stage_arc != -123) {
+		/* correct */
+		var num = last_stage_arc;
+		if (window.location.href.split("?").at(-1) == "true") {
+			clear_stage_list_arc.push(num);
+			document.cookie = "csl_arc=" + clear_stage_list_arc.join("@");
+		} else if (window.location.href.split("?").at(-1) == "false") {
+			fail_stage_list_arc.push(num);
+			document.cookie = "fsl_arc=" + fail_stage_list_arc.join("@");
+		}
+		document.cookie = "ls_arc=" + String(-123);
+		last_stage_arc = -123;
+		location.href = "/arc_competition";
+		return;
+	}
+
+	/* set ui by cookie */
+	let rnsh = document.getElementsByClassName("stage");
+	for (let i = 0; i < random_stage_arc.length; i++) {
+		rnsh[i].setAttribute(
+			"onclick",
+			"enterProblem_arc(" +
+				random_stage_arc[i].toString() +
+				"," +
+				(i + 1).toString() +
+				");"
+		);
+	}
+
+	for (let elem of clear_stage_list_arc) {
+		let stage_html = document.getElementById(elem);
+		stage_html.firstElementChild.className = "stage-clear";
+		stage_html.firstElementChild.setAttribute("onclick", "");
+		stage_html.firstElementChild.lastElementChild.textContent = "Clear";
+	}
+
+	/* change progress bar */
+	let per = parseInt((100 * clear_stage_list_arc.length) / TOTAL_STAGE);
+	document.querySelector(".progress-bar-move").style.width =
+		per.toString() + "%";
+	document.getElementsByClassName("titlePER")[0].innerHTML =
+		per.toString() + "%";
+
+	for (let elem of fail_stage_list_arc) {
+		let stage_html = document.getElementById(elem);
+		stage_html.firstElementChild.className = "stage-fail";
+		stage_html.firstElementChild.setAttribute("onclick", "");
+		stage_html.firstElementChild.lastElementChild.textContent = "Fail";
+	}
+}
+
+function enterProblem_arc(problem, stage) {
+	document.cookie = "ls_arc=" + String(stage);
+	location.href = "/arc_competition/anonymous/" + String(problem);
 }
