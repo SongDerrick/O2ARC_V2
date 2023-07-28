@@ -46,7 +46,8 @@ router.get('/:id/:problem', function(req, res, next) {
         // console.log(h)
 
         // console.log(traingrid)
-        return res.render('problem_solve_mario', {
+        return res.render('problem_solve', {
+        // return res.render('problem_solve_mario', {
           userName: userName,
           train: trainData,
           grid : traingrid,
