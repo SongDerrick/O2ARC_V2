@@ -751,7 +751,7 @@ function resetOutputGrid() {
 	enableSelectable();
 	labelText = "Critical";
 	moveDescript = "ResetGrid";
-	selection = [];
+	selection = [[rownum,colnum]];
 	// final = pushToTargetArray(array, labelText, moveDescript, final)
 }
 
@@ -799,7 +799,7 @@ function resizeOutputGrid() {
 	console.log(`-- Action: Resize Grid\n---- Size: ${rows} x ${cols}`);
 	labelText = "Critical";
 	moveDescript = "ResizeGrid";
-	final = pushToTargetArray(array, labelText, moveDescript,[], final);
+	final = pushToTargetArray(array, labelText, moveDescript,[[rows,cols]], final);
 	moveDescript = "";
 	selection = [];
 	enableSelectable();
