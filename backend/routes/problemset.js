@@ -47,7 +47,7 @@ router.get('/:id/:problem', function(req, res, next) {
     
     console.log(userName, problem)
     const params = problem;
-
+    
     db_test.get("SELECT content FROM HappyARC WHERE id = ?", [params], (err, row) => {
     // db.get("SELECT content FROM tasklist WHERE id = ?", [params], (err, row) => {
         if (err) {
@@ -85,7 +85,8 @@ router.get('/:id/:problem', function(req, res, next) {
             Testgrid: testgrid,
             Outputgrid: outputgrid,
             p:cellsize,
-            reset: resettedgrid
+            reset: resettedgrid,
+            competition: 0
         })
         } else {
           return res.status(404).send('Content not found');

@@ -54,7 +54,8 @@ router.get('/:id/:problem', function(req, res, next) {
           Testgrid: testgrid,
           Outputgrid: outputgrid,
           p:cellsize,
-          reset: resettedgrid
+          reset: resettedgrid,
+          competition: 'mini'
       })
       } else {
         return res.status(404).send('Content not found');

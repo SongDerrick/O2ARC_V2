@@ -52,7 +52,7 @@
       var testgrid = <%- JSON.stringify(Testgrid) %>;
       var currentRoute = window.location.href;
     </script>
-    
+      <script src="/javascripts/mario.js"></script>
     <script src="/javascripts/jquery.js"></script>
     
 
@@ -214,7 +214,15 @@
 
                   <button onclick="copyFromInput()">Copy from input</button>
                   <button id="resetBtn" onclick="resetOutputGrid()">Reset grid</button>
-                  <button onclick="submitSolution(testgrid, '<%= userName %>' , currentRoute)" id="submit_solution_btn">Submit!</button>
+                  <% if(competition == 'mini'){ %>
+                    <button onclick="submitSolutionMarioMini(testgrid, '<%= userName %>' , currentRoute)" id="submit_solution_btn">Submit!</button>
+                  <% } %>
+                  <% if(competition === 'arc'){ %>
+                    <button onclick="submitSolutionMarioARC(testgrid, '<%= userName %>' , currentRoute)" id="submit_solution_btn">Submit!</button>
+                  <% } %>
+                  <% if(!competition){ %>
+                    <button onclick="submitSolution(testgrid, '<%= userName %>' , currentRoute)" id="submit_solution_btn">Submit!</button>
+                  <% } %>
               </div>
                 <% Outputgrid.forEach(item => { %>
                   <div class="container-fluid row demo_row mx-auto">
