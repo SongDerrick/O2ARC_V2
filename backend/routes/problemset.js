@@ -3,7 +3,6 @@ var router = express.Router();
 const axios = require('axios')
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('./db/O2ARC.db');
-const db_test = new sqlite3.Database('./db/O2ARC_test.db');
 const logic_function = require('../public/javascripts/logic_function.js')
 const userhelper = require('../helpers/users');
 const testing_function = require('../public/javascripts/testing_interface.js')
@@ -48,7 +47,7 @@ router.get('/:id/:problem', function(req, res, next) {
     console.log(userName, problem)
     const params = problem;
     
-    db_test.get("SELECT content FROM HappyARC WHERE id = ?", [params], (err, row) => {
+    db.get("SELECT content FROM HappyARC WHERE id = ?", [params], (err, row) => {
     // db.get("SELECT content FROM tasklist WHERE id = ?", [params], (err, row) => {
         if (err) {
           console.error(err.message);
@@ -120,8 +119,7 @@ router.post('/:id/:problem/save-data', (req, res) => {
 
   function retrieveIds() {
     return new Promise((resolve, reject) => {
-      db_test.all(sql1, [userName], (err, rows) => {
-      // db.all(sql1, [userName], (err, rows) => {
+      db.all(sql1, [userName], (err, rows) => {
         if (err) {
           reject(err);
         }
@@ -134,8 +132,7 @@ router.post('/:id/:problem/save-data', (req, res) => {
 
   function retrieveTaskIds() {
     return new Promise((resolve, reject) => {
-      db_test.all(sql2, [problem], (err, rows) => {
-      // db.all(sql2, [problem], (err, rows) => {
+      db.all(sql2, [problem], (err, rows) => {
         if (err) {
           reject(err);
         }
@@ -152,8 +149,7 @@ router.post('/:id/:problem/save-data', (req, res) => {
   
     const sql = 'INSERT INTO submission (id, user_id, user_name, task_id, task_name, time_stamp, action_sequence) VALUES (?, ?, ?, ?, ?, ?, ?)';
     
-    db_test.run(sql, [subid, userId, userName, taskId, taskName, timeStamp, actionSequence], function(err) {
-    // db.run(sql, [subid, userId, userName, taskId, taskName, timeStamp, actionSequence], function(err) {
+    db.run(sql, [subid, userId, userName, taskId, taskName, timeStamp, actionSequence], function(err) {
       if (err) {
         console.error(err);
       } else {

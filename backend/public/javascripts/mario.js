@@ -334,7 +334,7 @@ function setCookieData_mini() {
 		// 	6496,
 		// 	TOTAL_STAGE
 		// ); /* 문제를 랜덤으로 가져오는건데 지정하는걸로 바꿔.*/
-		random_stage_mini = [6472, 6473, 6474, 6475, 6476, 6477, 6478, 6479, 6480, 6481, 6482, 6483]
+		random_stage_mini = [5952,5971,5978,5983,6015,6018,6021,6022,6026,6033,6048,6055]
 		document.cookie = "rs_mini=" + random_stage_mini.join("@");
 	}
 }
@@ -397,7 +397,7 @@ function enterProblem_mini(problem, stage) {
 	location.href = "/mini_competition/anonymous/" + String(problem);
 }
 
-function submitSolutionMario_mini(input) {
+function submitSolutionMarioMini(input) {
 	/* 맞았는지 틀렸는지 구현 */
 	const divs = document.querySelectorAll("#user_interact .cell_final");
 	const rows = document.querySelectorAll("#user_interact .row");
@@ -547,7 +547,7 @@ function setCookieData_arc() {
 		// 	6496,
 		// 	TOTAL_STAGE
 		// ); /* 문제를 랜덤으로 가져오는건데 지정하는걸로 바꿔.*/
-		random_stage_arc = [6484, 6485, 6486, 6487, 6488, 6489, 6490, 6491, 6492, 6493, 6494, 6495]
+		random_stage_arc = [6268,6303,6241,6247,6309,6271,6490,6299,6291,6410,6186,6227]
 		document.cookie = "rs_arc=" + random_stage_arc.join("@");
 	}
 }
@@ -610,7 +610,7 @@ function enterProblem_arc(problem, stage) {
 	location.href = "/arc_competition/anonymous/" + String(problem);
 }
 
-function submitSolutionMario_arc(input) {
+function submitSolutionMarioARC(input) {
 	/* 맞았는지 틀렸는지 구현 */
 	const divs = document.querySelectorAll("#user_interact .cell_final");
 	const rows = document.querySelectorAll("#user_interact .row");
