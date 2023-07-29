@@ -18,7 +18,7 @@ const Actions = [
 ];
 const CriticalActions = ["CopyFromInput", "ResetGrid", "ResizeGrid", "Submit"];
 var moveDescript = "";
-
+var selection = [];
 $(function () {
 	rownum = testgrid[0][0].height;
 	colnum = testgrid[0][0].width;
@@ -47,7 +47,16 @@ $(function () {
 		var symbols = getSymbolClassesFromCellIds(selectedIds); // Retrieve Selected Cells' Colors
 		var coordinates = convertCellIdsToCoordinates(selectedIds); // Convert Cell ids' to Coords
 		var rectangular = isRectangular(coordinates); // Verify the selection area is square-shaped
-
+		
+		var minx = 1000, maxx=-1, miny=1000,maxy=-1;
+		for(var i=0 ; i<coordinates.length ; i++){
+			minx=Math.min(minx,coordinates[i][0]);
+			miny=Math.min(miny,coordinates[i][1]);
+			maxx=Math.max(maxx,coordinates[i][0]);
+			maxy=Math.max(maxy,coordinates[i][1]);
+		}
+		selection = [[minx,miny],[maxx,maxy]];
+		
 		if (rectangular) {
 			var size = calculateRectangleSize(coordinates);
 			var planesymbol = saveInRectangle(symbols, size.width, size.height);
@@ -79,7 +88,7 @@ $(function () {
 					//console.log("black: ", black_symbol)
 					updateCellClasses(planeid, black_symbol);
 				}
-				
+
 				var changed_id = rotateRectangle(planeid);
 
 				addSelectedClass(changed_id);
@@ -151,7 +160,7 @@ $(function () {
 			let maxy = Math.max(...ylist);
 			let copyheight = maxx - minx + 1;
 			let copywidth = maxy - miny + 1;
-
+			
 			// ARRAY CONStruction
 			COPIED_ARRAY = [];
 			for (var i = 0; i < copyheight; i++) {
@@ -169,6 +178,27 @@ $(function () {
 				`-- Action: Copy Array\n---- From: <${from}>\n---- Where: (${minx},${miny}) ~ (${maxx},${maxy})\n---- Copied:`,
 				COPIED_ARRAY
 			);
+ 
+			const numbersArray = [];
+			var cells = document.querySelectorAll("#test_output_grid .cell_final");
+			for (let i = 0; i < rownum; i++) {
+				const rowArray = [];
+
+				for (let j = 0; j < colnum; j++) {
+					const index = i * colnum + j;
+					const div = cells[index];
+
+					const className = div.className;
+					const number = className.split("symbol_")[1]; // Extract the number after "symbol_"
+					rowArray.push(parseInt(number)); // Convert the number to an integer and store it in the row array
+				}
+
+				numbersArray.push(rowArray); // Store the row array in the main array
+			}
+			moveDescript = 'Copy';
+			selection = [[minx,miny],[maxx,maxy],from];
+			final = pushToTargetArray(numbersArray,'Select',moveDescript,selection,final );
+
 		} else if (event.ctrlKey && event.key === "v") {
 			if (COPIED_ARRAY.length == 0) {
 				// No Data To Paste
@@ -200,6 +230,7 @@ $(function () {
 					}
 				}
 				moveDescript = "Paste";
+				selection = [[pasteCellX,pasteCellY]]
 				console.log(
 					`-- Action: Paste Array\n---- Where: (${pasteCellX},${pasteCellY}) ~ (${
 						pasteCellX + height - 1
@@ -395,9 +426,9 @@ $(function () {
 	cell_observer();
 });
 
-function pushToTargetArray(array2D, text1, text2, targetArray) {
-	console.log(`-------- Data Pushed, ${text1}, ${text2} --------`);
-	targetArray.push([text1, text2, array2D]);
+function pushToTargetArray(array2D, text1, text2, sel, targetArray) {
+	console.log(`-------- Data Pushed, ${text1}, ${text2}, ${sel} --------`);
+	targetArray.push([text1, text2, sel, array2D]);
 	return targetArray;
 }
 
@@ -469,9 +500,14 @@ function cell_observer(cells, observer) {
 
 			//console.log(numbersArray)
 			//console.log(labelText);
-			final = pushToTargetArray(numbersArray, labelText, moveDescript, final);
+
+			if(CriticalActions.includes(moveDescript)){
+				labelText='Critical';
+			}
+			final = pushToTargetArray(numbersArray, labelText, moveDescript,selection, final);
 			//console.log(final)
 			moveDescript = "";
+			selection = [];
 		}
 	});
 	// Start observing changes to the 'class' attribute of each cell_final element
@@ -565,6 +601,7 @@ function enableEditable() {
 		moveDescript = "Color";
 		let from, x, y;
 		[from, x, y] = $(this).attr("id").split(/[_-]/);
+		selection = [[parseInt(x),parseInt(y)]];
 		console.log(
 			`--Action: Coloring\n---- Where: (${x},${y})\n---- Color: ${selectedPreview.attr(
 				"symbol"
@@ -637,6 +674,7 @@ function fillSelected() {
 	});
 	if (maxx === -1) return;
 	moveDescript = "Fill";
+	selection = [[minx,miny],[maxx,maxy]];
 	console.log(
 		`-- Action: Fill\n---- Where: (${minx},${miny}) ~ (${maxx},${maxy})\n---- Color: ${color}`
 	);
@@ -711,8 +749,9 @@ function resetOutputGrid() {
 	console.log(`-- Action: Reset Grid`);
 
 	enableSelectable();
-	labelText = "Edit";
+	labelText = "Critical";
 	moveDescript = "ResetGrid";
+	selection = [];
 	// final = pushToTargetArray(array, labelText, moveDescript, final)
 }
 
@@ -758,10 +797,11 @@ function resizeOutputGrid() {
 	}
 	// Log the input value to the console
 	console.log(`-- Action: Resize Grid\n---- Size: ${rows} x ${cols}`);
-	labelText = "Edit";
+	labelText = "Critical";
 	moveDescript = "ResizeGrid";
-	final = pushToTargetArray(array, labelText, moveDescript, final);
+	final = pushToTargetArray(array, labelText, moveDescript,[], final);
 	moveDescript = "";
+	selection = [];
 	enableSelectable();
 
 	cell_observer();
@@ -804,16 +844,17 @@ function copyFromInput() {
 
 	enableSelectable();
 	console.log(`-- Action: Copy From Input`);
-	labelText = "Edit";
+	labelText = "Critical";
 	moveDescript = "CopyFromInput";
 	final = pushToTargetArray(
 		testgrid[0][0].grid,
 		labelText,
 		moveDescript,
+		selection,
 		final
 	);
 	moveDescript = "";
-
+	selection = [];
 	cell_observer();
 }
 
@@ -895,6 +936,7 @@ function submitSolution(input, name, cRoute) {
 		input[0][1].grid,
 		`\n---- Correct: ${answer}`
 	);
+	final = pushToTargetArray(numbersArray,'Critical','Submit',[answer],final);
 	if (answer) {
 		sendLogData(final);
 		final = [];
@@ -903,6 +945,7 @@ function submitSolution(input, name, cRoute) {
 	} else {
 		sendLogData(final);
 		alert("Wrong!");
+		copyFromInput();
 		final = [];
 	}
 }
