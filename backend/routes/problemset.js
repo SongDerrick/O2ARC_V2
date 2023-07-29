@@ -17,7 +17,7 @@ router.get('/:id', async function(req, res, next) {
     // var minirand = logic_function.getRandomInt(5948,6096)
     var minirand = logic_function.getRandomInt(5948,6084)
     // var rand = logic_function.getRandomInt(6098,6496)
-    var rand = logic_function.getRandomInt(6085,6472)
+    var rand = logic_function.getRandomInt(6085,6471)
     console.log(userName)
 
     try{

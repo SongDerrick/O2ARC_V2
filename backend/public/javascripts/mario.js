@@ -334,7 +334,7 @@ function setCookieData_mini() {
 		// 	6496,
 		// 	TOTAL_STAGE
 		// ); /* 문제를 랜덤으로 가져오는건데 지정하는걸로 바꿔.*/
-		random_stage_mini = [5952,5971,5978,5983,6015,6018,6021,6022,6026,6033,6048,6055]
+		random_stage_mini = [6472, 6473, 6474, 6475, 6476, 6477, 6478, 6479, 6480, 6481, 6482, 6483]
 		document.cookie = "rs_mini=" + random_stage_mini.join("@");
 	}
 }
@@ -397,6 +397,90 @@ function enterProblem_mini(problem, stage) {
 	location.href = "/mini_competition/anonymous/" + String(problem);
 }
 
+function submitSolutionMario_mini(input) {
+	/* 맞았는지 틀렸는지 구현 */
+	const divs = document.querySelectorAll("#user_interact .cell_final");
+	const rows = document.querySelectorAll("#user_interact .row");
+	const rownum = rows.length;
+	const divnum = divs.length;
+
+	// console.log(divs[0].className)
+	// console.log(rownum)
+	// console.log(divnum/rownum)
+
+	const numbersArray = [];
+	for (let i = 0; i < rownum; i++) {
+		const rowArray = [];
+
+		for (let j = 0; j < divnum / rownum; j++) {
+			const index = i * (divnum / rownum) + j;
+			const div = divs[index];
+
+			const className = div.className;
+			const number = className.split("symbol_")[1]; // Extract the number after "symbol_"
+			rowArray.push(parseInt(number)); // Store the number in the row array
+		}
+
+		numbersArray.push(rowArray); // Store the row array in the main array
+	}
+
+	User_Answer = numbersArray.map((num) => parseInt(num));
+	Actual_Answer = input[0][1].grid.flat().map((num) => parseInt(num));
+
+	console.log(numbersArray);
+
+	for (let i = 0; i < input[0][1].grid.length; i++) {
+		for (let j = 0; j < input[0][1].grid[i].length; j++) {
+			// Convert the value to an integer using parseInt()
+			input[0][1].grid[i][j] = parseInt(input[0][1].grid[i][j]);
+		}
+	}
+	console.log(input[0][1].grid);
+	answer = compareArrays(numbersArray, input[0][1].grid);
+	var retVal = "";
+
+	if (!answer) {
+		retVal = "false";
+		alert("Wrong!");
+	} else {
+		retVal = "true";
+		alert("Success!");
+	}
+
+	/* 마리오 페이지로 redirection with return val */
+	/* retVal에는 정답이면 true 오답이면 false인 String이 들어가야함*/
+	location.href = "/mini_competition?" + retVal;
+}
+
+/* super secret */
+function superSecret_mini() {
+	if (TOTAL_STAGE == clear_stage_list.length) {
+		alert("Congraturation!");
+		if (!confirm("Reset?")) {
+			// alert("None")
+		} else {
+			document.cookie = "csl_mini=";
+			document.cookie = "fsl_mini=";
+			document.cookie = "ls_mini=";
+			document.cookie = "rs_mini=";
+			window.location.reload();
+		}
+	} else {
+		if (
+			!confirm(
+				"You can get reward when you achieve 100%\nDo you want to reset?"
+			)
+		) {
+			// alert("None")
+		} else {
+			document.cookie = "csl_mini=";
+			document.cookie = "fsl_mini=";
+			document.cookie = "ls_mini=";
+			document.cookie = "rs_mini=";
+			window.location.reload();
+		}
+	}
+}
 
 // ARC competition을 위한 코드
 function setCookieData_arc() {
@@ -463,7 +547,7 @@ function setCookieData_arc() {
 		// 	6496,
 		// 	TOTAL_STAGE
 		// ); /* 문제를 랜덤으로 가져오는건데 지정하는걸로 바꿔.*/
-		random_stage_arc = [6268,6410,6241,6247,6309,6271,6490,6299,6291,6410,6186,6227]
+		random_stage_arc = [6484, 6485, 6486, 6487, 6488, 6489, 6490, 6491, 6492, 6493, 6494, 6495]
 		document.cookie = "rs_arc=" + random_stage_arc.join("@");
 	}
 }
@@ -524,4 +608,89 @@ function checkResult_arc() {
 function enterProblem_arc(problem, stage) {
 	document.cookie = "ls_arc=" + String(stage);
 	location.href = "/arc_competition/anonymous/" + String(problem);
+}
+
+function submitSolutionMario_arc(input) {
+	/* 맞았는지 틀렸는지 구현 */
+	const divs = document.querySelectorAll("#user_interact .cell_final");
+	const rows = document.querySelectorAll("#user_interact .row");
+	const rownum = rows.length;
+	const divnum = divs.length;
+
+	// console.log(divs[0].className)
+	// console.log(rownum)
+	// console.log(divnum/rownum)
+
+	const numbersArray = [];
+	for (let i = 0; i < rownum; i++) {
+		const rowArray = [];
+
+		for (let j = 0; j < divnum / rownum; j++) {
+			const index = i * (divnum / rownum) + j;
+			const div = divs[index];
+
+			const className = div.className;
+			const number = className.split("symbol_")[1]; // Extract the number after "symbol_"
+			rowArray.push(parseInt(number)); // Store the number in the row array
+		}
+
+		numbersArray.push(rowArray); // Store the row array in the main array
+	}
+
+	User_Answer = numbersArray.map((num) => parseInt(num));
+	Actual_Answer = input[0][1].grid.flat().map((num) => parseInt(num));
+
+	console.log(numbersArray);
+
+	for (let i = 0; i < input[0][1].grid.length; i++) {
+		for (let j = 0; j < input[0][1].grid[i].length; j++) {
+			// Convert the value to an integer using parseInt()
+			input[0][1].grid[i][j] = parseInt(input[0][1].grid[i][j]);
+		}
+	}
+	console.log(input[0][1].grid);
+	answer = compareArrays(numbersArray, input[0][1].grid);
+	var retVal = "";
+
+	if (!answer) {
+		retVal = "false";
+		alert("Wrong!");
+	} else {
+		retVal = "true";
+		alert("Success!");
+	}
+
+	/* 마리오 페이지로 redirection with return val */
+	/* retVal에는 정답이면 true 오답이면 false인 String이 들어가야함*/
+	location.href = "/arc_competition?" + retVal;
+}
+
+/* super secret */
+function superSecret_arc() {
+	if (TOTAL_STAGE == clear_stage_list.length) {
+		alert("Congraturation!");
+		if (!confirm("Reset?")) {
+			// alert("None")
+		} else {
+			document.cookie = "csl_arc=";
+			document.cookie = "fsl_arc=";
+			document.cookie = "ls_arc=";
+			document.cookie = "rs_arc=";
+			window.location.reload();
+		}
+	} else {
+		if (
+			!confirm(
+				"You can get reward when you achieve 100%\nDo you want to reset?"
+			)
+		) {
+			// alert("None")
+		} else {
+			document.cookie = "csl_arc=";
+			document.cookie = "fsl_arc=";
+			document.cookie = "ls_arc=";
+			document.cookie = "rs_arc=";
+			window.location.reload();
+		}
+	}
 }
