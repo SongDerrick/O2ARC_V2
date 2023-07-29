@@ -67,19 +67,19 @@ $(function () {
 			}
 			if (buttonName == "clockrotate") {
 				moveDescript = "RotateCW";
-				selectedIds = getSelectedCellIds(); // getSelectedCellIds() 함수를 호출하여 선택된 셀의 ID를 가져옴
-				symbols = getSymbolClassesFromCellIds(selectedIds);
-				coordinates = convertCellIdsToCoordinates(selectedIds);
+
 				size = calculateRectangleSize(coordinates);
 				planesymbol = saveInRectangle(symbols, size.width, size.height);
 				planeid = saveInRectangle(selectedIds, size.width, size.height);
 				removeSelectedClass();
 				var changed_symbol = rotateArrayClockwise(planesymbol);
 				console.log("-- Action: CW Rotate\n---- Changed:", changed_symbol);
-
-				var black_symbol = createRectangle(size.height, size.width);
-				//console.log("black: ", black_symbol)
-				updateCellClasses(planeid, black_symbol);
+				if (size.width != size.height){
+					var black_symbol = createRectangle(size.height, size.width);
+					//console.log("black: ", black_symbol)
+					updateCellClasses(planeid, black_symbol);
+				}
+				
 				var changed_id = rotateRectangle(planeid);
 
 				addSelectedClass(changed_id);
@@ -87,19 +87,19 @@ $(function () {
 			}
 			if (buttonName == "counterclockrotate") {
 				moveDescript = "RotateCCW";
-				selectedIds = getSelectedCellIds(); // getSelectedCellIds() 함수를 호출하여 선택된 셀의 ID를 가져옴
-				symbols = getSymbolClassesFromCellIds(selectedIds);
-				coordinates = convertCellIdsToCoordinates(selectedIds);
+
 				size = calculateRectangleSize(coordinates);
 				planesymbol = saveInRectangle(symbols, size.width, size.height);
 				planeid = saveInRectangle(selectedIds, size.width, size.height);
 				removeSelectedClass();
 				var changed_symbol = rotateArrayCounterClockwise(planesymbol);
 				console.log("-- Action: CCW Rotate\n---- Changed:", changed_symbol);
+				if (size.width != size.height){
+					var black_symbol = createRectangle(size.height, size.width);
+					//console.log("black: ", black_symbol)
+					updateCellClasses(planeid, black_symbol);
+				}
 
-				var black_symbol = createRectangle(size.height, size.width);
-				//console.log("black: ", black_symbol)
-				updateCellClasses(planeid, black_symbol);
 				var changed_id = rotateRectangle(planeid);
 
 				addSelectedClass(changed_id);
