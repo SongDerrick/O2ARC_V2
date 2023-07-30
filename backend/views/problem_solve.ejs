@@ -214,6 +214,9 @@
 
                   <button onclick="copyFromInput()">Copy from input</button>
                   <button id="resetBtn" onclick="resetOutputGrid()">Reset grid</button>
+                  <% if(competition === 'mario'){ %>
+                    <button onclick="submitSolutionMario(testgrid, '<%= userName %>' , currentRoute)" id="submit_solution_btn">Submit!</button>
+                  <% } %>
                   <% if(competition == 'mini'){ %>
                     <button onclick="submitSolutionMarioMini(testgrid, '<%= userName %>' , currentRoute)" id="submit_solution_btn">Submit!</button>
                   <% } %>
