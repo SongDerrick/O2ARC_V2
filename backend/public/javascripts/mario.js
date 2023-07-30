@@ -185,8 +185,8 @@ function enterProblemMario(problem, stage) {
 /* function for submit button */
 function submitSolutionMario(input) {
 	/* 맞았는지 틀렸는지 구현 */
-	const divs = document.querySelectorAll("#user_interact .cell_final");
-	const rows = document.querySelectorAll("#user_interact .row");
+	const divs = document.querySelectorAll("#test_output_grid .cell_final");
+	const rows = document.querySelectorAll("#test_output_grid .row");
 	const rownum = rows.length;
 	const divnum = divs.length;
 
@@ -399,8 +399,8 @@ function enterProblem_mini(problem, stage) {
 
 function submitSolutionMarioMini(input) {
 	/* 맞았는지 틀렸는지 구현 */
-	const divs = document.querySelectorAll("#user_interact .cell_final");
-	const rows = document.querySelectorAll("#user_interact .row");
+	const divs = document.querySelectorAll("#test_output_grid .cell_final");
+	const rows = document.querySelectorAll("#test_output_grid .row");
 	const rownum = rows.length;
 	const divnum = divs.length;
 
@@ -612,8 +612,8 @@ function enterProblem_arc(problem, stage) {
 
 function submitSolutionMarioARC(input) {
 	/* 맞았는지 틀렸는지 구현 */
-	const divs = document.querySelectorAll("#user_interact .cell_final");
-	const rows = document.querySelectorAll("#user_interact .row");
+	const divs = document.querySelectorAll("#test_output_grid .cell_final");
+	const rows = document.querySelectorAll("#test_output_grid .row");
 	const rownum = rows.length;
 	const divnum = divs.length;
 
