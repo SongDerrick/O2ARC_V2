@@ -347,10 +347,10 @@ function checkResult_mini() {
 		if (window.location.href.split("?").at(-1) == "true") {
 			clear_stage_list_mini.push(num);
 			document.cookie = "csl_mini=" + clear_stage_list_mini.join("@");
-		} else if (window.location.href.split("?").at(-1) == "false") {
+		} /*else if (window.location.href.split("?").at(-1) == "false") {
 			fail_stage_list_mini.push(num);
 			document.cookie = "fsl_mini=" + fail_stage_list_mini.join("@");
-		}
+		}*/
 		document.cookie = "ls_mini=" + String(-123);
 		last_stage_mini = -123;
 		location.href = "/mini_competition";
@@ -560,10 +560,10 @@ function checkResult_arc() {
 		if (window.location.href.split("?").at(-1) == "true") {
 			clear_stage_list_arc.push(num);
 			document.cookie = "csl_arc=" + clear_stage_list_arc.join("@");
-		} else if (window.location.href.split("?").at(-1) == "false") {
+		} /*else if (window.location.href.split("?").at(-1) == "false") {
 			fail_stage_list_arc.push(num);
 			document.cookie = "fsl_arc=" + fail_stage_list_arc.join("@");
-		}
+		} */
 		document.cookie = "ls_arc=" + String(-123);
 		last_stage_arc = -123;
 		location.href = "/arc_competition";
