@@ -179,22 +179,8 @@ $(function () {
 				COPIED_ARRAY
 			);
  
-			const numbersArray = [];
-			var cells = document.querySelectorAll("#test_output_grid .cell_final");
-			for (let i = 0; i < rownum; i++) {
-				const rowArray = [];
-
-				for (let j = 0; j < colnum; j++) {
-					const index = i * colnum + j;
-					const div = cells[index];
-
-					const className = div.className;
-					const number = className.split("symbol_")[1]; // Extract the number after "symbol_"
-					rowArray.push(parseInt(number)); // Convert the number to an integer and store it in the row array
-				}
-
-				numbersArray.push(rowArray); // Store the row array in the main array
-			}
+			const numbersArray = getCurrentArray();
+			
 			moveDescript = 'Copy';
 			selection = [[minx,miny],[maxx,maxy],from];
 			final = pushToTargetArray(numbersArray,'Select',moveDescript,selection,final );
@@ -582,7 +568,7 @@ function handleToolModeChange(toolMode) {
 		// 'flood fill' mode
 		console.log("Switch Tool: Flood Fill");
 		disableTools();
-		//enableFloodFill();
+		enableFloodFill();
 		//   infoMsg('Flood fill mode activated');
 	} else {
 	}
@@ -591,7 +577,7 @@ function handleToolModeChange(toolMode) {
 function enableEditable() {
 	$("#symbol_picker")
 		.find(".symbol_preview")
-		.click(function (event) {
+		.on('click',function (event) {
 			pickSymbol();
 		});
 	// Find the user_interact cell div and add a click listener to it.
@@ -638,6 +624,61 @@ function enableSelectable() {
 			pickSymbol(); // pick symbol color
 			fillSelected(); // fill selected cell_final
 		});
+}
+
+function dfsFloodFill(x,y,color) {
+	const arr = getCurrentArray();
+	const H = arr.length;
+	const W = arr[0].length;
+	const directions = [[-1,0],[1,0],[0,-1],[0,1]];
+	let affects = [];
+    let visit = [];
+
+	for(let i=0;i<H;i++) visit.push(Array.from({length: W}, () => 0));
+	const orcolor = arr[x][y];
+	function dfs(i,j){
+		if(visit[i][j]) return;
+
+		$(`#cell_${i}-${j}`).removeClass(function (index, className) {
+			return (className.match(/(^|\s)symbol_\S+/g) || []).join(" ");
+		}).addClass("symbol_" + color);
+
+		visit[i][j] = 1;
+		affects.push([i,j]);
+		for(let dd=0; dd<4;dd++){
+			var [dx,dy] = directions[dd];
+			if(i+dx>=H || i+dx<0 || j+dy>=W || j+dy<0) continue;
+			else if(arr[i+dx][j+dy]!==orcolor || visit[i+dx][j+dy]) continue;
+			else dfs(i+dx,j+dy);
+		}
+	}
+	dfs(x,y);
+	return affects
+	//console.log(getCurrentArray());
+}
+
+function enableFloodFill() {
+	$("#symbol_picker")
+	.find(".symbol_preview")
+	.on('click',function (event) {
+		pickSymbol();
+	});
+	$("#test_output_grid").on("click", ".cell_final", function (event) {
+		var selectedPreview = $("#symbol_picker").find(".selected-symbol-preview");
+		// Get the class of the clicked element.
+		moveDescript = "FloodFill";
+		let from, x, y;
+		[from, x, y] = $(this).attr("id").split(/[_-]/);
+		x = parseInt(x); y=parseInt(y);
+		selection = [[x,y]];
+		console.log(
+			`--Action: FloodFill\n---- Where: (${x},${y})\n---- Color: ${selectedPreview.attr(
+				"symbol"
+			)}`
+		);
+		dfsFloodFill(x,y,selectedPreview.attr('symbol'));
+
+	});
 }
 
 function pickSymbol() {
@@ -688,7 +729,7 @@ function disableTools() {
 
 	disableEditable();
 	disableSelectable();
-	// disableFloodFill();
+	disableFloodFill();
 }
 
 function disableEditable() {
@@ -700,6 +741,35 @@ function disableSelectable() {
 	try {
 		$(".user_interact").selectable("destroy");
 	} catch (e) {}
+}
+
+function disableFloodFill(){
+	$("#symbol_picker").find(".symbol_preview").off("click");
+	$("#test_output_grid").off("click", ".cell_final");
+}
+
+function getCurrentArray(){
+	let cells = document.querySelectorAll("#test_output_grid .cell_final");
+	const rows = document.querySelectorAll("#test_output_grid .row");
+
+	const rownum = rows.length;
+	const colnum = cells.length / rownum;
+	let numbersArray = [];
+	for (let i = 0; i < rownum; i++) {
+		const rowArray = [];
+
+		for (let j = 0; j < colnum; j++) {
+			const index = i * colnum + j;
+			const div = cells[index];
+
+			const className = div.className;
+			const number = className.split("symbol_")[1]; // Extract the number after "symbol_"
+			rowArray.push(parseInt(number)); // Convert the number to an integer and store it in the row array
+		}
+
+		numbersArray.push(rowArray); // Store the row array in the main array
+	}
+	return numbersArray;
 }
 
 // Function to extract symbol classes
