@@ -4,6 +4,9 @@ const miniGridSize = 200;
 const fullGridSize = 400;
 var final = [];
 
+var TOTAL_SUBPROBLEMS;
+var CURRENT_SUBPROBLEM;
+
 const Actions = [
 	"Color",
 	"Fill",
@@ -20,8 +23,10 @@ const CriticalActions = ["CopyFromInput", "ResetGrid", "ResizeGrid", "Submit"];
 var moveDescript = "";
 var selection = [];
 $(function () {
-	rownum = testgrid[0][0].height;
-	colnum = testgrid[0][0].width;
+	final = []
+	selection = []
+	rownum = testgrid[0].height;
+	colnum = testgrid[0].width;
 	$("#output_grid_size").val(rownum + "x" + colnum);
 
 	// Configure Initial Tool Mode
@@ -878,9 +883,9 @@ function resizeOutputGrid() {
 }
 
 function copyFromInput() {
-	//console.log(testgrid[0][0])
-	rows = testgrid[0][0].height;
-	cols = testgrid[0][0].width;
+	//console.log(testgrid[0])
+	rows = testgrid[0].height;
+	cols = testgrid[0].width;
 	if (rows > cols) {
 		n = rows;
 		$("#test_output_grid").css("width", (fullGridSize * cols) / rows);
@@ -901,7 +906,7 @@ function copyFromInput() {
 
 		for (var j = 0; j < cols; j++) {
 			var cellDiv = document.createElement("div");
-			cellDiv.className = "cell_final symbol_" + testgrid[0][0].grid[i][j];
+			cellDiv.className = "cell_final symbol_" + testgrid[0].grid[i][j];
 			cellDiv.id = "cell_" + i + "-" + j;
 			cellDiv.style.width = (fullGridSize - 1) / n + "px"; // Set the desired width of each cell
 			cellDiv.style.height = (fullGridSize - 1) / n + "px"; // Set the desired height of each cell
@@ -917,7 +922,7 @@ function copyFromInput() {
 	labelText = "Critical";
 	moveDescript = "CopyFromInput";
 	final = pushToTargetArray(
-		testgrid[0][0].grid,
+		testgrid[0].grid,
 		labelText,
 		moveDescript,
 		selection,
@@ -965,29 +970,15 @@ function submitSolution(input, name, cRoute) {
 	// console.log(rownum)
 	// console.log(divnum/rownum)
 
-	const numbersArray = [];
-	for (let i = 0; i < rownum; i++) {
-		const rowArray = [];
-
-		for (let j = 0; j < colnum; j++) {
-			const index = i * colnum + j;
-			const div = divs[index];
-
-			const className = div.className;
-			const number = className.split("symbol_")[1]; // Extract the number after "symbol_"
-			rowArray.push(parseInt(number)); // Store the number in the row array
-		}
-
-		numbersArray.push(rowArray); // Store the row array in the main array
-	}
+	const numbersArray = getCurrentArray();
 
 	User_Answer = numbersArray.map((num) => parseInt(num));
-	Actual_Answer = input[0][1].grid.flat().map((num) => parseInt(num));
+	Actual_Answer = input[1].grid.flat().map((num) => parseInt(num));
 
-	for (let i = 0; i < input[0][1].grid.length; i++) {
-		for (let j = 0; j < input[0][1].grid[i].length; j++) {
+	for (let i = 0; i < input[1].grid.length; i++) {
+		for (let j = 0; j < input[1].grid[i].length; j++) {
 			// Convert the value to an integer using parseInt()
-			input[0][1].grid[i][j] = parseInt(input[0][1].grid[i][j]);
+			input[1].grid[i][j] = parseInt(input[1].grid[i][j]);
 		}
 	}
 
@@ -998,24 +989,30 @@ function submitSolution(input, name, cRoute) {
 	// Convert the incremented value back to a string
 	var incrementedLastPart = incrementedValue.toString();
 
-	answer = compareArrays(numbersArray, input[0][1].grid);
+	answer = compareArrays(numbersArray, input[1].grid);
 	console.log(
 		`-- Action: Submit\n---- Input:`,
 		numbersArray,
 		`\n---- Answer: `,
-		input[0][1].grid,
+		input[1].grid,
 		`\n---- Correct: ${answer}`
 	);
 	final = pushToTargetArray(numbersArray,'Critical','Submit',[answer],final);
+	final = {'success': answer ,'subtask': CURRENT_SUBPROBLEM,'taskcount': TOTAL_SUBPROBLEMS, 'trace': final}
 	if (answer) {
 		sendLogData(final);
 		final = [];
 		COPIED_ARRAY = [];
 		alert("Success!");
-		window.location.href = "/task/" + name + "/" + incrementedLastPart;
+		if (CURRENT_SUBPROBLEM+1 < TOTAL_SUBPROBLEMS){
+			window.location.href = "/task/" + name + "/" + (incrementedValue-1) +"?subp="+(CURRENT_SUBPROBLEM+1);
+		} else {
+			window.location.href = "/task/" + name + "/" + incrementedLastPart;
+		}
 	} else {
 		sendLogData(final);
 		alert("Wrong!");
+		final = []; // Do not remove!!!
 		copyFromInput();
 		final = [];
 		COPIED_ARRAY = [];
@@ -1047,20 +1044,20 @@ function IQsubmitSolution(input, name, cRoute) {
 	}
 
 	User_Answer = numbersArray.map((num) => parseInt(num));
-	Actual_Answer = input[0][1].grid.flat().map((num) => parseInt(num));
+	Actual_Answer = input[1].grid.flat().map((num) => parseInt(num));
 
 	console.log(numbersArray);
 
-	for (let i = 0; i < input[0][1].grid.length; i++) {
-		for (let j = 0; j < input[0][1].grid[i].length; j++) {
+	for (let i = 0; i < input[1].grid.length; i++) {
+		for (let j = 0; j < input[1].grid[i].length; j++) {
 			// Convert the value to an integer using parseInt()
-			input[0][1].grid[i][j] = parseInt(input[0][1].grid[i][j]);
+			input[1].grid[i][j] = parseInt(input[1].grid[i][j]);
 		}
 	}
 
 	//console.log(numbersArray)
-	//console.log(input[0][0].grid)
-	//console.log(input[0][1].grid.flat()) // 이 친구가 답임 ㅋㅋ
+	//console.log(input.grid)
+	//console.log(input[1].grid.flat()) // 이 친구가 답임 ㅋㅋ
 	console.log(cRoute);
 	var lastPart = cRoute.substring(cRoute.lastIndexOf("/") + 1);
 	var incrementedValue = parseInt(lastPart, 10) + 1;
@@ -1070,7 +1067,7 @@ function IQsubmitSolution(input, name, cRoute) {
 
 	console.log(User_Answer);
 	console.log(Actual_Answer);
-	answer = compareArrays(numbersArray, input[0][1].grid);
+	answer = compareArrays(numbersArray, input[1].grid);
 	console.log(answer);
 	if (answer) {
 		alert("Success!");

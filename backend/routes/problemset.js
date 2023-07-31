@@ -47,6 +47,14 @@ router.get('/:id/:problem', function(req, res, next) {
     console.log(userName, problem)
     const params = problem;
     
+    const qs = req.query.subp
+    let subprobidx;
+    if(!qs){
+      subprobidx = 0;
+    } else {
+      subprobidx = parseInt(qs)
+    }
+
     db.get("SELECT content FROM HappyARC WHERE id = ?", [params], (err, row) => {
     // db.get("SELECT content FROM tasklist WHERE id = ?", [params], (err, row) => {
         if (err) {
@@ -81,8 +89,10 @@ router.get('/:id/:problem', function(req, res, next) {
             userName: userName,
             train: trainData,
             grid : traingrid,
-            Testgrid: testgrid,
-            Outputgrid: outputgrid,
+            Testgrid: testgrid[subprobidx],
+            Outputgrid: outputgrid[subprobidx],
+            subprobidx: subprobidx,
+            subprobcnt: testgrid.length,
             p:cellsize,
             reset: resettedgrid,
             competition: 0
