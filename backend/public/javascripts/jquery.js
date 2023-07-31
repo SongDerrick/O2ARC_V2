@@ -1386,3 +1386,51 @@ function convertCellIdsToCoordinates(cellIds) {
 
 	return coordinates;
 }
+function openMiniARCTasklist() {
+    //$("#ARC_task_side_nav").hide()
+    //$("#ARC_task_list").hide();
+	$("#sidenav_overlay").fadeIn('0.2s');
+
+    $("#mini_ARC_task_side_nav").addClass('open');
+	$("#ARC_task_side_nav").removeClass('open')
+	$("#sidenav_overlay").on('click', function(){
+		$("#mini_ARC_task_side_nav").removeClass('open');
+		$("#sidenav_overlay").fadeOut('0.2s');
+	})
+    
+
+    //$("#mini_ARC_task_list").show();
+    //$("#mini_ARC_task_side_nav").width("250px");
+    //$("#mini_ARC_task_list").width("250px");
+    //$("#container-fluid").css('margin-left', '250px');
+}
+
+function openARCTasklist() {
+	$("#sidenav_overlay").fadeIn('0.2s');
+    $("#ARC_task_side_nav").addClass('open');
+	$("#mini_ARC_task_side_nav").removeClass('open')
+	$("#sidenav_overlay").on('click', function(){
+		$("#ARC_task_side_nav").removeClass('open');
+		$("#sidenav_overlay").fadeOut('0.2s');
+	})
+    //$("#ARC_task_list").show();
+    //$("#mini_ARC_task_side_nav").hide();
+    //$("#mini_ARC_task_list").hide();
+    //$("#ARC_task_side_nav").width("250px");
+    //$("#ARC_task_list").width("250px");
+    //$("#container-fluid").css('margin-left', '250px');
+}
+
+function closeMiniARCTaskList() {
+	$("#mini_ARC_task_side_nav").removeClass('open')
+
+   // $("#mini_ARC_task_side_nav").hide();
+    //$("#container-fluid").css('margin-left', '0');
+}
+
+function closeARCTaskList() {
+	$("#ARC_task_side_nav").removeClass('open');
+
+    //$("#ARC_task_side_nav").hide();
+    //$("#container-fluid").css('margin-left', '0');
+}

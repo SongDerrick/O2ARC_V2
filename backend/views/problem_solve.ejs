@@ -98,14 +98,36 @@
 
     <!--Main layout-->
     <main class="my-5">
+      <nav id="ARC_task_side_nav" class="sidenav card card_2" ">
+
+          <% ARC_idlist.forEach( value => { %>
+          <button onclick="window.location.href='./<%= value.id %>'" > <%= value.task_name %> </button>
+          <% }) %>
+
+          </nav>
+
+      <nav id="mini_ARC_task_side_nav" class="sidenav card card_2" ">
+
+          <% miniARC_idlist.forEach( value => { %>
+          <button onclick="window.location.href='./<%= value.id %>'" > <%= value.task_name %> </button>
+          <% }) %>
+
+          </nav>
+      <div id="sidenav_overlay"></div>
       <div class="container-fluid">
         <!--Section: Content-->
         <section class="text-center">
           <h4 class="pt-5 mb-5"><strong>Try Solving Mini-ARC or ARC Problems!</strong></h4>
           
+          <button class="testing_button" id="browse_task" onclick="openMiniARCTasklist()">Browse MINI-ARC</button>
+          <button class="testing_button" id="browse_task" onclick="openARCTasklist()">Browse ARC</button>
+          <button onclick="window.location.href='./<%= ran1 %>'">Random MINI-ARC</button>
+          <button onclick="window.location.href='./<%= ran2 %>'">Random ARC</button>
+          
           
           <div class="container-fluid">
             <div class="row">
+              
 
               <div class="card card_2 col-lg-4" style="overflow-y: scroll;">
                 <h5>
