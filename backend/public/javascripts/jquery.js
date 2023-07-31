@@ -1010,6 +1010,7 @@ function submitSolution(input, name, cRoute) {
 	if (answer) {
 		sendLogData(final);
 		final = [];
+		COPIED_ARRAY = [];
 		alert("Success!");
 		window.location.href = "/task/" + name + "/" + incrementedLastPart;
 	} else {
@@ -1017,6 +1018,7 @@ function submitSolution(input, name, cRoute) {
 		alert("Wrong!");
 		copyFromInput();
 		final = [];
+		COPIED_ARRAY = [];
 	}
 }
 
