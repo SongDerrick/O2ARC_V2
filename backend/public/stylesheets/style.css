@@ -156,3 +156,31 @@ button:focus {outline:0;}
   margin: 90px auto;
   height: 20px;
 }
+.sidenav{
+  width: 15%;
+  float: left;
+  position: fixed;
+  z-index: 1000;
+  transform: translate3d(-100%,0,0);
+  transition: all 0.3s;
+  overflow-y: scroll;
+  height: 100%;
+}
+.sidenav.open{
+  transform: translate3d(0,0,0);
+  transition: all 0.3s;
+}
+
+.sidenav button{
+  background-color: transparent; 
+  border-color: transparent;
+}
+
+#sidenav_overlay{
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: none;
+}
