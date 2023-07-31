@@ -32,7 +32,7 @@ router.get('/:id', async function(req, res, next) {
         // data2 = await userhelper.getARCList(userName);
         data = await userhelper.getARCList_test(userName,mini=true);
         data2 = await userhelper.getARCList_test(userName);
-        console.log(data2);
+
     } catch (err) {
         console.log(err)
         return res.status(500).send("Internal Server Error")
@@ -112,7 +112,7 @@ router.get('/:id/:problem', async function(req, res, next) {
             // data2 = await userhelper.getARCList(userName);
             data = await userhelper.getARCList_test(userName,mini=true);
             data2 = await userhelper.getARCList_test(userName);
-            console.log(data2);
+            
           } catch (err) {
               console.log(err)
               return res.status(500).send("Internal Server Error")

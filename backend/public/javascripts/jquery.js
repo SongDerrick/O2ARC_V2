@@ -29,6 +29,9 @@ $(function () {
 	colnum = testgrid[0].width;
 	$("#output_grid_size").val(rownum + "x" + colnum);
 
+	document.querySelectorAll('.form-outline').forEach((formOutline) => {
+		new mdb.Input(formOutline).init();
+	});
 	// Configure Initial Tool Mode
 	var initialToolMode = "edit";
 	handleToolModeChange(initialToolMode);
@@ -37,11 +40,14 @@ $(function () {
 	// Event Listener for Tool Switching
 	$("input[name=tool_switching]").on("change", function () {
 		var selectedToolMode = $(this).val();
+		$("#toolbar-selection > label").each((i,e) => {$(e).removeClass('bg-primary text-white')});
 		handleToolModeChange(selectedToolMode);
+		$(`label[for=tool_${selectedToolMode}]`).addClass('bg-primary text-white');
 	});
 
 	$("input[name=tool_switching]").on("focus", function () {
 		$(":focus").trigger("blur");
+
 	});
 
 	// Select Mode Action Buttonsr
