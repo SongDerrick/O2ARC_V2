@@ -218,6 +218,7 @@ $(function () {
 
 			moveDescript = "MoveUp";
 			var selectedIds = getSelectedCellIds(); // getSelectedCellIds() 함수를 호출하여 선택된 셀의 ID를 가져옴
+			selectedIdsBeforeMove = selectedIds;
 			var symbols = getSymbolClassesFromCellIds(selectedIds);
 			var coordinates = convertCellIdsToCoordinates(selectedIds);
 			var size = calculateRectangleSize(coordinates);
