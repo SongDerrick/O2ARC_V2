@@ -4,6 +4,9 @@ const miniGridSize = 200;
 const fullGridSize = 400;
 var final = [];
 
+var TOTAL_SUBPROBLEMS;
+var CURRENT_SUBPROBLEM;
+
 const Actions = [
 	"Color",
 	"Fill",
@@ -18,10 +21,12 @@ const Actions = [
 ];
 const CriticalActions = ["CopyFromInput", "ResetGrid", "ResizeGrid", "Submit"];
 var moveDescript = "";
-
+var selection = [];
 $(function () {
-	rownum = testgrid[0][0].height;
-	colnum = testgrid[0][0].width;
+	final = []
+	selection = []
+	rownum = testgrid[0].height;
+	colnum = testgrid[0].width;
 	$("#output_grid_size").val(rownum + "x" + colnum);
 
 	// Configure Initial Tool Mode
@@ -47,7 +52,16 @@ $(function () {
 		var symbols = getSymbolClassesFromCellIds(selectedIds); // Retrieve Selected Cells' Colors
 		var coordinates = convertCellIdsToCoordinates(selectedIds); // Convert Cell ids' to Coords
 		var rectangular = isRectangular(coordinates); // Verify the selection area is square-shaped
-
+		
+		var minx = 1000, maxx=-1, miny=1000,maxy=-1;
+		for(var i=0 ; i<coordinates.length ; i++){
+			minx=Math.min(minx,coordinates[i][0]);
+			miny=Math.min(miny,coordinates[i][1]);
+			maxx=Math.max(maxx,coordinates[i][0]);
+			maxy=Math.max(maxy,coordinates[i][1]);
+		}
+		selection = [[minx,miny],[maxx,maxy]];
+		
 		if (rectangular) {
 			var size = calculateRectangleSize(coordinates);
 			var planesymbol = saveInRectangle(symbols, size.width, size.height);
@@ -67,19 +81,19 @@ $(function () {
 			}
 			if (buttonName == "clockrotate") {
 				moveDescript = "RotateCW";
-				selectedIds = getSelectedCellIds(); // getSelectedCellIds() 함수를 호출하여 선택된 셀의 ID를 가져옴
-				symbols = getSymbolClassesFromCellIds(selectedIds);
-				coordinates = convertCellIdsToCoordinates(selectedIds);
+
 				size = calculateRectangleSize(coordinates);
 				planesymbol = saveInRectangle(symbols, size.width, size.height);
 				planeid = saveInRectangle(selectedIds, size.width, size.height);
 				removeSelectedClass();
 				var changed_symbol = rotateArrayClockwise(planesymbol);
 				console.log("-- Action: CW Rotate\n---- Changed:", changed_symbol);
+				if (size.width != size.height){
+					var black_symbol = createRectangle(size.height, size.width);
+					//console.log("black: ", black_symbol)
+					updateCellClasses(planeid, black_symbol);
+				}
 
-				var black_symbol = createRectangle(size.height, size.width);
-				//console.log("black: ", black_symbol)
-				updateCellClasses(planeid, black_symbol);
 				var changed_id = rotateRectangle(planeid);
 
 				addSelectedClass(changed_id);
@@ -87,19 +101,19 @@ $(function () {
 			}
 			if (buttonName == "counterclockrotate") {
 				moveDescript = "RotateCCW";
-				selectedIds = getSelectedCellIds(); // getSelectedCellIds() 함수를 호출하여 선택된 셀의 ID를 가져옴
-				symbols = getSymbolClassesFromCellIds(selectedIds);
-				coordinates = convertCellIdsToCoordinates(selectedIds);
+
 				size = calculateRectangleSize(coordinates);
 				planesymbol = saveInRectangle(symbols, size.width, size.height);
 				planeid = saveInRectangle(selectedIds, size.width, size.height);
 				removeSelectedClass();
 				var changed_symbol = rotateArrayCounterClockwise(planesymbol);
 				console.log("-- Action: CCW Rotate\n---- Changed:", changed_symbol);
+				if (size.width != size.height){
+					var black_symbol = createRectangle(size.height, size.width);
+					//console.log("black: ", black_symbol)
+					updateCellClasses(planeid, black_symbol);
+				}
 
-				var black_symbol = createRectangle(size.height, size.width);
-				//console.log("black: ", black_symbol)
-				updateCellClasses(planeid, black_symbol);
 				var changed_id = rotateRectangle(planeid);
 
 				addSelectedClass(changed_id);
@@ -151,7 +165,7 @@ $(function () {
 			let maxy = Math.max(...ylist);
 			let copyheight = maxx - minx + 1;
 			let copywidth = maxy - miny + 1;
-
+			
 			// ARRAY CONStruction
 			COPIED_ARRAY = [];
 			for (var i = 0; i < copyheight; i++) {
@@ -169,6 +183,13 @@ $(function () {
 				`-- Action: Copy Array\n---- From: <${from}>\n---- Where: (${minx},${miny}) ~ (${maxx},${maxy})\n---- Copied:`,
 				COPIED_ARRAY
 			);
+ 
+			const numbersArray = getCurrentArray();
+			
+			moveDescript = 'Copy';
+			selection = [[minx,miny],[maxx,maxy],from];
+			final = pushToTargetArray(numbersArray,'Select',moveDescript,selection,final );
+
 		} else if (event.ctrlKey && event.key === "v") {
 			if (COPIED_ARRAY.length == 0) {
 				// No Data To Paste
@@ -200,6 +221,7 @@ $(function () {
 					}
 				}
 				moveDescript = "Paste";
+				selection = [[pasteCellX,pasteCellY]]
 				console.log(
 					`-- Action: Paste Array\n---- Where: (${pasteCellX},${pasteCellY}) ~ (${
 						pasteCellX + height - 1
@@ -395,9 +417,9 @@ $(function () {
 	cell_observer();
 });
 
-function pushToTargetArray(array2D, text1, text2, targetArray) {
-	console.log(`-------- Data Pushed, ${text1}, ${text2} --------`);
-	targetArray.push([text1, text2, array2D]);
+function pushToTargetArray(array2D, text1, text2, sel, targetArray) {
+	console.log(`-------- Data Pushed, ${text1}, ${text2}, ${sel} --------`);
+	targetArray.push([text1, text2, sel, array2D]);
 	return targetArray;
 }
 
@@ -469,9 +491,14 @@ function cell_observer(cells, observer) {
 
 			//console.log(numbersArray)
 			//console.log(labelText);
-			final = pushToTargetArray(numbersArray, labelText, moveDescript, final);
+
+			if(CriticalActions.includes(moveDescript)){
+				labelText='Critical';
+			}
+			final = pushToTargetArray(numbersArray, labelText, moveDescript,selection, final);
 			//console.log(final)
 			moveDescript = "";
+			selection = [];
 		}
 	});
 	// Start observing changes to the 'class' attribute of each cell_final element
@@ -546,7 +573,7 @@ function handleToolModeChange(toolMode) {
 		// 'flood fill' mode
 		console.log("Switch Tool: Flood Fill");
 		disableTools();
-		//enableFloodFill();
+		enableFloodFill();
 		//   infoMsg('Flood fill mode activated');
 	} else {
 	}
@@ -555,7 +582,7 @@ function handleToolModeChange(toolMode) {
 function enableEditable() {
 	$("#symbol_picker")
 		.find(".symbol_preview")
-		.click(function (event) {
+		.on('click',function (event) {
 			pickSymbol();
 		});
 	// Find the user_interact cell div and add a click listener to it.
@@ -565,6 +592,7 @@ function enableEditable() {
 		moveDescript = "Color";
 		let from, x, y;
 		[from, x, y] = $(this).attr("id").split(/[_-]/);
+		selection = [[parseInt(x),parseInt(y)]];
 		console.log(
 			`--Action: Coloring\n---- Where: (${x},${y})\n---- Color: ${selectedPreview.attr(
 				"symbol"
@@ -603,6 +631,61 @@ function enableSelectable() {
 		});
 }
 
+function dfsFloodFill(x,y,color) {
+	const arr = getCurrentArray();
+	const H = arr.length;
+	const W = arr[0].length;
+	const directions = [[-1,0],[1,0],[0,-1],[0,1]];
+	let affects = [];
+    let visit = [];
+
+	for(let i=0;i<H;i++) visit.push(Array.from({length: W}, () => 0));
+	const orcolor = arr[x][y];
+	function dfs(i,j){
+		if(visit[i][j]) return;
+
+		$(`#cell_${i}-${j}`).removeClass(function (index, className) {
+			return (className.match(/(^|\s)symbol_\S+/g) || []).join(" ");
+		}).addClass("symbol_" + color);
+
+		visit[i][j] = 1;
+		affects.push([i,j]);
+		for(let dd=0; dd<4;dd++){
+			var [dx,dy] = directions[dd];
+			if(i+dx>=H || i+dx<0 || j+dy>=W || j+dy<0) continue;
+			else if(arr[i+dx][j+dy]!==orcolor || visit[i+dx][j+dy]) continue;
+			else dfs(i+dx,j+dy);
+		}
+	}
+	dfs(x,y);
+	return affects
+	//console.log(getCurrentArray());
+}
+
+function enableFloodFill() {
+	$("#symbol_picker")
+	.find(".symbol_preview")
+	.on('click',function (event) {
+		pickSymbol();
+	});
+	$("#test_output_grid").on("click", ".cell_final", function (event) {
+		var selectedPreview = $("#symbol_picker").find(".selected-symbol-preview");
+		// Get the class of the clicked element.
+		moveDescript = "FloodFill";
+		let from, x, y;
+		[from, x, y] = $(this).attr("id").split(/[_-]/);
+		x = parseInt(x); y=parseInt(y);
+		selection = [[x,y]];
+		console.log(
+			`--Action: FloodFill\n---- Where: (${x},${y})\n---- Color: ${selectedPreview.attr(
+				"symbol"
+			)}`
+		);
+		dfsFloodFill(x,y,selectedPreview.attr('symbol'));
+
+	});
+}
+
 function pickSymbol() {
 	symbol_preview = $(event.target);
 	$("#symbol_picker")
@@ -637,6 +720,7 @@ function fillSelected() {
 	});
 	if (maxx === -1) return;
 	moveDescript = "Fill";
+	selection = [[minx,miny],[maxx,maxy]];
 	console.log(
 		`-- Action: Fill\n---- Where: (${minx},${miny}) ~ (${maxx},${maxy})\n---- Color: ${color}`
 	);
@@ -650,7 +734,7 @@ function disableTools() {
 
 	disableEditable();
 	disableSelectable();
-	// disableFloodFill();
+	disableFloodFill();
 }
 
 function disableEditable() {
@@ -662,6 +746,35 @@ function disableSelectable() {
 	try {
 		$(".user_interact").selectable("destroy");
 	} catch (e) {}
+}
+
+function disableFloodFill(){
+	$("#symbol_picker").find(".symbol_preview").off("click");
+	$("#test_output_grid").off("click", ".cell_final");
+}
+
+function getCurrentArray(){
+	let cells = document.querySelectorAll("#test_output_grid .cell_final");
+	const rows = document.querySelectorAll("#test_output_grid .row");
+
+	const rownum = rows.length;
+	const colnum = cells.length / rownum;
+	let numbersArray = [];
+	for (let i = 0; i < rownum; i++) {
+		const rowArray = [];
+
+		for (let j = 0; j < colnum; j++) {
+			const index = i * colnum + j;
+			const div = cells[index];
+
+			const className = div.className;
+			const number = className.split("symbol_")[1]; // Extract the number after "symbol_"
+			rowArray.push(parseInt(number)); // Convert the number to an integer and store it in the row array
+		}
+
+		numbersArray.push(rowArray); // Store the row array in the main array
+	}
+	return numbersArray;
 }
 
 // Function to extract symbol classes
@@ -711,8 +824,9 @@ function resetOutputGrid() {
 	console.log(`-- Action: Reset Grid`);
 
 	enableSelectable();
-	labelText = "Edit";
+	labelText = "Critical";
 	moveDescript = "ResetGrid";
+	selection = [[rownum,colnum]];
 	// final = pushToTargetArray(array, labelText, moveDescript, final)
 }
 
@@ -758,19 +872,20 @@ function resizeOutputGrid() {
 	}
 	// Log the input value to the console
 	console.log(`-- Action: Resize Grid\n---- Size: ${rows} x ${cols}`);
-	labelText = "Edit";
+	labelText = "Critical";
 	moveDescript = "ResizeGrid";
-	final = pushToTargetArray(array, labelText, moveDescript, final);
+	final = pushToTargetArray(array, labelText, moveDescript,[[rows,cols]], final);
 	moveDescript = "";
+	selection = [];
 	enableSelectable();
 
 	cell_observer();
 }
 
 function copyFromInput() {
-	//console.log(testgrid[0][0])
-	rows = testgrid[0][0].height;
-	cols = testgrid[0][0].width;
+	//console.log(testgrid[0])
+	rows = testgrid[0].height;
+	cols = testgrid[0].width;
 	if (rows > cols) {
 		n = rows;
 		$("#test_output_grid").css("width", (fullGridSize * cols) / rows);
@@ -791,7 +906,7 @@ function copyFromInput() {
 
 		for (var j = 0; j < cols; j++) {
 			var cellDiv = document.createElement("div");
-			cellDiv.className = "cell_final symbol_" + testgrid[0][0].grid[i][j];
+			cellDiv.className = "cell_final symbol_" + testgrid[0].grid[i][j];
 			cellDiv.id = "cell_" + i + "-" + j;
 			cellDiv.style.width = (fullGridSize - 1) / n + "px"; // Set the desired width of each cell
 			cellDiv.style.height = (fullGridSize - 1) / n + "px"; // Set the desired height of each cell
@@ -804,16 +919,17 @@ function copyFromInput() {
 
 	enableSelectable();
 	console.log(`-- Action: Copy From Input`);
-	labelText = "Edit";
+	labelText = "Critical";
 	moveDescript = "CopyFromInput";
 	final = pushToTargetArray(
-		testgrid[0][0].grid,
+		testgrid[0].grid,
 		labelText,
 		moveDescript,
+		selection,
 		final
 	);
 	moveDescript = "";
-
+	selection = [];
 	cell_observer();
 }
 
@@ -854,29 +970,15 @@ function submitSolution(input, name, cRoute) {
 	// console.log(rownum)
 	// console.log(divnum/rownum)
 
-	const numbersArray = [];
-	for (let i = 0; i < rownum; i++) {
-		const rowArray = [];
-
-		for (let j = 0; j < colnum; j++) {
-			const index = i * colnum + j;
-			const div = divs[index];
-
-			const className = div.className;
-			const number = className.split("symbol_")[1]; // Extract the number after "symbol_"
-			rowArray.push(parseInt(number)); // Store the number in the row array
-		}
-
-		numbersArray.push(rowArray); // Store the row array in the main array
-	}
+	const numbersArray = getCurrentArray();
 
 	User_Answer = numbersArray.map((num) => parseInt(num));
-	Actual_Answer = input[0][1].grid.flat().map((num) => parseInt(num));
+	Actual_Answer = input[1].grid.flat().map((num) => parseInt(num));
 
-	for (let i = 0; i < input[0][1].grid.length; i++) {
-		for (let j = 0; j < input[0][1].grid[i].length; j++) {
+	for (let i = 0; i < input[1].grid.length; i++) {
+		for (let j = 0; j < input[1].grid[i].length; j++) {
 			// Convert the value to an integer using parseInt()
-			input[0][1].grid[i][j] = parseInt(input[0][1].grid[i][j]);
+			input[1].grid[i][j] = parseInt(input[1].grid[i][j]);
 		}
 	}
 
@@ -887,23 +989,33 @@ function submitSolution(input, name, cRoute) {
 	// Convert the incremented value back to a string
 	var incrementedLastPart = incrementedValue.toString();
 
-	answer = compareArrays(numbersArray, input[0][1].grid);
+	answer = compareArrays(numbersArray, input[1].grid);
 	console.log(
 		`-- Action: Submit\n---- Input:`,
 		numbersArray,
 		`\n---- Answer: `,
-		input[0][1].grid,
+		input[1].grid,
 		`\n---- Correct: ${answer}`
 	);
+	final = pushToTargetArray(numbersArray,'Critical','Submit',[answer],final);
+	final = {'success': answer ,'subtask': CURRENT_SUBPROBLEM,'taskcount': TOTAL_SUBPROBLEMS, 'trace': final}
 	if (answer) {
 		sendLogData(final);
 		final = [];
+		COPIED_ARRAY = [];
 		alert("Success!");
-		window.location.href = "/task/" + name + "/" + incrementedLastPart;
+		if (CURRENT_SUBPROBLEM+1 < TOTAL_SUBPROBLEMS){
+			window.location.href = "/task/" + name + "/" + (incrementedValue-1) +"?subp="+(CURRENT_SUBPROBLEM+1);
+		} else {
+			window.location.href = "/task/" + name + "/" + incrementedLastPart;
+		}
 	} else {
 		sendLogData(final);
 		alert("Wrong!");
+		final = []; // Do not remove!!!
+		copyFromInput();
 		final = [];
+		COPIED_ARRAY = [];
 	}
 }
 
@@ -932,20 +1044,20 @@ function IQsubmitSolution(input, name, cRoute) {
 	}
 
 	User_Answer = numbersArray.map((num) => parseInt(num));
-	Actual_Answer = input[0][1].grid.flat().map((num) => parseInt(num));
+	Actual_Answer = input[1].grid.flat().map((num) => parseInt(num));
 
 	console.log(numbersArray);
 
-	for (let i = 0; i < input[0][1].grid.length; i++) {
-		for (let j = 0; j < input[0][1].grid[i].length; j++) {
+	for (let i = 0; i < input[1].grid.length; i++) {
+		for (let j = 0; j < input[1].grid[i].length; j++) {
 			// Convert the value to an integer using parseInt()
-			input[0][1].grid[i][j] = parseInt(input[0][1].grid[i][j]);
+			input[1].grid[i][j] = parseInt(input[1].grid[i][j]);
 		}
 	}
 
 	//console.log(numbersArray)
-	//console.log(input[0][0].grid)
-	//console.log(input[0][1].grid.flat()) // 이 친구가 답임 ㅋㅋ
+	//console.log(input.grid)
+	//console.log(input[1].grid.flat()) // 이 친구가 답임 ㅋㅋ
 	console.log(cRoute);
 	var lastPart = cRoute.substring(cRoute.lastIndexOf("/") + 1);
 	var incrementedValue = parseInt(lastPart, 10) + 1;
@@ -955,7 +1067,7 @@ function IQsubmitSolution(input, name, cRoute) {
 
 	console.log(User_Answer);
 	console.log(Actual_Answer);
-	answer = compareArrays(numbersArray, input[0][1].grid);
+	answer = compareArrays(numbersArray, input[1].grid);
 	console.log(answer);
 	if (answer) {
 		alert("Success!");
