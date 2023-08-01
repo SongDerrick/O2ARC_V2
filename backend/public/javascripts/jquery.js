@@ -4,13 +4,11 @@ const miniGridSize = 200;
 const fullGridSize = 400;
 var final = []
 
-/*
 // Undo and Redo History Stacks
 var history = []
 var undoHistory = []
-*/
 
-const Actions = ['Color', 'Fill', 'FlipX', 'FlipY', 'RotateCW', 'RotateCCW', 'Copy', 'Paste', 'Move', 'FloodFill'];
+const Actions = ['Color', 'Fill', 'FlipX', 'FlipY', 'RotateCW', 'RotateCCW', 'Copy', 'Paste', 'Move', 'FloodFill', 'Undo', 'Redo'];
 const CriticalActions = ['CopyFromInput', 'ResetGrid', 'ResizeGrid', 'Submit'];
 var moveDescript = ''
 
@@ -30,6 +28,8 @@ $(function () {
         var selectedToolMode = $(this).val();
         handleToolModeChange(selectedToolMode);
     });
+
+    recordGridchange();
 
     // Select Mode Action Buttons 
     $('#select_util_btn').on('click', 'button' , function() {
@@ -51,6 +51,7 @@ $(function () {
           var changed_symbol = flipArrayX(planesymbol)
           console.log("-- Action: X Flip\n---- Changed:", changed_symbol);
           updateCellClasses(planeid, changed_symbol)
+          recordGridchange();
 
         }
         if (buttonName == 'yflip') {
@@ -58,6 +59,7 @@ $(function () {
           var changed_symbol = flipArrayY(planesymbol)
           console.log("-- Action: Y Flip\n---- Changed:", changed_symbol);
           updateCellClasses(planeid, changed_symbol)
+          recordGridchange();
 
         }
         if (buttonName == 'clockrotate') {
@@ -79,6 +81,7 @@ $(function () {
 
           addSelectedClass(changed_id)
           updateCellClasses(changed_id, changed_symbol)
+          recordGridchange();
 
         }
         if (buttonName == 'counterclockrotate') {
@@ -100,6 +103,7 @@ $(function () {
 
           addSelectedClass(changed_id)
           updateCellClasses(changed_id, changed_symbol)
+          recordGridchange();
         }
       }
     });
@@ -206,28 +210,38 @@ $(function () {
         
       }
     });
+
   
-  /*
-  // Event Listeners for Undo & Redo Button
-  $('#undo_button').on('click', function() {
+    // Undo & Redo Button Event Handlers
+    $('#undo_button').on('click', 'button', function() {
       handleUndoAction();
-  });
+    });
   
-  $('#redo_button').on('click', function() {
+    $('#redo_button').on('click', 'button', function() {
       handleRedoAction();
-  });
-  */
+    });
+
+
 
     cell_observer()
 
 })
 
-/*
+// Make a deep copy of the current grid
+function copyGrid() {
+  let copiedGrid = [];
+  $('#test_output_grid .cell_final').each(function() {
+    let cellId = $(this).attr('id');
+    let cellSymbol = $(this).attr('class').match(/symbol_([0-9])/)[1];
+    copiedGrid[cellId] = cellSymbol;
+  });
+  return copiedGrid;
+}
 
-// Record cell state changes
-function recordCellchange(cellId, OldSymbol, NewSymbol) {
-  // Push the cell change to the history stack
-  history.push({cellId: cellId, oldSymbol: oldSymbol, newSymbol: newSymbol});
+// Record grid state changes
+function recordGridchange() {
+  // Push the grid state to the history stack
+  history.push(copyGrid());
   // Clear the undoHistory stack whenever a new change is made
   undoHistory = [];
 }
@@ -235,14 +249,14 @@ function recordCellchange(cellId, OldSymbol, NewSymbol) {
 // Event Handlers for Undo & Redo Button
 function handleUndoAction() {
   if (history.length > 0) {
-    // Pop the latest change from the history stack
-    var change = history.pop();
+    // Pop the latest grid state from the history stack
+    var state = history.pop();
     
-    // Revert the cell to its old symbol
-    $('#' + change.cellId).removeClass('symbol_' + change.newSymbol).addClass('symbol_' + change.oldSymbol);
+    // Revert the grid to its old state
+    updateCellSymbols(state);
     
     // Push the change to the undoHistory stack
-    undoHistory.push(change);
+    undoHistory.push(copyGrid());
     }
   // Disable the Undo button if there is no more history
   if (history.length === 0) {
@@ -256,14 +270,14 @@ function handleUndoAction() {
 
 function handleRedoAction() {
   if (undoHistory.length > 0) {
-    // Pop the latest undone change from the undoHistory stack
-    var change = undoHistory.pop();
+    // Pop the latest undone grid state from the undoHistory stack
+    var state = undoHistory.pop();
 
-    // Reapply the new symbol to the cell
-    $('#' + change.cellId).removeClass('symbol_' + change.oldSymbol).addClass('symbol_' + change.newSymbol);
+    // Reapply the state to the grid
+    updateCellSymbols(state);
     
-    // Push the change back to the history stack
-    history.push(change);
+    // Push the state back to the history stack
+    history.push(copyGrid());
     }
   // Disable the Redo button if there is no more undo history
     if (undoHistory.length === 0) {
@@ -273,7 +287,7 @@ function handleRedoAction() {
     // Enable the Undo button after a redo
     $('#undo_button').prop('disabled', false);
 }
-*/
+
 
 
 function pushToTargetArray(array2D, text1, text2, targetArray) {
@@ -865,6 +879,7 @@ function calculateRectangleSize(coordinates) {
   return { height, width };
 }
 
+// Function to save the selected cells or symbols in a rectangle
 function saveInRectangle(symbols, numRows, numColumns) {
   var output = [];
   var index = 0;
