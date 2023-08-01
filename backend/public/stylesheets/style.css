@@ -123,19 +123,23 @@ h5 {
 
 
 #resize_control_btns {
-  max-width:fit-content;
-  min-width:50%;
+  max-width:80%;
+  min-width: 50%;
   margin:auto;
   margin-bottom: 10px;
-  
   justify-content: center;
 }
-
+#resize_control_btns .input-group{
+  justify-content: center;
+}
+#resize_control_btns .form-outline{
+  width: 25%;
+}
 #critical_control_btns {
-  max-width: fit-content;
+  max-width: 80%;
   min-width: 50%;
 }
-
+/*
 #undo_button, #redo_button {
   display: inline-block;
   margin: 5px;
@@ -156,7 +160,7 @@ h5 {
   background-color: white;
   color: black;
 }
-
+*/
 
 button:focus {outline:0;}
 
@@ -171,15 +175,24 @@ button:focus {outline:0;}
 #toolbar-selection > .btn {
   width: 34%;
 }
+#undo-redo {
+  width: 30%;
+  margin:auto;
+  margin-bottom: 10px;
+}
+
 #toolbar-selection {
-  max-width:100%;
-  min-width:50%;
+  max-width: 80%;
+  min-width: 50%;
+  
+  margin:auto;
   margin-bottom: 10px;
 }
 
 #select_util_btn > button{
   width: 6em;
 }
+
 
 
 .arrow {
