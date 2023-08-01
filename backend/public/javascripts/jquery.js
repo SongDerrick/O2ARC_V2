@@ -34,7 +34,7 @@ $(function () {
 		// 		return { id: this.id, class: this.className };
 		// 	})
 		// 	.get();
-		console.log("cell state : ", originalSelectedCellIds);
+		// console.log("cell state : ", originalSelectedCellIds);
 
 		var selectedIds = getSelectedCellIds();
 		selectedIdsBeforeMove = selectedIds;
@@ -66,14 +66,16 @@ $(function () {
 			addSelectedClass(planeid);
 			return null;
 		}
+
+		planeid.forEach(function (row) {
+			row.forEach(function (cell) {
+				var oldCell = $(`#${cell}`);
+				var symbolClass = oldCell.attr("class").match(/symbol_[0-9]/)[0];
+				oldCell.removeClass(symbolClass).addClass("symbol_0"); // Assuming "symbol_0" is the class for black
+			});
+		});
 		return newXPlaneId;
 	}
-
-	originalSelectedCellIds.forEach(function (cell) {
-		var oldCell = $(`#${cell}`);
-		console.log("--------oldcell\n", oldCell);
-		oldCell.removeClass().addClass("cell_final symbol_0 ui-selectee");
-	});
 
 	function handleSelectEnd(newXPlaneId, planesymbol) {
 		// select cell end
@@ -517,7 +519,6 @@ function enableSelectable() {
 						return { id: this.id, class: this.className };
 					})
 					.get();
-				console.log(originalSelectedCellIds);
 			});
 		},
 	});
