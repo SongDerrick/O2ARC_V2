@@ -81,12 +81,15 @@ $(function () {
 	function handleSelectEnd(newXPlaneId, planesymbol) {
 		// select cell end
 		if (newXPlaneId !== null) {
+			moveDescript = 'Move'
 			updateCellClasses(newXPlaneId, planesymbol);
 			addSelectedClass(newXPlaneId);
+			
+			recordGridchange();
+		} else {
+			selection = [];
 		}
 	}
-
-	$("#output_grid_size").val(rownum + "x" + colnum);
 
 	document.querySelectorAll('.form-outline').forEach((formOutline) => {
 		new mdb.Input(formOutline).init();
@@ -104,8 +107,9 @@ $(function () {
 		$(`label[for=tool_${selectedToolMode}]`).addClass('bg-primary text-white');
 	});
 
-    recordGridchange();
-    $('#undo_button').prop('disabled',true);
+	//reset undo redo feature
+    resetHistoryStack();
+
     // Select Mode Action Buttons 
 	$("input[name=tool_switching]").on("focus", function () {
 		$(":focus").trigger("blur");
@@ -313,30 +317,30 @@ $(function () {
 			//Key Move Event//
 			event.preventDefault(); // Prevent scrolling
 
-			moveDescript = "MoveUp";
 			var { planeid, planesymbol } = handleSelectStart();
 			var newXPlaneId = handleCellMove(planeid, planesymbol, { x: -1, y: 0 });
+			selection = ['U'];
 			handleSelectEnd(newXPlaneId, planesymbol);
 		} else if (event.key === "a" || event.key === "ArrowLeft") {
 			event.preventDefault(); // Prevent scrolling
 
-			moveDescript = "MoveLeft";
 			var { planeid, planesymbol } = handleSelectStart();
 			var newXPlaneId = handleCellMove(planeid, planesymbol, { x: 0, y: -1 });
+			selection = ['L'];
 			handleSelectEnd(newXPlaneId, planesymbol);
 		} else if (event.key === "s" || event.key === "ArrowDown") {
 			event.preventDefault(); // Prevent scrolling
 
-			moveDescript = "MoveDown";
 			var { planeid, planesymbol } = handleSelectStart();
 			var newXPlaneId = handleCellMove(planeid, planesymbol, { x: 1, y: 0 });
+			selection = ['D'];
 			handleSelectEnd(newXPlaneId, planesymbol);
 		} else if (event.key === "d" || event.key === "ArrowRight") {
 			event.preventDefault(); // Prevent scrolling
 
-			moveDescript = "MoveRight";
 			var { planeid, planesymbol } = handleSelectStart();
 			var newXPlaneId = handleCellMove(planeid, planesymbol, { x: 0, y: 1 });
+			selection = ['R'];
 			handleSelectEnd(newXPlaneId, planesymbol);
 		}
 	});
@@ -381,6 +385,14 @@ function recordGridchange() {
 	historyStack.push(copyGrid());
 }
   
+function resetHistoryStack(){
+	historyStack = [];
+	undoHistory = [];
+	// Initial grid push
+	recordGridchange();
+	$('#undo_button').prop('disabled',true);
+
+}
   // Event Handlers for Undo & Redo Button
 function handleUndoAction() {
 
@@ -912,7 +924,7 @@ function resizeOutputGrid() {
 	moveDescript = "";
 	selection = [];
 	enableSelectable();
-
+	resetHistoryStack();
 	cell_observer();
 }
 
@@ -965,6 +977,7 @@ function copyFromInput() {
 	);
 	moveDescript = "";
 	selection = [];
+	resetHistoryStack();
 	cell_observer();
 }
 
@@ -1060,9 +1073,7 @@ function submitSolution(input, name, cRoute) {
 		final = []; // Do not remove!!!
 		copyFromInput();
 		final = [];
-        historyStack = [];
-        recordGridchange();
-        $('#undo_button').prop('disabled',true);
+        resetHistoryStack();
 		COPIED_ARRAY = [];
 	}
 }
@@ -1154,7 +1165,7 @@ function calculateRectangleSize(coordinates) {
 	var height = maxY - minY + 1;
 	var width = maxX - minX + 1;
 
-	return { height, width };
+	return { height, width, minX,minY,maxX,maxY };
 }
 
 // Function to save the selected cells or symbols in a rectangle
