@@ -252,17 +252,18 @@
                   
                   <div id="critical_control_btns" class="btn-group shadow-0" role="group" >
                     <button onclick="copyFromInput()" class="btn btn-secondary">Copy from input</button>
-                    <button id="resetBtn" onclick="resetOutputGrid()" class="btn btn-secondary">Reset grid</button>
-                    <% if(competition == 'mini'){ %>
-                      <button onclick="submitSolutionMarioMini(testgrid, '<%= userName %>' , currentRoute)" id="submit_solution_btn" class="btn btn-success">Submit!</button>
-                    <% } %>
-                    <% if(competition === 'arc'){ %>
-                      <button onclick="submitSolutionMarioARC(testgrid, '<%= userName %>' , currentRoute)" id="submit_solution_btn" class="btn btn-success">Submit!</button>
-                    <% } %>
-                    <% if(!competition){ %>
-                      <button onclick="submitSolution(testgrid, '<%= userName %>' , currentRoute)" id="submit_solution_btn" class="btn btn-success">Submit!</button>
-                    <% } %>
+                    <button id="resetBtn" onclick="resetOutputGrid()" class="btn btn-secondary">Clear grid</button>
+                    
                 </div>
+                <% if(competition == 'mini'){ %>
+                  <button onclick="submitSolutionMarioMini(testgrid, '<%= userName %>' , currentRoute)" id="submit_solution_btn" class="btn btn-success">Submit!</button>
+                <% } %>
+                <% if(competition === 'arc'){ %>
+                  <button onclick="submitSolutionMarioARC(testgrid, '<%= userName %>' , currentRoute)" id="submit_solution_btn" class="btn btn-success">Submit!</button>
+                <% } %>
+                <% if(!competition){ %>
+                  <button onclick="submitSolution(testgrid, '<%= userName %>' , currentRoute)" id="submit_solution_btn" class="btn btn-success">Submit!</button>
+                <% } %>
               </div>
                 <!-- <% //Outputgrid.forEach(item => { %> -->
                   <% item = Outputgrid %>
@@ -295,8 +296,8 @@
                 
                 <div id="toolbar" class="container-fluid row demo_row mx-auto">
                     <div id="undo-redo" class="btn-group shadow-0">
-                      <button id="undo_button" class="btn btn-secondary btn-rounded" disabled >Undo</button>
-                      <button id="redo_button" class="btn btn-secondary btn-rounded" disabled >Redo</button>
+                      <button id="undo_button" class="btn btn-secondary" disabled >Undo</button>
+                      <button id="redo_button" class="btn btn-secondary" disabled >Redo</button>
                     </div>
                     <div id="toolbar-selection" class="btn-group shadow-0">
                       <input type="radio" class="btn-check" id="tool_edit"
