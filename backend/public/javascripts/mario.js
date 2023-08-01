@@ -185,8 +185,8 @@ function enterProblemMario(problem, stage) {
 /* function for submit button */
 function submitSolutionMario(input) {
 	/* 맞았는지 틀렸는지 구현 */
-	const divs = document.querySelectorAll("#user_interact .cell_final");
-	const rows = document.querySelectorAll("#user_interact .row");
+	const divs = document.querySelectorAll("#test_output_grid .cell_final");
+	const rows = document.querySelectorAll("#test_output_grid .row");
 	const rownum = rows.length;
 	const divnum = divs.length;
 
@@ -307,7 +307,7 @@ function setCookieData_mini() {
 	}
 	/* if no cookie data about csl fsl */
 	if (!flag) {
-		document.cookie = "csl_mini=" + clear_stage_list_mini.join("@");
+		document.cookie = "csl_mini=" + btoa(clear_stage_list_mini.join("@"));
 		document.cookie = "fsl_mini=" + fail_stage_list_mini.join("@");
 		document.cookie = "ls_mini=" + String(-123);
 
@@ -345,12 +345,15 @@ function checkResult_mini() {
 		/* correct */
 		var num = last_stage_mini;
 		if (window.location.href.split("?").at(-1) == "true") {
+
+			clear_stage_list_mini = atob(clear_stage_list_mini).split('@')
 			clear_stage_list_mini.push(num);
-			document.cookie = "csl_mini=" + clear_stage_list_mini.join("@");
-		} else if (window.location.href.split("?").at(-1) == "false") {
+
+			document.cookie = "csl_mini=" + btoa(clear_stage_list_mini.join("@"));
+		} /*else if (window.location.href.split("?").at(-1) == "false") {
 			fail_stage_list_mini.push(num);
 			document.cookie = "fsl_mini=" + fail_stage_list_mini.join("@");
-		}
+		}*/
 		document.cookie = "ls_mini=" + String(-123);
 		last_stage_mini = -123;
 		location.href = "/mini_competition";
@@ -369,6 +372,8 @@ function checkResult_mini() {
 				");"
 		);
 	}
+	clear_stage_list_mini = atob(clear_stage_list_mini).split('@')
+	clear_stage_list_mini = clear_stage_list_mini.filter((element) => element !== '')
 
 	for (let elem of clear_stage_list_mini) {
 		let stage_html = document.getElementById(elem);
@@ -399,8 +404,8 @@ function enterProblem_mini(problem, stage) {
 
 function submitSolutionMarioMini(input) {
 	/* 맞았는지 틀렸는지 구현 */
-	const divs = document.querySelectorAll("#user_interact .cell_final");
-	const rows = document.querySelectorAll("#user_interact .row");
+	const divs = document.querySelectorAll("#test_output_grid .cell_final");
+	const rows = document.querySelectorAll("#test_output_grid .row");
 	const rownum = rows.length;
 	const divnum = divs.length;
 
@@ -454,7 +459,10 @@ function submitSolutionMarioMini(input) {
 
 /* super secret */
 function superSecret_mini() {
-	if (TOTAL_STAGE == clear_stage_list.length) {
+	clear_stage_list_mini = atob(clear_stage_list_mini).split('@')
+	clear_stage_list_mini = clear_stage_list_mini.filter((element) => element !== '')
+
+	if (TOTAL_STAGE == clear_stage_list_mini.length) {
 		alert("Congraturation!");
 		if (!confirm("Reset?")) {
 			// alert("None")
@@ -520,7 +528,7 @@ function setCookieData_arc() {
 	}
 	/* if no cookie data about csl fsl */
 	if (!flag) {
-		document.cookie = "csl_arc=" + clear_stage_list_arc.join("@");
+		document.cookie = "csl_arc=" + btoa(clear_stage_list_arc.join("@"));
 		document.cookie = "fsl_arc=" + fail_stage_list_arc.join("@");
 		document.cookie = "ls_arc=" + String(-123);
 
@@ -558,12 +566,14 @@ function checkResult_arc() {
 		/* correct */
 		var num = last_stage_arc;
 		if (window.location.href.split("?").at(-1) == "true") {
+			clear_stage_list_arc = atob(clear_stage_list_arc).split('@')
 			clear_stage_list_arc.push(num);
-			document.cookie = "csl_arc=" + clear_stage_list_arc.join("@");
-		} else if (window.location.href.split("?").at(-1) == "false") {
+
+			document.cookie = "csl_arc=" + btoa(clear_stage_list_arc.join("@"));
+		} /*else if (window.location.href.split("?").at(-1) == "false") {
 			fail_stage_list_arc.push(num);
 			document.cookie = "fsl_arc=" + fail_stage_list_arc.join("@");
-		}
+		} */
 		document.cookie = "ls_arc=" + String(-123);
 		last_stage_arc = -123;
 		location.href = "/arc_competition";
@@ -582,6 +592,9 @@ function checkResult_arc() {
 				");"
 		);
 	}
+
+	clear_stage_list_arc = atob(clear_stage_list_arc).split('@')
+	clear_stage_list_arc = clear_stage_list_arc.filter((element) => element !== '')
 
 	for (let elem of clear_stage_list_arc) {
 		let stage_html = document.getElementById(elem);
@@ -612,8 +625,8 @@ function enterProblem_arc(problem, stage) {
 
 function submitSolutionMarioARC(input) {
 	/* 맞았는지 틀렸는지 구현 */
-	const divs = document.querySelectorAll("#user_interact .cell_final");
-	const rows = document.querySelectorAll("#user_interact .row");
+	const divs = document.querySelectorAll("#test_output_grid .cell_final");
+	const rows = document.querySelectorAll("#test_output_grid .row");
 	const rownum = rows.length;
 	const divnum = divs.length;
 
@@ -667,7 +680,10 @@ function submitSolutionMarioARC(input) {
 
 /* super secret */
 function superSecret_arc() {
-	if (TOTAL_STAGE == clear_stage_list.length) {
+	clear_stage_list_arc = atob(clear_stage_list_arc).split('@')
+	clear_stage_list_arc = clear_stage_list_arc.filter((element) => element !== '')
+
+	if (TOTAL_STAGE == clear_stage_list_arc.length) {
 		alert("Congraturation!");
 		if (!confirm("Reset?")) {
 			// alert("None")
