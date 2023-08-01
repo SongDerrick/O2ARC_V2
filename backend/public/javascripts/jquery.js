@@ -1,4 +1,5 @@
 var COPIED_ARRAY = [];
+var originalSelectedCellIds = [];
 
 const miniGridSize = 200;
 const fullGridSize = 400;
@@ -21,8 +22,71 @@ $(function () {
 	selection = []
 	rownum = testgrid[0].height;
 	colnum = testgrid[0].width;
-	$("#output_grid_height").val(rownum );
+	$("#output_grid_height").val(rownum);
 	$("#output_grid_width").val(colnum);
+
+	let previousGridState = {};
+
+	function handleSelectStart() {
+		// select cell stored
+
+		// originalSelectedCellIds = $("#test_output_grid")
+		// 	.map(function () {
+		// 		return { id: this.id, class: this.className };
+		// 	})
+		// 	.get();
+		// console.log("cell state : ", originalSelectedCellIds);
+
+		var selectedIds = getSelectedCellIds();
+		selectedIdsBeforeMove = selectedIds;
+		var symbols = getSymbolClassesFromCellIds(selectedIds);
+		var coordinates = convertCellIdsToCoordinates(selectedIds);
+		var size = calculateRectangleSize(coordinates);
+		var planesymbol = saveInRectangle(symbols, size.width, size.height);
+		var planeid = saveInRectangle(selectedIds, size.width, size.height);
+		removeSelectedClass();
+		return { planeid, planesymbol };
+	}
+
+	function handleCellMove(planeid, planesymbol, operation) {
+		// move cell operation
+		var newXPlaneId = planeid.map(function (row) {
+			return row.map(function (cell) {
+				var [_, x, y] = cell.split(/[-_]/);
+				return `cell_${parseInt(x) + operation.x}-${parseInt(y) + operation.y}`;
+			});
+		});
+
+		var isValid = newXPlaneId.every(function (row) {
+			return row.every(function (cell) {
+				return $(`#${cell}`).length === 1;
+			});
+		});
+
+		if (!isValid) {
+			addSelectedClass(planeid);
+			return null;
+		}
+
+		planeid.forEach(function (row) {
+			row.forEach(function (cell) {
+				var oldCell = $(`#${cell}`);
+				var symbolClass = oldCell.attr("class").match(/symbol_[0-9]/)[0];
+				oldCell.removeClass(symbolClass).addClass("symbol_0"); // Assuming "symbol_0" is the class for black
+			});
+		});
+		return newXPlaneId;
+	}
+
+	function handleSelectEnd(newXPlaneId, planesymbol) {
+		// select cell end
+		if (newXPlaneId !== null) {
+			updateCellClasses(newXPlaneId, planesymbol);
+			addSelectedClass(newXPlaneId);
+		}
+	}
+
+	$("#output_grid_size").val(rownum + "x" + colnum);
 
 	document.querySelectorAll('.form-outline').forEach((formOutline) => {
 		new mdb.Input(formOutline).init();
@@ -246,182 +310,34 @@ $(function () {
 		} else if (event.ctrlKey && event.key === "y") {
             handleRedoAction();
 		} else if (event.key === "w" || event.key === "ArrowUp") {
-			//여기부터 수정 -------------------------------------------//
+			//Key Move Event//
 			event.preventDefault(); // Prevent scrolling
 
 			moveDescript = "MoveUp";
-			var selectedIds = getSelectedCellIds(); // getSelectedCellIds() 함수를 호출하여 선택된 셀의 ID를 가져옴
-			var symbols = getSymbolClassesFromCellIds(selectedIds);
-			var coordinates = convertCellIdsToCoordinates(selectedIds);
-			var size = calculateRectangleSize(coordinates);
-			var planesymbol = saveInRectangle(symbols, size.width, size.height);
-			var planeid = saveInRectangle(selectedIds, size.width, size.height);
-			removeSelectedClass();
-
-			// Moving up reduces the y-coordinate by 1
-			var newYPlaneId = planeid.map(function (row) {
-				return row.map(function (cell) {
-					var [_, x, y] = cell.split(/[-_]/);
-					console.log(x, y);
-					return `cell_${parseInt(x) - 1}-${y}`;
-				});
-			});
-
-			// Check if the new location is valid
-			var isValid = newYPlaneId.every(function (row) {
-				return row.every(function (cell) {
-					return $(`#${cell}`).length === 1;
-				});
-			});
-
-			if (!isValid) {
-				// If the new location is not valid, reselect the original cells and return
-				addSelectedClass(planeid);
-				return;
-			}
-			planeid.forEach(function (row) {
-				row.forEach(function (cell) {
-					var oldCell = $(`#${cell}`);
-					var symbolClass = oldCell.attr("class").match(/symbol_[0-9]/)[0];
-					oldCell.removeClass(symbolClass).addClass("symbol_0"); // Assuming "symbol_0" is the class for black
-				});
-			});
-
-			console.log("-- Action: Move Up\n---- Changed:", newYPlaneId);
-			updateCellClasses(newYPlaneId, planesymbol);
-			addSelectedClass(newYPlaneId);
+			var { planeid, planesymbol } = handleSelectStart();
+			var newXPlaneId = handleCellMove(planeid, planesymbol, { x: -1, y: 0 });
+			handleSelectEnd(newXPlaneId, planesymbol);
 		} else if (event.key === "a" || event.key === "ArrowLeft") {
 			event.preventDefault(); // Prevent scrolling
 
 			moveDescript = "MoveLeft";
-			var selectedIds = getSelectedCellIds(); // getSelectedCellIds() 함수를 호출하여 선택된 셀의 ID를 가져옴
-			var symbols = getSymbolClassesFromCellIds(selectedIds);
-			var coordinates = convertCellIdsToCoordinates(selectedIds);
-			var size = calculateRectangleSize(coordinates);
-			var planesymbol = saveInRectangle(symbols, size.width, size.height);
-			var planeid = saveInRectangle(selectedIds, size.width, size.height);
-			removeSelectedClass();
-
-			// Moving up reduces the y-coordinate by 1
-			var newYPlaneId = planeid.map(function (row) {
-				return row.map(function (cell) {
-					var [_, x, y] = cell.split(/[-_]/);
-					console.log(x, y);
-					return `cell_${x}-${parseInt(y) - 1}`;
-				});
-			});
-
-			// Check if the new location is valid
-			var isValid = newYPlaneId.every(function (row) {
-				return row.every(function (cell) {
-					return $(`#${cell}`).length === 1;
-				});
-			});
-
-			if (!isValid) {
-				// If the new location is not valid, reselect the original cells and return
-				addSelectedClass(planeid);
-				return;
-			}
-			planeid.forEach(function (row) {
-				row.forEach(function (cell) {
-					var oldCell = $(`#${cell}`);
-					var symbolClass = oldCell.attr("class").match(/symbol_[0-9]/)[0];
-					oldCell.removeClass(symbolClass).addClass("symbol_0"); // Assuming "symbol_0" is the class for black
-				});
-			});
-
-			console.log("-- Action: Move Left\n---- Changed:", newYPlaneId);
-			updateCellClasses(newYPlaneId, planesymbol);
-			addSelectedClass(newYPlaneId);
+			var { planeid, planesymbol } = handleSelectStart();
+			var newXPlaneId = handleCellMove(planeid, planesymbol, { x: 0, y: -1 });
+			handleSelectEnd(newXPlaneId, planesymbol);
 		} else if (event.key === "s" || event.key === "ArrowDown") {
 			event.preventDefault(); // Prevent scrolling
 
 			moveDescript = "MoveDown";
-			var selectedIds = getSelectedCellIds(); // getSelectedCellIds() 함수를 호출하여 선택된 셀의 ID를 가져옴
-			var symbols = getSymbolClassesFromCellIds(selectedIds);
-			var coordinates = convertCellIdsToCoordinates(selectedIds);
-			var size = calculateRectangleSize(coordinates);
-			var planesymbol = saveInRectangle(symbols, size.width, size.height);
-			var planeid = saveInRectangle(selectedIds, size.width, size.height);
-			removeSelectedClass();
-
-			// Moving up reduces the y-coordinate by 1
-			var newYPlaneId = planeid.map(function (row) {
-				return row.map(function (cell) {
-					var [_, x, y] = cell.split(/[-_]/);
-					console.log(x, y);
-					return `cell_${parseInt(x) + 1}-${y}`;
-				});
-			});
-
-			// Check if the new location is valid
-			var isValid = newYPlaneId.every(function (row) {
-				return row.every(function (cell) {
-					return $(`#${cell}`).length === 1;
-				});
-			});
-
-			if (!isValid) {
-				// If the new location is not valid, reselect the original cells and return
-				addSelectedClass(planeid);
-				return;
-			}
-			planeid.forEach(function (row) {
-				row.forEach(function (cell) {
-					var oldCell = $(`#${cell}`);
-					var symbolClass = oldCell.attr("class").match(/symbol_[0-9]/)[0];
-					oldCell.removeClass(symbolClass).addClass("symbol_0"); // Assuming "symbol_0" is the class for black
-				});
-			});
-
-			console.log("-- Action: Move Down\n---- Changed:", newYPlaneId);
-			updateCellClasses(newYPlaneId, planesymbol);
-			addSelectedClass(newYPlaneId);
+			var { planeid, planesymbol } = handleSelectStart();
+			var newXPlaneId = handleCellMove(planeid, planesymbol, { x: 1, y: 0 });
+			handleSelectEnd(newXPlaneId, planesymbol);
 		} else if (event.key === "d" || event.key === "ArrowRight") {
 			event.preventDefault(); // Prevent scrolling
 
 			moveDescript = "MoveRight";
-			var selectedIds = getSelectedCellIds(); // getSelectedCellIds() 함수를 호출하여 선택된 셀의 ID를 가져옴
-			var symbols = getSymbolClassesFromCellIds(selectedIds);
-			var coordinates = convertCellIdsToCoordinates(selectedIds);
-			var size = calculateRectangleSize(coordinates);
-			var planesymbol = saveInRectangle(symbols, size.width, size.height);
-			var planeid = saveInRectangle(selectedIds, size.width, size.height);
-			removeSelectedClass();
-
-			// Moving up reduces the y-coordinate by 1
-			var newYPlaneId = planeid.map(function (row) {
-				return row.map(function (cell) {
-					var [_, x, y] = cell.split(/[-_]/);
-					console.log(x, y);
-					return `cell_${x}-${parseInt(y) + 1}`;
-				});
-			});
-
-			// Check if the new location is valid
-			var isValid = newYPlaneId.every(function (row) {
-				return row.every(function (cell) {
-					return $(`#${cell}`).length === 1;
-				});
-			});
-
-			if (!isValid) {
-				// If the new location is not valid, reselect the original cells and return
-				addSelectedClass(planeid);
-				return;
-			}
-			planeid.forEach(function (row) {
-				row.forEach(function (cell) {
-					var oldCell = $(`#${cell}`);
-					var symbolClass = oldCell.attr("class").match(/symbol_[0-9]/)[0];
-					oldCell.removeClass(symbolClass).addClass("symbol_0"); // Assuming "symbol_0" is the class for black
-				});
-			});
-
-			console.log("-- Action: Move right\n---- Changed:", newYPlaneId);
-			updateCellClasses(newYPlaneId, planesymbol);
-			addSelectedClass(newYPlaneId);
+			var { planeid, planesymbol } = handleSelectStart();
+			var newXPlaneId = handleCellMove(planeid, planesymbol, { x: 0, y: 1 });
+			handleSelectEnd(newXPlaneId, planesymbol);
 		}
 	});
 	// Undo & Redo Button Event Handlers
@@ -724,11 +640,23 @@ function enableSelectable() {
 		autoRefresh: false,
 		filter: "> .row > .cell_final",
 		start: function (event, ui) {
-			$(".ui-selected").each(function (i, e) {
+			$(".ui-selected").addClass("ui-selected", function (i, e) {
 				$(e).removeClass("ui-selected");
 			});
 		},
-	}); // get selectable
+		stop: function (event, ui) {
+			$(".ui-selected").each(function (i, e) {
+				originalSelectedCellIds = $(".cell_final")
+					.filter(function () {
+						return $(e).attr("id").startsWith("cell");
+					})
+					.map(function () {
+						return { id: this.id, class: this.className };
+					})
+					.get();
+			});
+		},
+	});
 	$("#symbol_picker")
 		.find(".symbol_preview")
 		.on("click", function (event) {
