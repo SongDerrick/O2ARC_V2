@@ -501,12 +501,18 @@ function superSecret_mini() {
 	// clear_stage_list_mini = clear_stage_list_mini.filter((element) => element !== '')
 
 	if (TOTAL_STAGE == clear_stage_list_mini.length) {
+		if(!checkCookie("end_mini")) {
 		// 타이머 멈추는 코드 구현
-		timer_end_mini = Date.now();
-		timer_start_mini = Number(getCookieValue('start_mini'))
-		const diff = timer_end_mini - timer_start_mini;
-		const sec = Math.floor(diff / 1000);
-		alert(`Congraturation! ${sec}`);
+			timer_end_mini = Date.now();
+			timer_start_mini = Number(getCookieValue('start_mini'))
+			const diff = timer_end_mini - timer_start_mini;
+			const sec = Math.floor(diff / 1000);
+			alert(`Congraturation! ${sec}`);
+			document.cookie = `end_mini=${sec}`;
+		} else{
+			sec = Number(getCookieValue('end_mini'))
+			alert(`Congraturation! ${sec}`);
+		}
 		
 		// if (!confirm("Reset?")) {
 		// 	// alert("None")
@@ -738,11 +744,18 @@ function superSecret_arc() {
 
 	if (TOTAL_STAGE == clear_stage_list_arc.length) {
 		// 타이머 멈추는 코드 구현
-		timer_end_arc = Date.now();
-		timer_start_arc = Number(getCookieValue('start_arc'))
-		const diff = timer_end_arc - timer_start_arc;
-		const sec = Math.floor(diff / 1000);
-		alert(`Congraturation! ${sec}`);
+		if(!checkCookie("end_arc")) {
+			// 타이머 멈추는 코드 구현
+				timer_end_arc = Date.now();
+				timer_start_arc = Number(getCookieValue('start_arc'))
+				const diff = timer_end_arc - timer_start_arc;
+				const sec = Math.floor(diff / 1000);
+				alert(`Congraturation! ${sec} sec`);
+				document.cookie = `end_arc=${sec}`;
+			}else{
+				sec = Number(getCookieValue('end_arc'))
+				alert(`Congraturation! ${sec}`);
+			}
 		/*
 		if (!confirm("Reset?")) {
 			// alert("None")
