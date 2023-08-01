@@ -2,32 +2,27 @@ var COPIED_ARRAY = [];
 
 const miniGridSize = 200;
 const fullGridSize = 400;
-var final = [];
+var final = []
+
+// Undo and Redo History Stacks
+var historyStack = []
+var undoHistory = []
+
+const Actions = ['Color', 'Fill', 'FlipX', 'FlipY', 'RotateCW', 'RotateCCW', 'Copy', 'Paste', 'Move', 'FloodFill', 'Undo', 'Redo'];
+const CriticalActions = ['CopyFromInput', 'ResetGrid', 'ResizeGrid', 'Submit'];
+var moveDescript = ''
 
 var TOTAL_SUBPROBLEMS;
 var CURRENT_SUBPROBLEM;
 
-const Actions = [
-	"Color",
-	"Fill",
-	"FlipX",
-	"FlipY",
-	"RotateCW",
-	"RotateCCW",
-	"Copy",
-	"Paste",
-	"Move",
-	"FloodFill",
-];
-const CriticalActions = ["CopyFromInput", "ResetGrid", "ResizeGrid", "Submit"];
-var moveDescript = "";
 var selection = [];
 $(function () {
 	final = []
 	selection = []
 	rownum = testgrid[0].height;
 	colnum = testgrid[0].width;
-	$("#output_grid_size").val(rownum + "x" + colnum);
+	$("#output_grid_height").val(rownum );
+	$("#output_grid_width").val(colnum);
 
 	document.querySelectorAll('.form-outline').forEach((formOutline) => {
 		new mdb.Input(formOutline).init();
@@ -45,6 +40,9 @@ $(function () {
 		$(`label[for=tool_${selectedToolMode}]`).addClass('bg-primary text-white');
 	});
 
+    recordGridchange();
+    $('#undo_button').prop('disabled',true);
+    // Select Mode Action Buttons 
 	$("input[name=tool_switching]").on("focus", function () {
 		$(":focus").trigger("blur");
 
@@ -73,17 +71,19 @@ $(function () {
 			var planesymbol = saveInRectangle(symbols, size.width, size.height);
 			var planeid = saveInRectangle(selectedIds, size.width, size.height);
 
-			if (buttonName == "xflip") {
-				moveDescript = "FlipX";
-				var changed_symbol = flipArrayX(planesymbol);
+			if (buttonName == 'xflip') {
+				moveDescript = 'FlipX';
+				var changed_symbol = flipArrayX(planesymbol)
 				console.log("-- Action: X Flip\n---- Changed:", changed_symbol);
-				updateCellClasses(planeid, changed_symbol);
+				updateCellClasses(planeid, changed_symbol)
+				recordGridchange();
 			}
-			if (buttonName == "yflip") {
-				moveDescript = "FlipY";
-				var changed_symbol = flipArrayY(planesymbol);
+			if (buttonName == 'yflip') {
+				moveDescript = 'FlipY';
+				var changed_symbol = flipArrayY(planesymbol)
 				console.log("-- Action: Y Flip\n---- Changed:", changed_symbol);
-				updateCellClasses(planeid, changed_symbol);
+				updateCellClasses(planeid, changed_symbol)
+				recordGridchange();
 			}
 			if (buttonName == "clockrotate") {
 				moveDescript = "RotateCW";
@@ -104,6 +104,7 @@ $(function () {
 
 				addSelectedClass(changed_id);
 				updateCellClasses(changed_id, changed_symbol);
+				recordGridchange();
 			}
 			if (buttonName == "counterclockrotate") {
 				moveDescript = "RotateCCW";
@@ -124,6 +125,7 @@ $(function () {
 
 				addSelectedClass(changed_id);
 				updateCellClasses(changed_id, changed_symbol);
+				recordGridchange();
 			}
 		}
 	});
@@ -227,6 +229,7 @@ $(function () {
 					}
 				}
 				moveDescript = "Paste";
+                recordGridchange();
 				selection = [[pasteCellX,pasteCellY]]
 				console.log(
 					`-- Action: Paste Array\n---- Where: (${pasteCellX},${pasteCellY}) ~ (${
@@ -239,7 +242,9 @@ $(function () {
 				return;
 			}
 		} else if (event.ctrlKey && event.key === "z" && !event.shiftKey) {
-		} else if (event.ctrlKey && event.shiftKey && event.key === "z") {
+            handleUndoAction();
+		} else if (event.ctrlKey && event.key === "y") {
+            handleRedoAction();
 		} else if (event.key === "w" || event.key === "ArrowUp") {
 			//여기부터 수정 -------------------------------------------//
 			event.preventDefault(); // Prevent scrolling
@@ -419,9 +424,104 @@ $(function () {
 			addSelectedClass(newYPlaneId);
 		}
 	});
+	// Undo & Redo Button Event Handlers
+    $('#undo_button').on('click', function() {
+		handleUndoAction();
+	});
+	
+	$('#redo_button').on('click', function() {
+	    handleRedoAction();
+	});
 
 	cell_observer();
 });
+
+// Make a deep copy of the current grid
+function copyGrid() {
+
+	var allCellIds = [];
+	var allSymbols = [];
+	// Store all the cell classes in a 1D array
+	$('#test_output_grid .cell_final').each(function() {
+	  var cellId = $(this).attr('id');
+	  if(cellId){
+		allCellIds.push(cellId);
+	  }
+	}); 
+  
+	// Store all the symbols in a 1D array
+	allSymbols = getSymbolClassesFromCellIds(allCellIds);
+	
+	return {allCellIds, allSymbols};
+}
+  
+  // Record grid state changes
+function recordGridchange() {
+	// Clear the undoHistory stack whenever a new change is made
+    $('#undo_button').prop('disabled',false);
+    $('#redo_button').prop('disabled',true);
+	undoHistory = [];
+	// Push the grid state to the history stack
+	historyStack.push(copyGrid());
+}
+  
+  // Event Handlers for Undo & Redo Button
+function handleUndoAction() {
+
+	if (historyStack.length > 1) {
+		// Push the current grid state to the undoHistory stack before reverting
+		undoHistory.push(copyGrid());
+		// Pop the latest grid state from the history stack
+		historyStack.pop();
+        let stackTop = historyStack[historyStack.length-1];
+		console.log("-- Action: Undo\n---- Changed:", stackTop.allSymbols);
+	
+		// Revert the grid to its old state
+        let coordinates = convertCellIdsToCoordinates(stackTop.allCellIds);
+        let size = calculateRectangleSize(coordinates);
+        let planesymbol = saveInRectangle(stackTop.allSymbols, size.width, size.height);
+        let planeid = saveInRectangle(stackTop.allCellIds, size.width, size.height);
+        moveDescript = 'Undo';
+		updateCellClasses(planeid, planesymbol);
+        // Enable the Redo button after an undo
+        $('#redo_button').prop('disabled', false);
+	}
+  
+	// Disable the Undo button if there is no more history
+	if (historyStack.length === 1) {
+		$('#undo_button').prop('disabled', true);
+    } 
+    
+}
+  
+  
+function handleRedoAction() {
+    console.log('hi')
+	if (undoHistory.length > 0) {
+        // Push the current grid state to the history stack before reapplying
+        historyStack.push(undoHistory.pop());
+        
+        // Pop the latest undone grid state from the undoHistory stack
+        var stackTop = historyStack[historyStack.length-1];
+    
+        console.log("-- Action: Redo\n---- Changed:", stackTop.allSymbols);
+        // Reapply the state to the grid
+        let coordinates = convertCellIdsToCoordinates(stackTop.allCellIds);
+        let size = calculateRectangleSize(coordinates);
+        let planesymbol = saveInRectangle(stackTop.allSymbols, size.width, size.height);
+        let planeid = saveInRectangle(stackTop.allCellIds, size.width, size.height);
+        moveDescript = 'Redo';
+		updateCellClasses(planeid, planesymbol);
+        // Enable the Undo button after a redo
+	    $('#undo_button').prop('disabled', false);
+	}
+	// Disable the Redo button if there is no more undo history
+	if (undoHistory.length === 0) {
+	    $('#redo_button').prop('disabled', true);
+	}
+	
+  }
+  
 
 function pushToTargetArray(array2D, text1, text2, sel, targetArray) {
 	console.log(`-------- Data Pushed, ${text1}, ${text2}, ${sel} --------`);
@@ -459,9 +559,8 @@ function cell_observer(cells, observer) {
 		var labelText = selectedLabel.textContent;
 
 		// Log the selected label text
-		var inputValue = $("#output_grid_size").val();
-		var rows = parseInt(inputValue.split("x")[0]);
-		var cols = parseInt(inputValue.split("x")[1]);
+		var rows = parseInt($("#output_grid_height").val());
+		var cols = parseInt($("#output_grid_width").val());
 
 		mutations.forEach(function (mutation) {
 			if (mutation.attributeName === "class") {
@@ -608,6 +707,7 @@ function enableEditable() {
 		$(this)
 			.removeClass(currentClasses[1])
 			.addClass("symbol_" + selectedPreview.attr("symbol"));
+        recordGridchange();
 	});
 }
 
@@ -688,7 +788,7 @@ function enableFloodFill() {
 			)}`
 		);
 		dfsFloodFill(x,y,selectedPreview.attr('symbol'));
-
+        recordGridchange();
 	});
 }
 
@@ -702,6 +802,7 @@ function pickSymbol() {
 	symbol_preview.addClass("selected-symbol-preview");
 }
 
+// Change the class of the selected cells to the clicked symbol
 function fillSelected() {
 	var selectedPreview = $("#symbol_picker").find(".selected-symbol-preview");
 	// remove old color and add new color
@@ -726,6 +827,7 @@ function fillSelected() {
 	});
 	if (maxx === -1) return;
 	moveDescript = "Fill";
+    recordGridchange();
 	selection = [[minx,miny],[maxx,maxy]];
 	console.log(
 		`-- Action: Fill\n---- Where: (${minx},${miny}) ~ (${maxx},${maxy})\n---- Color: ${color}`
@@ -843,10 +945,8 @@ $("#resetBtn").on("click", function () {
 
 function resizeOutputGrid() {
 	// Get the input value
-	var inputValue = $("#output_grid_size").val();
-
-	var rows = parseInt(inputValue.split("x")[0]);
-	var cols = parseInt(inputValue.split("x")[1]);
+	var rows = parseInt($("#output_grid_height").val());
+	var cols = parseInt($("#output_grid_width").val());
 	const numbersArray = createArray(rows, cols);
 	array = createArray(rows, cols);
 
@@ -899,7 +999,8 @@ function copyFromInput() {
 		n = cols;
 		$("#test_output_grid").css("width", fullGridSize);
 	}
-	$("#output_grid_size").val(rows + "x" + cols);
+	$("#output_grid_height").val(rows);
+    $("#output_grid_width").val( cols);
 	$("#test_output_grid").data("height", rows);
 	$("#test_output_grid").data("width", cols);
 	var userInteractDiv = document.getElementById("test_output_grid");
@@ -991,6 +1092,15 @@ function submitSolution(input, name, cRoute) {
 	//console.log(cRoute)
 	var lastPart = cRoute.substring(cRoute.lastIndexOf("/") + 1);
 	var incrementedValue = parseInt(lastPart, 10) + 1;
+	const competition_stage = [6268,6303,6241,6247,6309,6271,6490,6299,6291,6410,6186,6227,5952,5971,5978,5983,6015,6018,6021,6022,6026,6033,6048,6055]
+	
+	
+	if (competition_stage.indexOf(incrementedValue)!=-1) { //Only for competition_stage part. For future work, we have to edit it as a random.
+		incrementedValue+=1
+		if (incrementedValue==6022){
+			incrementedValue+=1
+		}
+	}
 
 	// Convert the incremented value back to a string
 	var incrementedLastPart = incrementedValue.toString();
@@ -1009,6 +1119,7 @@ function submitSolution(input, name, cRoute) {
 		sendLogData(final);
 		final = [];
 		COPIED_ARRAY = [];
+        historyStack = [];
 		alert("Success!");
 		if (CURRENT_SUBPROBLEM+1 < TOTAL_SUBPROBLEMS){
 			window.location.href = "/task/" + name + "/" + (incrementedValue-1) +"?subp="+(CURRENT_SUBPROBLEM+1);
@@ -1021,6 +1132,9 @@ function submitSolution(input, name, cRoute) {
 		final = []; // Do not remove!!!
 		copyFromInput();
 		final = [];
+        historyStack = [];
+        recordGridchange();
+        $('#undo_button').prop('disabled',true);
 		COPIED_ARRAY = [];
 	}
 }
@@ -1115,6 +1229,7 @@ function calculateRectangleSize(coordinates) {
 	return { height, width };
 }
 
+// Function to save the selected cells or symbols in a rectangle
 function saveInRectangle(symbols, numRows, numColumns) {
 	var output = [];
 	var index = 0;
@@ -1189,6 +1304,7 @@ function rotateArrayCounterClockwise(arr) {
 	return rotatedArr;
 }
 
+/*
 function updateCellSymbols(planeid, symbols) {
 	var cells = planeid.flat();
 
@@ -1210,6 +1326,7 @@ function updateCellSymbols(planeid, symbols) {
 		$("#" + cellId).addClass(symbol);
 	}
 }
+*/
 
 function updateCellClasses(cellIdsArray, symbolsArray) {
 	// Iterate over the cellIdsArray and symbolsArray
