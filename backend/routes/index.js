@@ -14,7 +14,11 @@ router.post('/', function(req, res, next){
   const db = new sqlite3.Database('./db/O2ARC.db');
   //console.log(req.body.username)
   user_name = req.body.username // 유저의 이름을 인풋으로 받음
-  
+  if(!user_name.match(/^[a-z0-9]+$/i)){
+    console.log("Invalid Username")
+    return res.status(500).render('error')
+  }
+
   // 이 함수는 알 수 없는 이유로 다른 곳으로 빼서 정리가 안됩니다... 버그인 듯
   async function checkInputExists(inputValue, callback) {
     await db.get("SELECT * FROM user WHERE name = ?", [inputValue], (err, row) => {

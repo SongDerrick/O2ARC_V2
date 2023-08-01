@@ -6,7 +6,7 @@ const testing_function = require('../public/javascripts/testing_interface.js')
 
 /* GET home page */ 
 router.get('/', function(req, res, next) {
-  res.render('mario');
+  res.render('mini_competition');
 });
 
 /* GET problem page */
@@ -17,6 +17,8 @@ router.get('/:id/:problem', function(req, res, next) {
   console.log(userName, problem)
   const query = 'SELECT content FROM tasklist WHERE id = ?';
   const params = problem;
+
+
 
   db.get(query, [params], (err, row) => {
       if (err) {
@@ -47,16 +49,20 @@ router.get('/:id/:problem', function(req, res, next) {
 
         // console.log(traingrid)
         return res.render('problem_solve', {
-        // return res.render('problem_solve_mario', {
-          userName: userName,
-          train: trainData,
-          grid : traingrid,
-          Testgrid: testgrid,
-          Outputgrid: outputgrid,
-          p:cellsize,
-          reset: resettedgrid,
-          competition: 'mario'
-      })
+          // return res.render('problem_solve_mario', {
+            userName: userName,
+            train: trainData,
+            grid : traingrid,
+            Testgrid: testgrid[0],
+            Outputgrid: outputgrid[0],
+            subprobidx: 0,
+            subprobcnt: testgrid.length,
+            p:cellsize,
+            reset: resettedgrid,
+            competition: 'mini'
+        })
+        
+      
       } else {
         return res.status(404).send('Content not found');
       }

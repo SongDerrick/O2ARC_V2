@@ -11,6 +11,9 @@ var IQtestRouter = require('./routes/IQtest')
 var problemsSetRouter = require('./routes/problemset')
 var dataRouter = require('./routes/data')
 
+var arcRouter = require('./routes/arc_competition')
+var miniRouter = require('./routes/mini_competition')
+
 var app = express();
 
  
@@ -31,6 +34,9 @@ app.use('/task', problemsSetRouter)
 app.use('/mario', marioRouter)
 app.use('/IQtest', IQtestRouter);
 app.use('/data', dataRouter)
+
+app.use('/arc_competition', arcRouter)
+app.use('/mini_competition', miniRouter)
 
 
 // catch 404 and forward to error handler

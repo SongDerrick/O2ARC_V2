@@ -13,18 +13,31 @@ router.get('/:id', async function(req, res, next) {
     const userName = req.params.id
     var data
     var data2
+    // var minirand = logic_function.getRandomInt(5948,6096)
     var minirand = logic_function.getRandomInt(5948,6096)
+    const random_stage_mini = [5952,5971,5978,5983,6015,6018,6021,6022,6026,6033,6048,6055]
+    if (random_stage_mini.indexOf(minirand)!=-1) {
+      minirand+=2
+    }
+    // var rand = logic_function.getRandomInt(6098,6496)
     var rand = logic_function.getRandomInt(6098,6496)
+    const random_stage_arc = [6186, 6227, 6241, 6247, 6268, 6271, 6291, 6299, 6303, 6309, 6410, 6490]
+    if (random_stage_arc.indexOf(rand)!=-1) {
+      rand+=2
+    }
     console.log(userName)
 
     try{
-        data = await userhelper.getARCList(userName,mini=true);
-        data2 = await userhelper.getARCList(userName);
+        // data = await userhelper.getARCList(userName,mini=true);
+        // data2 = await userhelper.getARCList(userName);
+        data = await userhelper.getARCList_test(userName,mini=true);
+        data2 = await userhelper.getARCList_test(userName);
+
     } catch (err) {
         console.log(err)
         return res.status(500).send("Internal Server Error")
     }
-
+    
     res.render('problem_set', {
         userName: userName,
         miniARC_idlist: data,
@@ -36,14 +49,35 @@ router.get('/:id', async function(req, res, next) {
 
 });
 
-router.get('/:id/:problem', function(req, res, next) {
+router.get('/:id/:problem', async function(req, res, next) {
     const userName = req.params.id
     const problem = req.params.problem
     
     console.log(userName, problem)
     const params = problem;
+    
+    // var minirand = logic_function.getRandomInt(5948,6096)
+    var minirand = logic_function.getRandomInt(5948,6096)
+    const random_stage_mini = [5952,5971,5978,5983,6015,6018,6021,6022,6026,6033,6048,6055]
+    if (random_stage_mini.indexOf(minirand)!=-1) {
+      minirand+=2
+    }
+    // var rand = logic_function.getRandomInt(6098,6496)
+    var rand = logic_function.getRandomInt(6098,6496)
+    const random_stage_arc = [6186, 6227, 6241, 6247, 6268, 6271, 6291, 6299, 6303, 6309, 6410, 6490]
+    if (random_stage_arc.indexOf(rand)!=-1) {
+      rand+=2
+    }
+    const qs = req.query.subp
+    let subprobidx;
+    if(!qs){
+      subprobidx = 0;
+    } else {
+      subprobidx = parseInt(qs)
+    }
+    db.get("SELECT content FROM HappyARC WHERE id = ?", [params], async (err, row) => {
 
-    db.get("SELECT content FROM tasklist WHERE id = ?", [params], (err, row) => {
+    // db.get("SELECT content FROM tasklist WHERE id = ?", [params], (err, row) => {
         if (err) {
           console.error(err.message);
           return res.status(500).send('Error executing query');
@@ -72,14 +106,33 @@ router.get('/:id/:problem', function(req, res, next) {
           // console.log(h)
 
           // console.log(traingrid)
+          var data, data2;
+          try{
+            // data = await userhelper.getARCList(userName,mini=true);
+            // data2 = await userhelper.getARCList(userName);
+            data = await userhelper.getARCList_test(userName,mini=true);
+            data2 = await userhelper.getARCList_test(userName);
+            
+          } catch (err) {
+              console.log(err)
+              return res.status(500).send("Internal Server Error")
+          }
+
           return res.render('problem_solve', {
             userName: userName,
             train: trainData,
             grid : traingrid,
-            Testgrid: testgrid,
-            Outputgrid: outputgrid,
+            Testgrid: testgrid[subprobidx],
+            Outputgrid: outputgrid[subprobidx],
+            subprobidx: subprobidx,
+            subprobcnt: testgrid.length,
             p:cellsize,
-            reset: resettedgrid
+            reset: resettedgrid,
+            competition: 0,
+            miniARC_idlist: data,
+            ARC_idlist: data2,
+            ran1: minirand,
+            ran2: rand
         })
         } else {
           return res.status(404).send('Content not found');
@@ -142,7 +195,7 @@ router.post('/:id/:problem/save-data', (req, res) => {
     const actionSequence = JSON.stringify(numbersArray);
   
     const sql = 'INSERT INTO submission (id, user_id, user_name, task_id, task_name, time_stamp, action_sequence) VALUES (?, ?, ?, ?, ?, ?, ?)';
-  
+    
     db.run(sql, [subid, userId, userName, taskId, taskName, timeStamp, actionSequence], function(err) {
       if (err) {
         console.error(err);

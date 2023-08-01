@@ -111,7 +111,8 @@ h5 {
 }
 
 #editor_grid_control_btns {
-  float: left;
+  float:left;
+  justify-content: center;
   margin-top: 10px;
   margin-bottom: 10px;
   background: white;
@@ -120,25 +121,19 @@ h5 {
   padding-bottom: 5px;
 }
 
+
 #resize_control_btns {
-  width: 100%;
-  float:left;
+  max-width:fit-content;
+  min-width:50%;
+  margin:auto;
   margin-bottom: 10px;
+  
+  justify-content: center;
 }
 
-#submit_solution_btn {
-  color: white;
-  border-radius: 4px;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-  background: rgb(28, 184, 65);
-}
-
-#submit_solution_btn:active {
-background: blue;
-}
-
-#select_util_btn button:active {
-background: blue;
+#critical_control_btns {
+  max-width: fit-content;
+  min-width: 50%;
 }
 
 #undo_button, #redo_button {
@@ -173,8 +168,56 @@ button:focus {outline:0;}
   width: 100%;
 
 }
+#toolbar-selection > .btn {
+  width: 34%;
+}
+#toolbar-selection {
+  max-width:100%;
+  min-width:50%;
+  margin-bottom: 10px;
+}
+
+#select_util_btn > button{
+  width: 6em;
+}
+
 
 .arrow {
   margin: 90px auto;
   height: 20px;
+}
+.sidenav{
+  width: 40em;
+  bottom: 10vh ;
+  left: 50%;
+  margin-left: -20em;
+  position: fixed;
+  z-index: 1000;
+  transform: translate3d(0,150%,0);
+  -webkit-transform: translate3d(0,150%,0);
+  transition: all 0.3s;
+  -webkit-transition: all 0.3s;
+  overflow-y: scroll;
+  
+  height: 20em;
+}
+.sidenav.open{
+  transform: translate3d(0,0%,0);
+  -webkit-transform: translate3d(0,0%,0);
+  transition: all 0.3s;
+  -webkit-transition: all 0.3s;
+}
+
+.sidenav button{
+  background-color: transparent; 
+  border-color: transparent;
+}
+
+#sidenav_overlay{
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: none;
 }
