@@ -21,7 +21,8 @@ $(function () {
 	selection = []
 	rownum = testgrid[0].height;
 	colnum = testgrid[0].width;
-	$("#output_grid_size").val(rownum + "x" + colnum);
+	$("#output_grid_height").val(rownum );
+	$("#output_grid_width").val(colnum);
 
 	document.querySelectorAll('.form-outline').forEach((formOutline) => {
 		new mdb.Input(formOutline).init();
@@ -558,9 +559,8 @@ function cell_observer(cells, observer) {
 		var labelText = selectedLabel.textContent;
 
 		// Log the selected label text
-		var inputValue = $("#output_grid_size").val();
-		var rows = parseInt(inputValue.split("x")[0]);
-		var cols = parseInt(inputValue.split("x")[1]);
+		var rows = parseInt($("#output_grid_height").val());
+		var cols = parseInt($("#output_grid_width").val());
 
 		mutations.forEach(function (mutation) {
 			if (mutation.attributeName === "class") {
@@ -945,10 +945,8 @@ $("#resetBtn").on("click", function () {
 
 function resizeOutputGrid() {
 	// Get the input value
-	var inputValue = $("#output_grid_size").val();
-
-	var rows = parseInt(inputValue.split("x")[0]);
-	var cols = parseInt(inputValue.split("x")[1]);
+	var rows = parseInt($("#output_grid_height").val());
+	var cols = parseInt($("#output_grid_width").val());
 	const numbersArray = createArray(rows, cols);
 	array = createArray(rows, cols);
 
@@ -1001,7 +999,8 @@ function copyFromInput() {
 		n = cols;
 		$("#test_output_grid").css("width", fullGridSize);
 	}
-	$("#output_grid_size").val(rows + "x" + cols);
+	$("#output_grid_height").val(rows);
+    $("#output_grid_width").val( cols);
 	$("#test_output_grid").data("height", rows);
 	$("#test_output_grid").data("width", cols);
 	var userInteractDiv = document.getElementById("test_output_grid");
