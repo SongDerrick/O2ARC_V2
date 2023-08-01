@@ -18,6 +18,15 @@ router.get('/:id/:problem', function(req, res, next) {
   const query = 'SELECT content FROM tasklist WHERE id = ?';
   const params = problem;
 
+  // 여기 추가
+  const qs = req.query.subp
+    let subprobidx;
+    if(!qs){
+      subprobidx = 0;
+    } else {
+      subprobidx = parseInt(qs)
+    }
+
   db.get(query, [params], (err, row) => {
       if (err) {
         console.error(err.message);
@@ -51,8 +60,12 @@ router.get('/:id/:problem', function(req, res, next) {
           userName: userName,
           train: trainData,
           grid : traingrid,
-          Testgrid: testgrid,
-          Outputgrid: outputgrid,
+          // Testgrid: testgrid,
+          // Outputgrid: outputgrid,
+          Testgrid: testgrid[subprobidx],
+          Outputgrid: outputgrid[subprobidx],
+          subprobidx: subprobidx,
+          subprobcnt: testgrid.length,
           p:cellsize,
           reset: resettedgrid,
           competition: 'mini'

@@ -14,6 +14,14 @@ router.get('/:id/:problem', function(req, res, next) {
   const userName = req.params.id
   const problem = req.params.problem
 
+  const qs = req.query.subp
+    let subprobidx;
+    if(!qs){
+      subprobidx = 0;
+    } else {
+      subprobidx = parseInt(qs)
+    }
+    
   console.log(userName, problem)
   const query = 'SELECT content FROM tasklist WHERE id = ?';
   const params = problem;
@@ -51,8 +59,12 @@ router.get('/:id/:problem', function(req, res, next) {
           userName: userName,
           train: trainData,
           grid : traingrid,
-          Testgrid: testgrid,
-          Outputgrid: outputgrid,
+          // Testgrid: testgrid,
+          // Outputgrid: outputgrid,
+          Testgrid: testgrid[subprobidx],
+          Outputgrid: outputgrid[subprobidx],
+          subprobidx: subprobidx,
+          subprobcnt: testgrid.length,
           p:cellsize,
           reset: resettedgrid,
           competition: 'arc'
