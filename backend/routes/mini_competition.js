@@ -47,16 +47,20 @@ router.get('/:id/:problem', function(req, res, next) {
 
         // console.log(traingrid)
         return res.render('problem_solve', {
-        // return res.render('problem_solve_mario', {
-          userName: userName,
-          train: trainData,
-          grid : traingrid,
-          Testgrid: testgrid,
-          Outputgrid: outputgrid,
-          p:cellsize,
-          reset: resettedgrid,
-          competition: 'mini'
-      })
+          // return res.render('problem_solve_mario', {
+            userName: userName,
+            train: trainData,
+            grid : traingrid,
+            Testgrid: testgrid[0],
+            Outputgrid: outputgrid[0],
+            subprobidx: 0,
+            subprobcnt: testgrid.length,
+            p:cellsize,
+            reset: resettedgrid,
+            competition: 'mini'
+        })
+        
+      
       } else {
         return res.status(404).send('Content not found');
       }

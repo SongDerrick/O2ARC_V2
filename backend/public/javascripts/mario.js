@@ -211,18 +211,18 @@ function submitSolutionMario(input) {
 	}
 
 	User_Answer = numbersArray.map((num) => parseInt(num));
-	Actual_Answer = input[0][1].grid.flat().map((num) => parseInt(num));
+	Actual_Answer = input[1].grid.flat().map((num) => parseInt(num));
 
 	console.log(numbersArray);
 
-	for (let i = 0; i < input[0][1].grid.length; i++) {
-		for (let j = 0; j < input[0][1].grid[i].length; j++) {
+	for (let i = 0; i < input[1].grid.length; i++) {
+		for (let j = 0; j < input[1].grid[i].length; j++) {
 			// Convert the value to an integer using parseInt()
-			input[0][1].grid[i][j] = parseInt(input[0][1].grid[i][j]);
+			input[1].grid[i][j] = parseInt(input[1].grid[i][j]);
 		}
 	}
-	console.log(input[0][1].grid);
-	answer = compareArrays(numbersArray, input[0][1].grid);
+	console.log(input[1].grid);
+	answer = compareArrays(numbersArray, input[1].grid);
 	var retVal = "";
 
 	if (!answer) {
@@ -425,18 +425,18 @@ function submitSolutionMarioMini(input) {
 	}
 
 	User_Answer = numbersArray.map((num) => parseInt(num));
-	Actual_Answer = input[0][1].grid.flat().map((num) => parseInt(num));
+	Actual_Answer = input[1].grid.flat().map((num) => parseInt(num));
 
 	console.log(numbersArray);
 
-	for (let i = 0; i < input[0][1].grid.length; i++) {
-		for (let j = 0; j < input[0][1].grid[i].length; j++) {
+	for (let i = 0; i < input[1].grid.length; i++) {
+		for (let j = 0; j < input[1].grid[i].length; j++) {
 			// Convert the value to an integer using parseInt()
-			input[0][1].grid[i][j] = parseInt(input[0][1].grid[i][j]);
+			input[1].grid[i][j] = parseInt(input[1].grid[i][j]);
 		}
 	}
-	console.log(input[0][1].grid);
-	answer = compareArrays(numbersArray, input[0][1].grid);
+	console.log(input[1].grid);
+	answer = compareArrays(numbersArray, input[1].grid);
 	var retVal = "";
 
 	if (!answer) {
@@ -638,18 +638,18 @@ function submitSolutionMarioARC(input) {
 	}
 
 	User_Answer = numbersArray.map((num) => parseInt(num));
-	Actual_Answer = input[0][1].grid.flat().map((num) => parseInt(num));
+	Actual_Answer = input[1].grid.flat().map((num) => parseInt(num));
 
 	console.log(numbersArray);
 
-	for (let i = 0; i < input[0][1].grid.length; i++) {
-		for (let j = 0; j < input[0][1].grid[i].length; j++) {
+	for (let i = 0; i < input[1].grid.length; i++) {
+		for (let j = 0; j < input[1].grid[i].length; j++) {
 			// Convert the value to an integer using parseInt()
-			input[0][1].grid[i][j] = parseInt(input[0][1].grid[i][j]);
+			input[1].grid[i][j] = parseInt(input[1].grid[i][j]);
 		}
 	}
-	console.log(input[0][1].grid);
-	answer = compareArrays(numbersArray, input[0][1].grid);
+	console.log(input[1].grid);
+	answer = compareArrays(numbersArray, input[1].grid);
 	var retVal = "";
 
 	if (!answer) {

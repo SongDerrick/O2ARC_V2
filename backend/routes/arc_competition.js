@@ -51,11 +51,13 @@ router.get('/:id/:problem', function(req, res, next) {
           userName: userName,
           train: trainData,
           grid : traingrid,
-          Testgrid: testgrid,
-          Outputgrid: outputgrid,
+          Testgrid: testgrid[0],
+          Outputgrid: outputgrid[0],
+          subprobidx:0,
+          subprobcnt: testgrid.length,
           p:cellsize,
           reset: resettedgrid,
-          competition: 'arc'
+          competition: 'arc',
       })
       } else {
         return res.status(404).send('Content not found');
