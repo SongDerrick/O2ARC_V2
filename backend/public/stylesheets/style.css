@@ -141,6 +141,28 @@ background: blue;
 background: blue;
 }
 
+#undo_button, #redo_button {
+  display: inline-block;
+  margin: 5px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+  border-radius: 12px;
+}
+
+#undo_button:hover, #redo_button:hover {
+  background-color: white;
+  color: black;
+}
+
+
 button:focus {outline:0;}
 
 #toolbar {

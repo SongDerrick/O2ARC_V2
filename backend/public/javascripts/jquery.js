@@ -222,45 +222,54 @@ $(function () {
     });
 
 
-
     cell_observer()
 
 })
 
 // Make a deep copy of the current grid
 function copyGrid() {
-  let copiedGrid = [];
+
+  var allCellIds = [];
+  var allSymbols = [];
+  // Store all the cell classes in a 1D array
   $('#test_output_grid .cell_final').each(function() {
-    let cellId = $(this).attr('id');
-    let cellSymbol = $(this).attr('class').match(/symbol_([0-9])/)[1];
-    copiedGrid[cellId] = cellSymbol;
-  });
-  return copiedGrid;
+    var cellId = $(this).attr('id');
+    if(cellId){
+      allCellIds.push(cellId);
+    }
+  }); 
+
+  // Store all the symbols in a 1D array
+  allSymbols = getSymbolClassesFromCellIds(allCellIds);
+  
+  return {allCellIds, allSymbols};
 }
 
 // Record grid state changes
 function recordGridchange() {
-  // Push the grid state to the history stack
-  history.push(copyGrid());
   // Clear the undoHistory stack whenever a new change is made
   undoHistory = [];
+  // Push the grid state to the history stack
+  history.push(copyGrid());
 }
 
 // Event Handlers for Undo & Redo Button
 function handleUndoAction() {
   if (history.length > 0) {
-    // Pop the latest grid state from the history stack
-    var state = history.pop();
-    
-    // Revert the grid to its old state
-    updateCellSymbols(state);
-    
-    // Push the change to the undoHistory stack
+    // Push the current grid state to the undoHistory stack before reverting
     undoHistory.push(copyGrid());
+    // Pop the latest grid state from the history stack
+    var stackTop = history.pop();
+
+    console.log("-- Action: Undo\n---- Changed:", stackTop.allSymbols);
+
+    // Revert the grid to its old state
+    updateCellClasses(stackTop.allCellIds, stackTop.allSymbols);
     }
+
   // Disable the Undo button if there is no more history
   if (history.length === 0) {
-        $('#undo_button').prop('disabled', true);
+      $('#undo_button').prop('disabled', true);
     }
     
     // Enable the Redo button after an undo
@@ -270,22 +279,21 @@ function handleUndoAction() {
 
 function handleRedoAction() {
   if (undoHistory.length > 0) {
-    // Pop the latest undone grid state from the undoHistory stack
-    var state = undoHistory.pop();
-
-    // Reapply the state to the grid
-    updateCellSymbols(state);
-    
-    // Push the state back to the history stack
+    // Push the current grid state to the history stack before reapplying
     history.push(copyGrid());
-    }
+    // Pop the latest undone grid state from the undoHistory stack
+    var stackTop = undoHistory.pop();
+
+    console.log("-- Action: Redo\n---- Changed:", stackTop.allSymbols);
+    // Reapply the state to the grid
+    updateCellClasses(stackTop.allCellIds, stackTop.allSymbols);
+  }
   // Disable the Redo button if there is no more undo history
-    if (undoHistory.length === 0) {
-        $('#redo_button').prop('disabled', true);
-    }
-    
-    // Enable the Undo button after a redo
-    $('#undo_button').prop('disabled', false);
+  if (undoHistory.length === 0) {
+    $('#redo_button').prop('disabled', true);
+  }
+  // Enable the Undo button after a redo
+  $('#undo_button').prop('disabled', false);
 }
 
 
@@ -954,6 +962,7 @@ function rotateArrayCounterClockwise(arr) {
   return rotatedArr;
 }
 
+/*
 function updateCellSymbols(planeid, symbols) {
   var cells = planeid.flat();
 
@@ -975,6 +984,7 @@ function updateCellSymbols(planeid, symbols) {
     $('#' + cellId).addClass(symbol);
   }
 }
+*/
 
 function updateCellClasses(cellIdsArray, symbolsArray) {
   // Iterate over the cellIdsArray and symbolsArray
