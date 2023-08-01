@@ -16,7 +16,6 @@ var TOTAL_SUBPROBLEMS;
 var CURRENT_SUBPROBLEM;
 
 var selection = [];
-
 $(function () {
 	final = []
 	selection = []
